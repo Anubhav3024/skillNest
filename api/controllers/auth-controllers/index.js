@@ -12,7 +12,6 @@ const jwt = require("jsonwebtoken");
 //       });
 //     }
 
-
 //   const allowedRoles = ["student", "instructor"];
 //     if (!allowedRoles.includes(role)) {
 //       return res.status(400).json({
@@ -49,6 +48,13 @@ const registerUser = async (req, res) => {
   try {
     let { userName, userEmail, userPassword, role } = req.body;
 
+    console.info("Auth register attempt", {
+      action: "register",
+      userName,
+      userEmail,
+      role,
+    });
+
     if (!userName || !userEmail || !userPassword || !role) {
       return res.status(400).json({
         success: false,
@@ -57,6 +63,7 @@ const registerUser = async (req, res) => {
     }
 
     userEmail = userEmail.toLowerCase();
+    userName = userName.toLowerCase();
 
     const allowedRoles = ["student", "instructor"];
     if (!allowedRoles.includes(role)) {
@@ -104,24 +111,24 @@ const registerUser = async (req, res) => {
     // console.log("Request Body: working", req.body);
 
     const accessToken = jwt.sign(
-  {
-    _id: newUser._id,
-    userName: newUser.userName,
-    userEmail: newUser.userEmail,
-    role: newUser.role,
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: "24h" }
-);
+      {
+        _id: newUser._id,
+        userName: newUser.userName,
+        userEmail: newUser.userEmail,
+        role: newUser.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" },
+    );
 
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
       user: userResponse,
-      accessToken
+      accessToken,
     });
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("Register error details:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -129,10 +136,14 @@ const registerUser = async (req, res) => {
   }
 };
 
-
 const loginUser = async (req, res) => {
   try {
     const { userEmail, userPassword } = req.body;
+
+    console.info("Auth login attempt", {
+      action: "login",
+      userEmail,
+    });
 
     if (!userEmail || !userPassword) {
       return res.status(400).json({
@@ -142,7 +153,10 @@ const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({
-      userEmail: userEmail.toLowerCase(),
+      $or: [
+        { userEmail: userEmail.toLowerCase() },
+        { userName: userEmail.toLowerCase() },
+      ],
     }).select("+userPassword");
 
     if (!user) {
@@ -154,7 +168,7 @@ const loginUser = async (req, res) => {
 
     const isCorrectPassword = await bcrypt.compare(
       userPassword,
-      user.userPassword
+      user.userPassword,
     );
 
     if (!isCorrectPassword) {
@@ -172,7 +186,7 @@ const loginUser = async (req, res) => {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "24h" },
     );
 
     user.userPassword = undefined;
@@ -192,5 +206,35 @@ const loginUser = async (req, res) => {
   }
 };
 
+const logoutUser = (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
 
-module.exports = { registerUser, loginUser };
+const refreshToken = (req, res) => {
+  try {
+    const user = req.user;
+
+    const newToken = jwt.sign(
+      {
+        _id: user._id,
+        userName: user.userName,
+        userEmail: user.userEmail,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" },
+    );
+
+    return res.status(200).json({
+      success: true,
+      accessToken: newToken,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = { registerUser, loginUser, logoutUser, refreshToken };

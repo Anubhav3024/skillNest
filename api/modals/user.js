@@ -23,16 +23,20 @@ const UserSchema = new mongoose.Schema(
       minlength: 6,
       select: false,
     },
-    role:{
+    role: {
       type: String,
       enum: ["student", "instructor"],
       required: true,
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-UserSchema.index({ userEmail: 1 }, { unique: true });
-UserSchema.index({ userName: 1 }, { unique: true });
+// UserSchema.index({ userEmail: 1 }, { unique: true });
+// UserSchema.index({ userName: 1 }, { unique: true });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -17,8 +17,11 @@ const OrderSchema = new mongoose.Schema(
     courseTitle: String,
     courseId: String,
     coursePricing: String,
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
+    razorpaySignature: String,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Order", OrderSchema);

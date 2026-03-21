@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Course = require("../../modals/course");
 
 const addNewCourse = async (req, res) => {
@@ -23,11 +24,10 @@ const getAllCourses = async (req, res) => {
 
     if (!instructorId) {
       return res.status(400).json({
-      success: false,
-      message: "Instructor ID is required",
-    });
+        success: false,
+        message: "Instructor ID is required",
+      });
     }
-
 
     const courseList = await Course.find({ instructorId });
 
@@ -37,7 +37,6 @@ const getAllCourses = async (req, res) => {
       courseList,
     });
   } catch (error) {
-
     return res.status(500).json({
       success: false,
       message: "Error fetching all courses",
@@ -107,9 +106,122 @@ const updateCourseById = async (req, res) => {
   }
 };
 
+const deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const requesterId = String(req.user?._id || "");
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    if (String(course.instructorId) !== requesterId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: you can only delete your own courses",
+      });
+    }
+
+    const deleted = await Course.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Course deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting course",
+    });
+  }
+};
+
+const reorderLectures = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { curriculum } = req.body;
+    const requesterId = String(req.user?._id || "");
+
+    const course = await Course.findById(id);
+    if (!course) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Course not found" });
+    }
+
+    if (String(course.instructorId) !== requesterId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: you can only reorder your own course lectures",
+      });
+    }
+
+    if (
+      !Array.isArray(curriculum) ||
+      curriculum.length !== course.curriculum.length
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid curriculum payload",
+      });
+    }
+
+    const existingLectureIds = new Set(
+      course.curriculum.map((lecture) => String(lecture._id)),
+    );
+
+    const isValidCurriculum = curriculum.every(
+      (lecture) =>
+        lecture &&
+        typeof lecture === "object" &&
+        lecture._id &&
+        typeof lecture.title === "string" &&
+        typeof lecture.videoUrl === "string" &&
+        typeof lecture.freePreview === "boolean" &&
+        existingLectureIds.has(String(lecture._id)),
+    );
+
+    if (!isValidCurriculum) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid lecture data. Ensure all lectures belong to this course.",
+      });
+    }
+
+    course.curriculum = curriculum;
+    await course.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Lectures reordered successfully",
+      curriculum: course.curriculum,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error reordering lectures",
+    });
+  }
+};
+
 module.exports = {
   addNewCourse,
   getAllCourses,
   getCourseDetailsById,
   updateCourseById,
+  deleteCourse,
+  reorderLectures,
 };

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -16,32 +15,26 @@ import {
   checkCoursePurchaseInfoService,
   fetchStudentViewCourseListService,
 } from "@/services";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { ArrowUpDownIcon } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+import { ArrowUpDown, Search, Filter, BookOpen, Star, BarChart, ChevronRight, CheckCircle2 } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
-//This function and its useeffect shows how to chnage the URL according to key-value pairs of an object
 const createSearchParamsHelper = (filterParams) => {
   const queryParams = [];
-
   for (const [key, value] of Object.entries(filterParams)) {
     if (Array.isArray(value) && value.length > 0) {
       const paramValue = value.join(",");
-      queryParams.push(`${key} = ${encodeURIComponent(paramValue)}`);
+      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
-
   return queryParams.join("&");
 };
 
 const StudentViewCoursesPage = () => {
   const navigate = useNavigate();
   const [sort, setSort] = useState("price-lowtohigh");
-
   const [filters, setFilters] = useState({});
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
@@ -54,25 +47,17 @@ const StudentViewCoursesPage = () => {
   const { auth } = useContext(AuthContext);
 
   const handleCourseNavigate = async (currentCourseId) => {
-    const response = await checkCoursePurchaseInfoService(
-      currentCourseId,
-      auth?.user?._id
-    );
-
+    const response = await checkCoursePurchaseInfoService(currentCourseId, auth?.user?._id);
     if (response?.success) {
-      if (response?.boughtOrNot) {
-        navigate(`/course-progress/${currentCourseId}`);
-      } else {
-        navigate(`/course/details/${currentCourseId}`);
-      }
+      if (response?.boughtOrNot) navigate(`/course-progress/${currentCourseId}`);
+      else navigate(`/course/details/${currentCourseId}`);
     }
   };
 
-  //belwo one is mainly to update the url for  a better UX
   useEffect(() => {
     const buildQueryStringForFilters = createSearchParamsHelper(filters);
     setSearchParams(new URLSearchParams(buildQueryStringForFilters));
-  }, [filters]);
+  }, [filters, setSearchParams]);
 
   useEffect(() => {
     setSort("price-lowtohigh");
@@ -83,192 +68,212 @@ const StudentViewCoursesPage = () => {
     if (filters !== null && sort !== null) {
       const fetchAllCoursesOfStudent = async () => {
         try {
-
-          const query = new URLSearchParams({
-            ...filters,
-            sortBy: sort,
-          });
+          const query = new URLSearchParams({ ...filters, sortBy: sort });
+          const searchQuery = searchParams.get("search");
+          if (searchQuery) query.set("search", searchQuery);
           setLoadingState(true);
           const response = await fetchStudentViewCourseListService(query);
-          if (response?.success) {
-            setStudentViewCoursesList(response?.courseList);
-          }
+          if (response?.success) setStudentViewCoursesList(response?.courseList);
         } catch (error) {
-          console.log("Error fetching courses of the student", error);
-          toast.error(
-            error?.response?.data?.message ||
-              "Error fetching courses. Please try again."
-          );
+          console.log("Error fetching courses", error);
         } finally {
           setLoadingState(false);
         }
       };
-
       fetchAllCoursesOfStudent();
     }
-  }, [filters, sort]);
+  }, [filters, sort, searchParams, setLoadingState, setStudentViewCoursesList]);
 
   useEffect(() => {
-    sessionStorage.removeItem("filters");
+    return () => sessionStorage.removeItem("filters");
   }, []);
 
-  //Below fucntion and "checked" and "onCheckedChange" tells how to control and synchronize marking and unmarking check-boxes
   const handleFilterOnChange = (getSectionId, getCurrentOption) => {
     let copyFilters = { ...filters };
-    const indexOfCurrentSection =
-      Object.keys(copyFilters).indexOf(getSectionId);
-
+    const indexOfCurrentSection = Object.keys(copyFilters).indexOf(getSectionId);
     if (indexOfCurrentSection === -1) {
-      copyFilters = {
-        ...copyFilters,
-        [getSectionId]: [getCurrentOption.id],
-      };
+      copyFilters = { ...copyFilters, [getSectionId]: [getCurrentOption.id] };
     } else {
-      const indexOfCurrentOption = copyFilters[getSectionId].indexOf(
-        getCurrentOption.id
-      );
-
-      if (indexOfCurrentOption === -1) {
-        copyFilters[getSectionId].push(getCurrentOption.id);
-      } else {
-        copyFilters[getSectionId].splice(indexOfCurrentOption, 1);
-      }
+      const indexOfCurrentOption = copyFilters[getSectionId].indexOf(getCurrentOption.id);
+      if (indexOfCurrentOption === -1) copyFilters[getSectionId].push(getCurrentOption.id);
+      else copyFilters[getSectionId].splice(indexOfCurrentOption, 1);
     }
     setFilters(copyFilters);
     sessionStorage.setItem("filters", JSON.stringify(copyFilters));
   };
 
-
   return (
-    <div className="container mx-auto p-4 lg:p-6 min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-        All Courses
-      </h1>
-      <div className="flex flex-col md:flex-row gap-6">
-        <aside className="w-full md:w-72 space-y-4">
-          <div className="bg-white rounded-2xl shadow-lg border-2 border-indigo-100 p-6 space-y-6 sticky top-4">
-            {Object.keys(filterOptions).map((keyItem) => (
-              <div className="space-y-2" key={keyItem?.Id}>
-                <h3 className="font-bold text-lg text-gray-800 border-b-2 border-indigo-200 pb-2">
-                  {keyItem.toUpperCase()}
-                </h3>
-                <div className="grid gap-3 mt-2">
-                  {filterOptions[keyItem].map((option) => (
-                    <Label 
-                      className="flex font-medium items-center gap-3 cursor-pointer hover:text-indigo-600 transition-colors p-0 rounded-lg hover:bg-indigo-50" 
-                      key={option?._id}
-                    >
-                      <Checkbox
-                        checked={
-                          filters &&
-                          Object.keys(filters).length > 0 &&
-                          filters[keyItem] &&
-                          filters[keyItem].indexOf(option.id) > -1
-                        }
-                        onCheckedChange={() =>
-                          handleFilterOnChange(keyItem, option)
-                        }
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-600 data-[state=checked]:to-purple-600 data-[state=checked]:border-0"
-                      />
-                      {option.label}
-                    </Label>
-                  ))}
+    <div className="min-h-screen bg-[#fcf8f1] pt-24 pb-20 px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 text-[#ff7e5f] font-headline font-black text-xs uppercase tracking-[0.2em]">
+               The Sanctuary
+               <span className="w-12 h-px bg-[#ff7e5f]/30"></span>
+            </div>
+            <h1 className="text-5xl lg:text-7xl font-headline font-black text-[#0d694f] tracking-tight">Browse Courses</h1>
+            <p className="text-muted-foreground font-medium text-lg">Explore our curated collection of high-fidelity digital masterclasses.</p>
+          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="rounded-2xl font-headline font-black text-xs flex items-center gap-3 border-[#0d694f]/20 bg-white hover:bg-[#fcf8f1] hover:border-[#0d694f] transition-all px-8 py-6 shadow-sm">
+                <ArrowUpDown className="h-4 w-4" />
+                SORT: {sortOptions.find(o => o.id === sort)?.label.toUpperCase() || "RANKING"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-2xl border border-border p-3 min-w-[220px] shadow-2xl">
+              <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
+                {sortOptions.map((opt) => (
+                  <DropdownMenuRadioItem key={opt.id} value={opt.id} className="rounded-xl font-headline font-bold text-xs py-3 cursor-pointer focus:bg-[#0d694f]/5">
+                    {opt.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
+
+        <div className="flex flex-col lg:flex-row gap-16">
+          {/* Filter Sidebar */}
+          <aside className="w-full lg:w-80 shrink-0">
+            <div className="bg-white rounded-[2.5rem] p-10 border border-[#0d694f]/10 shadow-xl shadow-emerald-950/5 sticky top-32">
+              <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center gap-3 text-[#0d694f] uppercase font-headline font-black tracking-widest text-[10px]">
+                  <Filter className="h-4 w-4" />
+                  Filter Catalog
                 </div>
+                {Object.keys(filters).length > 0 && (
+                  <button 
+                    onClick={() => setFilters({})}
+                    className="text-[10px] font-black text-[#ff7e5f] uppercase tracking-widest hover:underline transition-all"
+                  >
+                    Reset
+                  </button>
+                )}
               </div>
-            ))}
-          </div>
-        </aside>
-        <main className="flex-1">
-          <div className="flex justify-end items-center mb-6 gap-5 bg-white rounded-xl p-2 shadow-md border border-indigo-100">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-3 p-2 rounded-xl border-2 border-indigo-200 hover:border-indigo-400 hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:text-white transition-all duration-300 font-semibold"
-                >
-                  <ArrowUpDownIcon className="h-3 w-3" />
-                  <span className="text-[14px] font-medium">Sort By</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[180px] rounded-xl border-2 border-indigo-100">
-                <DropdownMenuRadioGroup
-                  value={sort}
-                  onValueChange={(value) => setSort(value)}
-                >
-                  {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem
-                      value={sortItem.id}
-                      key={sortItem.id}
-                      className="cursor-pointer"
-                    >
-                      {sortItem.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <span className="text-sm font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              {studentViewCoursesList.length} Results
-            </span>
-          </div>
-          <div className="space-y-6">
-            {studentViewCoursesList && studentViewCoursesList.length > 0 ? (
-              studentViewCoursesList.map((courseItem) => (
-                <Card
-                  onClick={() => handleCourseNavigate(courseItem?._id)}
-                  key={courseItem?._id}
-                  className="cursor-pointer group hover:shadow-xl transition-all duration-300 border-1 border-indigo-100 rounded-xl overflow-hidden hover:border-indigo-300 hover:scale-[1.02] bg-white"
-                >
-                  <CardContent className="flex gap-6 p-5">
-                    <div className="w-48 h-32 flex-shrink-0 rounded-xl overflow-hidden">
-                      <LazyLoadImage
-                        src={courseItem?.image}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        effect="blur"
-                        threshold={100}
-                        width={192}
-                        height={128}
-                      />
+              
+              <div className="space-y-12">
+                {Object.keys(filterOptions).map((keyItem) => (
+                  <div key={keyItem} className="space-y-6">
+                    <h3 className="text-xs font-headline font-black text-foreground uppercase tracking-widest ml-1">{keyItem}</h3>
+                    <div className="grid gap-4">
+                      {filterOptions[keyItem].map((option) => (
+                        <label 
+                          key={option.id}
+                          className="flex items-center gap-4 cursor-pointer group"
+                        >
+                          <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${filters[keyItem]?.includes(option.id) ? 'bg-[#0d694f] border-[#0d694f]' : 'border-[#0d694f]/20 group-hover:border-[#0d694f]/50'}`}>
+                             {filters[keyItem]?.includes(option.id) && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
+                             <input 
+                               type="checkbox" 
+                               className="hidden" 
+                               checked={filters[keyItem]?.includes(option.id)}
+                               onChange={() => handleFilterOnChange(keyItem, option)}
+                             />
+                          </div>
+                          <span className={`text-sm font-headline font-bold transition-colors ${filters[keyItem]?.includes(option.id) ? 'text-[#0d694f]' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                            {option.label}
+                          </span>
+                        </label>
+                      ))}
                     </div>
-                    <div className="flex-1 space-y-2">
-                      <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">
-                        {courseItem?.title}
-                      </CardTitle>
-                      <p className="text-medium text-gray-600">
-                        By{" "}
-                        <span className="font-bold text-gray-800">
-                          {courseItem?.instructorName}
-                        </span>
-                      </p>
-                      <p className="text-[15px] text-gray-600">
-                        {`${courseItem?.curriculum?.length} ${
-                          courseItem?.curriculum?.length > 1
-                            ? `Lectures`
-                            : `Lecture`
-                        }`}
-                      </p>
-                      <div className="flex items-center gap-4 pt-2">
-                        <span className="text-[16px] font-semibold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg">
-                          {courseItem?.level.toUpperCase()}
-                        </span>
-                        <p className="font-bold text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                          Rs {courseItem?.pricing}
-                        </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* Main Content Area */}
+          <main className="flex-1">
+            {loadingState ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-[28rem] rounded-[3rem] bg-white/50 border border-[#0d694f]/10" />)}
+              </div>
+            ) : studentViewCoursesList && studentViewCoursesList.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {studentViewCoursesList.map((course) => (
+                  <div 
+                    key={course._id}
+                    onClick={() => handleCourseNavigate(course._id)}
+                    className="bg-white rounded-[3rem] overflow-hidden border border-[#0d694f]/5 hover:shadow-[0_40px_80px_-20px_rgba(13,105,79,0.12)] hover:-translate-y-3 transition-all duration-700 group cursor-pointer flex flex-col relative"
+                  >
+                    <div className="h-64 overflow-hidden relative">
+                      <LazyLoadImage 
+                        src={course.image} 
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                        effect="blur"
+                      />
+                      <div className="absolute top-6 left-6 flex gap-2">
+                         <span className="bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-headline font-black text-[#0d694f] border border-emerald-50 shadow-lg uppercase tracking-widest">
+                           {course.category}
+                         </span>
+                      </div>
+                      <div className="absolute top-6 right-6">
+                        <div className="bg-white/95 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-lg border border-emerald-50">
+                           <Star className="h-4 w-4 text-[#ff7e5f] fill-current" />
+                           <span className="text-[10px] font-headline font-black text-foreground">4.9</span>
+                        </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : loadingState ? (
-              <Skeleton />
+                    
+                    <div className="p-10 pb-8 flex-1 flex flex-col">
+                      <h3 className="text-2xl font-headline font-black text-[#0d694f] leading-tight mb-4 group-hover:text-[#ff7e5f] transition-colors line-clamp-2">
+                        {course.title}
+                      </h3>
+                      
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="w-10 h-10 rounded-2xl bg-[#fcf8f1] flex items-center justify-center text-xs font-black text-[#0d694f] border border-[#0d694f]/10 shadow-sm uppercase">
+                          {course.instructorName?.[0]}
+                        </div>
+                        <div className="space-y-0.5">
+                           <div className="text-[10px] font-black text-[#ff7e5f] uppercase tracking-widest">Master</div>
+                           <div className="text-sm font-headline font-bold text-muted-foreground">{course.instructorName}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-8 border-t border-[#fcf8f1] mt-auto">
+                        <div className="flex gap-4">
+                           <div className="flex items-center gap-2 text-muted-foreground">
+                              <BookOpen className="h-4 w-4 text-[#0d694f]/40" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">{course.curriculum?.length} Lessons</span>
+                           </div>
+                           <div className="flex items-center gap-2 text-muted-foreground">
+                              <BarChart className="h-4 w-4 text-[#0d694f]/40" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">{course.level}</span>
+                           </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-10">
+                        <div className="flex flex-col">
+                           <span className="text-[10px] font-black text-[#ff7e5f] uppercase tracking-widest mb-1">Investment</span>
+                           <span className="text-3xl font-headline font-black text-[#0d694f]">Rs {course.pricing}</span>
+                        </div>
+                        <Button className="rounded-2xl w-14 h-14 bg-[#0d694f] hover:bg-[#ff7e5f] text-white p-0 shadow-lg shadow-[#0d694f]/20 transition-all border-none">
+                          <ChevronRight className="h-6 w-6" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
-              <div className="text-center py-16 bg-white rounded-2xl border-2 border-indigo-100">
-                <h1 className="text-2xl font-semibold text-gray-500">No results found</h1>
+              <div className="text-center py-40 bg-white rounded-[4rem] border border-dashed border-[#0d694f]/20 shadow-xl shadow-emerald-950/2">
+                <div className="max-w-xs mx-auto">
+                  <div className="w-24 h-24 bg-[#fcf8f1] rounded-full flex items-center justify-center mx-auto mb-10 border border-[#0d694f]/10 shadow-inner">
+                    <Search className="h-10 w-10 text-[#0d694f]/20" />
+                  </div>
+                  <h3 className="text-3xl font-headline font-black text-[#0d694f] mb-6 tracking-tight">Vault Empty</h3>
+                  <p className="text-muted-foreground font-medium mb-12 leading-relaxed">Try adjusting your filters or search terms to uncover your learning sanctuary.</p>
+                  <Button onClick={() => setFilters({})} className="rounded-2xl px-12 py-7 bg-[#0d694f] text-white font-headline font-black text-sm border-none shadow-xl shadow-[#0d694f]/20">
+                    Reset Selection
+                  </Button>
+                </div>
               </div>
             )}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );

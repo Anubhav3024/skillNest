@@ -27,6 +27,7 @@ const StudentCoursesPage = lazy(() =>
 const StudentCourseProgress = lazy(() =>
   import("./pages/student/course-progress")
 );
+const StudentProfilePage = lazy(() => import("./pages/student/profile"));
 
 function App() {
   const { auth } = useContext(AuthContext);
@@ -104,6 +105,7 @@ function App() {
             path="/course/details/:id"
             element={<StudentViewCourseDetailsPage />}
           />
+          <Route path="/profile" element={<StudentProfilePage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

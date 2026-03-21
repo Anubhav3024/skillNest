@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Unified Profile | Lumina Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#bec9c2",
+              "secondary-container": "#d5e8d2",
+              "secondary": "#526352",
+              "primary-fixed": "#a2f3d1",
+              "inverse-on-surface": "#ecf2ef",
+              "on-error-container": "#93000a",
+              "tertiary-container": "#68777e",
+              "primary-fixed-dim": "#87d6b6",
+              "on-primary-fixed-variant": "#00513c",
+              "inverse-primary": "#87d6b6",
+              "secondary-fixed": "#d5e8d2",
+              "surface-variant": "#dee4e1",
+              "surface": "#f5fbf8",
+              "inverse-surface": "#2b3230",
+              "surface-tint": "#126b51",
+              "primary-container": "#318266",
+              "on-primary-fixed": "#002116",
+              "on-secondary-container": "#586958",
+              "on-tertiary-fixed": "#0f1d23",
+              "tertiary-fixed": "#d6e5ed",
+              "surface-container-lowest": "#ffffff",
+              "on-error": "#ffffff",
+              "background": "#f5fbf8",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#eff5f2",
+              "on-secondary-fixed": "#101f12",
+              "on-primary-container": "#f5fff8",
+              "primary": "#0d694f",
+              "surface-bright": "#f5fbf8",
+              "tertiary-fixed-dim": "#bac9d1",
+              "on-tertiary-fixed-variant": "#3b494f",
+              "on-secondary": "#ffffff",
+              "secondary-fixed-dim": "#b9cbb7",
+              "surface-container": "#e9efec",
+              "on-background": "#171d1b",
+              "surface-container-high": "#e3eae7",
+              "tertiary": "#505e65",
+              "on-surface": "#171d1b",
+              "error-container": "#ffdad6",
+              "outline": "#6f7a73",
+              "surface-dim": "#d5dbd8",
+              "on-secondary-fixed-variant": "#3b4b3b",
+              "error": "#ba1a1a",
+              "on-surface-variant": "#3f4944",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#fbfdff",
+              "surface-container-highest": "#dee4e1"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar - Fixed Shell -->
+<nav class="bg-white/60 dark:bg-emerald-950/60 backdrop-blur-md fixed top-0 w-full z-50 shadow-sm shadow-emerald-900/5">
+<div class="flex justify-between items-center px-8 py-4 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-emerald-900 dark:text-emerald-50 tracking-tighter">Lumina Academy</span>
+<div class="hidden md:flex gap-6 font-manrope text-sm font-medium tracking-tight">
+<a class="text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-900 dark:hover:text-emerald-100 transition-colors" href="#">Browse</a>
+<a class="text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-900 dark:hover:text-emerald-100 transition-colors" href="#">Learning</a>
+<a class="text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-900 dark:hover:text-emerald-100 transition-colors" href="#">Teaching</a>
+<a class="text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-900 dark:hover:text-emerald-100 transition-colors" href="#">Community</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-manrope text-sm font-medium text-emerald-600/70 hover:text-emerald-900 transition-colors">Switch Role</button>
+<div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 border-b-2 border-emerald-700 dark:border-emerald-300 pb-1 font-manrope text-sm font-medium">
+<img alt="User profile avatar" class="w-8 h-8 rounded-full object-cover" data-alt="Close up of a professional woman smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0yMlf_fHO0V4jL0zi8l20Q-_ULHxY_kA6xKSp6aqnExfnyIZ1KyQ_d0AMxtReVB8QUN6W4BrB7sshwIxGg9OWMdnXOtR-larbn7zcAFa9BvDLIT6TIorRwrKC7XyAdCnYAXnuqA14BAZ26d08f3vspXpyGjBzKai6oLKE8MsaT2mXQVvtkTGhIvoXCyllCOqhodKnI5NLPPFMSrNxh0apNNFTpjshWw1xpB2llR4LXSUIRGNrDjfLXw1i-Kqw1b6fUE_xKmQsOOc"/>
+<span>Profile</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-12 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Header Section (Asymmetrical Editorial) -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
+<div class="max-w-2xl">
+<span class="font-inter text-xs tracking-wide uppercase font-bold text-primary mb-2 block">Account Management</span>
+<h1 class="text-5xl font-extrabold text-on-surface tracking-tighter leading-none mb-4">Unified Profile</h1>
+<p class="text-on-surface-variant font-body leading-relaxed">Customize your digital atelier. Manage your credentials, refine your learning trajectory, and secure your sanctuary.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-3 bg-surface-container-low text-on-surface font-semibold rounded-full hover:bg-surface-container transition-all active:scale-95 duration-200">Discard</button>
+<button class="px-8 py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary font-semibold rounded-full shadow-lg shadow-primary/10 active:scale-95 duration-200">Save Changes</button>
+</div>
+</header>
+<!-- Profile Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Sidebar: Navigation/Summary -->
+<div class="md:col-span-3 flex flex-col gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm shadow-primary/5 flex flex-col items-center text-center">
+<div class="relative mb-4">
+<img alt="Avatar" class="w-24 h-24 rounded-full object-cover ring-4 ring-primary-fixed" data-alt="Portrait of a woman with a professional smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP4Q6gpSGNuC-GnQ8vkfu9xJOQ00X76y77_xsL3NjehUblZ2gjKABq08QCDqR2H3bVKkm8CjO6uKEZsZL5HWkDV5Z16uk6p5iO_Yl4dQn4GWPefmM57GJF9CC_Oi-HyNIKj-DSfadGQG1VkAM9HbNm4WCNFGeD8N326iHZ0XnLxaLgbRruqzEKtvFVBYzll8eI4RcEh8hJI4IWFu_WiA4XWj2hLTaBPjHQSQf_Q56jHb4rUd1Eh7vZg1PpMBu-zYsS7HUI9sG2lRA"/>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-2 rounded-full shadow-md hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-sm" data-icon="photo_camera">photo_camera</span>
+</button>
+</div>
+<h3 class="font-headline font-bold text-lg">Elena Vance</h3>
+<p class="text-sm text-on-surface-variant mb-4">Senior Curator &amp; Educator</p>
+<div class="w-full bg-surface-container h-1 rounded-full overflow-hidden mb-2">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container" style="width: 85%"></div>
+</div>
+<span class="text-[10px] font-inter font-bold uppercase tracking-wider text-primary">85% Profile Completeness</span>
+</div>
+<nav class="bg-surface-container-low p-2 rounded-xl flex flex-col">
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-container-lowest text-primary font-semibold rounded-lg shadow-sm" href="#personal">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-sm">Personal Info</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg" href="#roles">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="text-sm">Role Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg" href="#security">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="text-sm">Security</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg" href="#notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="text-sm">Preferences</span>
+</a>
+</nav>
+</div>
+<!-- Main Form Canvas -->
+<div class="md:col-span-9 space-y-6">
+<!-- Section: Personal Info -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-sm shadow-primary/5" id="personal">
+<div class="flex items-center gap-2 mb-8">
+<span class="w-8 h-8 bg-primary-fixed flex items-center justify-center rounded-lg text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="badge">badge</span>
+</span>
+<h2 class="text-2xl font-bold tracking-tight">Identity &amp; Reach</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-inter text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Display Name</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/40 transition-all font-body text-sm" type="text" value="Elena Vance"/>
+</div>
+<div class="space-y-2">
+<label class="font-inter text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Email Address</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/40 transition-all font-body text-sm" type="email" value="elena.vance@lumina.edu"/>
+</div>
+<div class="md:col-span-2 space-y-2">
+<label class="font-inter text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Professional Bio</label>
+<textarea class="w-full px-4 py-3 bg-surface-container-low border-none rounded-lg focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/40 transition-all font-body text-sm resize-none" rows="4">Architecting digital learning experiences at the intersection of psychology and design. Curator of the 'Modern Aesthetics' curriculum.</textarea>
+</div>
+</div>
+</section>
+<!-- Section: Role Specific Details -->
+<section class="bg-surface-container p-1 rounded-xl" id="roles">
+<div class="bg-surface-container-lowest p-8 rounded-[0.65rem]">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div class="flex items-center gap-2">
+<span class="w-8 h-8 bg-secondary-container flex items-center justify-center rounded-lg text-secondary">
+<span class="material-symbols-outlined text-lg" data-icon="verified_user">verified_user</span>
+</span>
+<h2 class="text-2xl font-bold tracking-tight">Educator Credentials</h2>
+</div>
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-tighter">Active Instructor</span>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="workspace_premium">workspace_premium</span>
+</div>
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant">Certification</p>
+<p class="text-sm font-semibold">Master of Instructional Design</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center gap-4">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="history_edu">history_edu</span>
+</div>
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant">Expertise</p>
+<p class="text-sm font-semibold">UI/UX &amp; Behavioral Psych</p>
+</div>
+</div>
+</div>
+<div class="space-y-4 pt-4 border-t border-surface-container-high">
+<h4 class="font-headline font-bold text-base">Student Persona Settings</h4>
+<p class="text-xs text-on-surface-variant">As a student, what are your primary sanctuaries of learning?</p>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 bg-primary text-on-primary rounded-full text-xs font-medium">Visual Design</button>
+<button class="px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-medium hover:bg-primary-fixed-dim transition-colors">Digital Marketing</button>
+<button class="px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-medium hover:bg-primary-fixed-dim transition-colors">Philosophy</button>
+<button class="px-4 py-2 border-2 border-dashed border-outline-variant text-on-surface-variant rounded-full text-xs font-medium">+ Add Goal</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Security & Notifications (Side-by-side Bento) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Security Card -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm shadow-primary/5" id="security">
+<div class="flex items-center gap-2 mb-6">
+<span class="w-8 h-8 bg-error-container flex items-center justify-center rounded-lg text-error">
+<span class="material-symbols-outlined text-lg" data-icon="lock">lock</span>
+</span>
+<h2 class="text-xl font-bold tracking-tight">Security</h2>
+</div>
+<div class="space-y-4">
+<button class="w-full flex items-center justify-between p-4 bg-surface-container-low rounded-lg hover:bg-surface-container transition-all">
+<div class="text-left">
+<p class="text-sm font-bold">Two-Factor Auth</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Recommended</p>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="toggle_on" style="font-variation-settings: 'FILL' 1;">toggle_on</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 bg-surface-container-low rounded-lg hover:bg-surface-container transition-all">
+<div class="text-left">
+<p class="text-sm font-bold">Change Password</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Last changed 3mo ago</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Notifications Card -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm shadow-primary/5" id="notifications">
+<div class="flex items-center gap-2 mb-6">
+<span class="w-8 h-8 bg-tertiary-fixed flex items-center justify-center rounded-lg text-tertiary">
+<span class="material-symbols-outlined text-lg" data-icon="mail">mail</span>
+</span>
+<h2 class="text-xl font-bold tracking-tight">Alerts</h2>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between py-2 border-b border-surface-container-low">
+<span class="text-sm font-medium">Course Updates</span>
+<input checked="" class="w-5 h-5 rounded text-primary border-none bg-surface-container-low focus:ring-primary" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between py-2 border-b border-surface-container-low">
+<span class="text-sm font-medium">Direct Messages</span>
+<input checked="" class="w-5 h-5 rounded text-primary border-none bg-surface-container-low focus:ring-primary" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between py-2">
+<span class="text-sm font-medium">Newsletter</span>
+<input class="w-5 h-5 rounded text-primary border-none bg-surface-container-low focus:ring-primary" type="checkbox"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer - Editorial Style -->
+<footer class="bg-white dark:bg-emerald-950 w-full border-t border-emerald-100/20 mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-8 gap-4">
+<div class="flex flex-col items-center md:items-start gap-1">
+<span class="font-manrope font-bold text-emerald-900 dark:text-emerald-50">Lumina Academy</span>
+<p class="font-inter text-[10px] tracking-wide uppercase text-emerald-600 dark:text-emerald-400">© 2024 Lumina Academy. The Intellectual Sanctuary.</p>
+</div>
+<div class="flex gap-8 font-inter text-xs tracking-wide uppercase">
+<a class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-200 underline opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-200 underline opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-200 underline opacity-80 hover:opacity-100 transition-opacity" href="#">Accessibility</a>
+<a class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-200 underline opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

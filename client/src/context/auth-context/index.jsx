@@ -1,6 +1,12 @@
 import { initalSignInFormData, initalSignUpFormData } from "@/config";
-import { checkAuthService, loginService, registerService } from "@/services";
+import {
+  checkAuthService,
+  loginService,
+  logoutService,
+  registerService,
+} from "@/services";
 import { createContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { ClipLoader } from "react-spinners";
 
 import { toast } from "react-toastify";
@@ -13,106 +19,107 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isValidEmail = (email) => emailRegex.test(email);
 
 export default function AuthProvider({ children }) {
-  
   const [signInFormData, setSignInFormData] = useState(initalSignInFormData);
   const [signUpFormData, setSignUpFormData] = useState(initalSignUpFormData);
   const [auth, setAuth] = useState({ authenticated: false, user: null });
   const [loading, setLoading] = useState(true);
 
   const handleRegisterUser = async (event) => {
-  event.preventDefault();
-  
-  const { userName, userEmail, userPassword, role } = signUpFormData;
-  
-  if (!userName || !userEmail || !userPassword || !role) {
-    toast.error("All fields are required");
-    return;
-  }
-  
-  if (!isValidEmail(userEmail)) {
-    toast.error("Please enter a valid email address");
-    return;
-  }
-  
-  if (userPassword.length < 6) {
-    toast.error("Password must be at least 6 characters");
-    return;
-  }
-  try {
-    const data = await registerService(signUpFormData);
+    event.preventDefault();
 
-    if (data.success) {
-  localStorage.setItem("accessToken", data.accessToken);
-  localStorage.setItem(
-    "user",
-    JSON.stringify(data.user || data.newUser)
-  );
+    const { userName, userEmail, userPassword, role } = signUpFormData;
 
-  toast.success("Registration successful!", { autoClose: 800 });
-
-  setAuth({
-    authenticated: true,
-    user: data.user || data.newUser,
-  });
-} else {
-      toast.error(data.message);
+    if (!userName || !userEmail || !userPassword || !role) {
+      toast.error("All fields are required");
+      return;
     }
-  } catch (error) {
-    console.log("Error in registering user", error);
-    toast.error(error?.response?.data?.message || "Registration failed");
-  } finally {
-    setSignUpFormData(initalSignUpFormData);
-  }
-};
+
+    if (!isValidEmail(userEmail)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (userPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    try {
+      const data = await registerService(signUpFormData);
+
+      if (data.success) {
+        const user = data.user || data.newUser;
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        toast.success("Registration successful!", { autoClose: 800 });
+
+        setAuth({
+          authenticated: true,
+          user: user,
+        });
+      } else {
+        toast.error(data.message || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Error in registering user", error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Registration failed: backend is not reachable",
+      );
+    } finally {
+      setSignUpFormData(initalSignUpFormData);
+    }
+  };
 
   const handleloginUser = async (event) => {
-  event.preventDefault();
-  setLoading(true);
+    event.preventDefault();
+    setLoading(true);
 
-  const { userEmail, userPassword } = signInFormData;
+    const { userEmail, userPassword } = signInFormData;
 
-  if (!userEmail || !userPassword) {
-    toast.error("Email and password are required");
-    setLoading(false);
-    return;
-  }
-
-  if (!isValidEmail(userEmail)) {
-    toast.error("Please enter a valid email address");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const data = await loginService(signInFormData);
-    if (data.success) {
-      // sessionStorage.setItem(
-      //   "accessToken",
-      //   JSON.stringify(data.accessToken)
-      // );
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("user", JSON.stringify(data.user || data.newUser));
-      toast.success("Login successful!", { autoClose: 800 });
-      setAuth({
-        authenticated: true,
-        user: data.user || data.newUser,
-      });
-    } else {
-      toast.error(data.message || "Login failed");
-      setAuth({
-        authenticated: false,
-        user: null,
-      });
+    if (!userEmail || !userPassword) {
+      toast.error("Email and password are required");
+      setLoading(false);
+      return;
     }
-  } catch (error) {
-    console.log("Error logging in the user", error);
-    toast.error(error?.response?.data?.message || "Login failed");
-  } finally {
-    setLoading(false);
-    setSignInFormData(initalSignInFormData);
-  }
-};
 
+    if (!isValidEmail(userEmail)) {
+      toast.error("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const data = await loginService(signInFormData);
+      if (data.success) {
+        const user = data.user || data.newUser;
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        toast.success("Login successful!", { autoClose: 800 });
+
+        setAuth({
+          authenticated: true,
+          user: user,
+        });
+      } else {
+        toast.error(data.message || "Login failed");
+        setAuth({
+          authenticated: false,
+          user: null,
+        });
+      }
+    } catch (error) {
+      console.error("Error logging in the user", error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Login failed: backend is not reachable",
+      );
+    } finally {
+      setLoading(false);
+      setSignInFormData(initalSignInFormData);
+    }
+  };
 
   const checkAuthUser = async () => {
     try {
@@ -147,27 +154,35 @@ export default function AuthProvider({ children }) {
     }
   };
 
-useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-  const user = localStorage.getItem("user");
-
-  if (token && user) {
-    setAuth({
-      authenticated: true,
-      user: JSON.parse(user),
-    });
-    setLoading(false);
-  } else {
+  useEffect(() => {
     checkAuthUser();
-  }
-}, []);
+  }, []);
 
-const resetCredentials = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("user");
-  setAuth({ authenticated: false, user: null });
-};
+  const resetCredentials = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+    setAuth({ authenticated: false, user: null });
+  };
 
+  const updateAuthUser = (nextUser) => {
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    setAuth((prev) => ({
+      ...prev,
+      user: nextUser,
+    }));
+  };
+
+  const logoutUser = async () => {
+    try {
+      await logoutService();
+    } catch (error) {
+      console.error("Logout API error", error);
+      throw error;
+    } finally {
+      resetCredentials();
+      sessionStorage.clear();
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -180,6 +195,8 @@ const resetCredentials = () => {
         handleloginUser,
         auth,
         resetCredentials,
+        updateAuthUser,
+        logoutUser,
         loading,
       }}
     >
@@ -193,3 +210,7 @@ const resetCredentials = () => {
     </AuthContext.Provider>
   );
 }
+
+AuthProvider.propTypes = {
+  children: PropTypes.node,
+};

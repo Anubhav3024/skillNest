@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instructor Portal | SkillNest</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "outline-variant": "#bec9c2",
+                "secondary-container": "#d5e8d2",
+                "secondary": "#526352",
+                "primary-fixed": "#a2f3d1",
+                "inverse-on-surface": "#ecf2ef",
+                "on-error-container": "#93000a",
+                "tertiary-container": "#68777e",
+                "primary-fixed-dim": "#87d6b6",
+                "on-primary-fixed-variant": "#00513c",
+                "inverse-primary": "#87d6b6",
+                "secondary-fixed": "#d5e8d2",
+                "surface-variant": "#dee4e1",
+                "surface": "#f5fbf8",
+                "inverse-surface": "#2b3230",
+                "surface-tint": "#126b51",
+                "primary-container": "#318266",
+                "on-primary-fixed": "#002116",
+                "on-secondary-container": "#586958",
+                "on-tertiary-fixed": "#0f1d23",
+                "tertiary-fixed": "#d6e5ed",
+                "surface-container-lowest": "#ffffff",
+                "on-error": "#ffffff",
+                "background": "#f5fbf8",
+                "on-primary": "#ffffff",
+                "surface-container-low": "#eff5f2",
+                "on-secondary-fixed": "#101f12",
+                "on-primary-container": "#f5fff8",
+                "primary": "#0d694f",
+                "surface-bright": "#f5fbf8",
+                "tertiary-fixed-dim": "#bac9d1",
+                "on-tertiary-fixed-variant": "#3b494f",
+                "on-secondary": "#ffffff",
+                "secondary-fixed-dim": "#b9cbb7",
+                "surface-container": "#e9efec",
+                "on-background": "#171d1b",
+                "surface-container-high": "#e3eae7",
+                "tertiary": "#505e65",
+                "on-surface": "#171d1b",
+                "error-container": "#ffdad6",
+                "outline": "#6f7a73",
+                "surface-dim": "#d5dbd8",
+                "on-secondary-fixed-variant": "#3b4b3b",
+                "error": "#ba1a1a",
+                "on-surface-variant": "#3f4944",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-container": "#fbfdff",
+                "surface-container-highest": "#dee4e1"
+              },
+              fontFamily: {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+              animation: {
+                'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+              },
+              keyframes: {
+                fadeInUp: {
+                  '0%': { opacity: '0', transform: 'translateY(20px)' },
+                  '100%': { opacity: '1', transform: 'translateY(0)' },
+                }
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f5fbf8; color: #171d1b; }
+        h1, h2, h3, h4 { font-family: 'Manrope', sans-serif; }
+        .glass-nav { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); }
+        .ambient-shadow { box-shadow: 0 10px 30px -5px rgba(13, 105, 79, 0.08); }
+        .primary-gradient { background: linear-gradient(135deg, #0d694f 0%, #318266 100%); }
+        .card-hover:hover { transform: translateY(-4px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .chart-bar-glow:hover { filter: drop-shadow(0 0 8px rgba(13, 105, 79, 0.4)); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<nav class="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-md flex justify-between items-center px-8 py-4 max-w-full shadow-sm shadow-emerald-900/5">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-emerald-900 tracking-tighter">Lumina Academy</span>
+<div class="hidden md:flex gap-6 items-center font-manrope text-sm font-medium tracking-tight">
+<a class="text-emerald-600/70 hover:text-emerald-900 transition-colors" href="#">Browse</a>
+<a class="text-emerald-600/70 hover:text-emerald-900 transition-colors" href="#">Learning</a>
+<a class="text-emerald-600/70 hover:text-emerald-900 transition-colors" href="#">Teaching</a>
+<a class="text-emerald-600/70 hover:text-emerald-900 transition-colors" href="#">Community</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-emerald-600/70 text-sm font-medium hover:text-emerald-900 transition-colors">Switch Role</button>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden ring-2 ring-emerald-100 ring-offset-2">
+<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAcPjRkRM-ydDihkVVL7F1X8r3po63Ws512xCwJWi3pKyP3X9lZP9_wHvxkd_vMRGcfzde6XNNmRjYQy19REWKp9pgST8ttUETYNTIEsV95hFXbP0JFMPAmJKeS0iYv3SP1XiFk234GGPOHvePMK0zd-72lUmzBRgKWdfo29FtkWxJhmQ0yTp1nWzgQN9u8ZhcfOHAhK3daaqeQXZo9DQzF4PU6c8vRUWLcahMfp5oTWYwcWgReekUtIrpScq9AlsVn32TzEtrmDE"/>
+</div>
+</div>
+</nav>
+<aside class="h-screen w-64 fixed left-0 top-0 bg-emerald-50 flex flex-col p-6 gap-2 z-40 mt-16 border-r border-emerald-100/50">
+<div class="mb-8 px-4">
+<h2 class="text-lg font-black text-emerald-900">Instructor Portal</h2>
+<p class="text-[10px] font-manrope text-emerald-700/60 uppercase tracking-[0.2em] mt-1">Management Hub</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="bg-emerald-900 text-white rounded-xl px-4 py-3 flex items-center gap-3 font-manrope text-sm font-semibold shadow-lg shadow-emerald-900/20 active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="text-emerald-700/70 px-4 py-3 flex items-center gap-3 font-manrope text-sm font-semibold hover:bg-emerald-100/80 rounded-xl transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="school">school</span>
+<span>My Courses</span>
+</a>
+<a class="text-emerald-700/70 px-4 py-3 flex items-center gap-3 font-manrope text-sm font-semibold hover:bg-emerald-100/80 rounded-xl transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="group">group</span>
+<span>Students</span>
+</a>
+<a class="text-emerald-700/70 px-4 py-3 flex items-center gap-3 font-manrope text-sm font-semibold hover:bg-emerald-100/80 rounded-xl transition-all active:translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="payments">payments</span>
+<span>Earnings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 flex flex-col gap-1 border-t border-emerald-100/50">
+<button class="w-full primary-gradient text-white rounded-xl py-3 px-4 text-sm font-bold flex items-center justify-center gap-2 mb-4 hover:brightness-110 active:scale-95 duration-200 shadow-md shadow-emerald-900/10">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+            Create New Course
+        </button>
+<a class="text-emerald-700/60 px-4 py-2 flex items-center gap-3 font-manrope text-sm font-semibold hover:bg-emerald-100/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="text-emerald-700/60 px-4 py-2 flex items-center gap-3 font-manrope text-sm font-semibold hover:bg-emerald-100/50 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="help_outline">help_outline</span>
+<span>Help</span>
+</a>
+</div>
+</aside>
+<main class="ml-64 pt-24 pb-12 px-10 min-h-screen bg-surface">
+<header class="mb-10 flex justify-between items-end animate-fade-in-up">
+<div>
+<h1 class="text-4xl font-extrabold text-on-surface tracking-tight leading-none mb-3">Welcome back, Dr. Julian.</h1>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="flex items-center justify-center w-5 h-5 bg-primary/10 text-primary rounded-full">
+<span class="material-symbols-outlined text-[14px] font-bold" data-icon="trending_up">trending_up</span>
+</span>
+<p class="font-body text-sm font-medium">Your courses have seen a <span class="text-primary font-bold">12% increase</span> in engagement this week.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="bg-white border border-emerald-100 px-5 py-2.5 rounded-xl text-sm font-semibold text-emerald-900 hover:bg-emerald-50 transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+                Download Report
+            </button>
+</div>
+</header>
+<div class="grid grid-cols-12 gap-6">
+<!-- Refined Stats Cards -->
+<div class="col-span-12 lg:col-span-4 bg-white p-7 rounded-2xl ambient-shadow card-hover animate-fade-in-up" style="animation-delay: 0.1s">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-primary/5 text-primary rounded-xl ring-1 ring-primary/10">
+<span class="material-symbols-outlined text-2xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<div class="text-right">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Monthly Revenue</span>
+<div class="flex items-center gap-1 justify-end mt-1 text-primary">
+<span class="material-symbols-outlined text-[14px] font-bold" data-icon="expand_less">expand_less</span>
+<span class="text-xs font-bold">8.4%</span>
+</div>
+</div>
+</div>
+<div>
+<span class="text-3xl font-extrabold font-headline text-on-surface tracking-tight">$14,280.00</span>
+<p class="text-[11px] text-on-surface-variant/70 mt-2 font-medium uppercase tracking-wider">Projected: $15.5k</p>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-white p-7 rounded-2xl ambient-shadow card-hover animate-fade-in-up" style="animation-delay: 0.2s">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-secondary/5 text-secondary rounded-xl ring-1 ring-secondary/10">
+<span class="material-symbols-outlined text-2xl" data-icon="group">group</span>
+</div>
+<div class="text-right">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Total Students</span>
+<div class="flex items-center gap-1 justify-end mt-1 text-secondary">
+<span class="material-symbols-outlined text-[14px] font-bold" data-icon="add">add</span>
+<span class="text-xs font-bold">142 new</span>
+</div>
+</div>
+</div>
+<div>
+<span class="text-3xl font-extrabold font-headline text-on-surface tracking-tight">2,842</span>
+<p class="text-[11px] text-on-surface-variant/70 mt-2 font-medium uppercase tracking-wider">Active across 8 courses</p>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-white p-7 rounded-2xl ambient-shadow card-hover animate-fade-in-up" style="animation-delay: 0.3s">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-yellow-400/5 text-yellow-600 rounded-xl ring-1 ring-yellow-400/20">
+<span class="material-symbols-outlined text-2xl" data-icon="star" style="font-variation-settings: 'FILL' 1">star</span>
+</div>
+<div class="text-right">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Average Rating</span>
+<div class="flex items-center gap-1 justify-end mt-1 text-on-surface-variant/60">
+<span class="text-xs font-bold">1.2k total</span>
+</div>
+</div>
+</div>
+<div>
+<span class="text-3xl font-extrabold font-headline text-on-surface tracking-tight">4.9<span class="text-xl text-on-surface-variant/40 font-medium">/5.0</span></span>
+<p class="text-[11px] text-on-surface-variant/70 mt-2 font-medium uppercase tracking-wider">Top 1% of instructors</p>
+</div>
+</div>
+<!-- Refined Earnings Chart Area -->
+<div class="col-span-12 lg:col-span-8 bg-white p-8 rounded-2xl ambient-shadow animate-fade-in-up" style="animation-delay: 0.4s">
+<div class="flex justify-between items-center mb-12">
+<div>
+<h3 class="text-xl font-bold text-on-surface">Earnings Performance</h3>
+<p class="text-sm text-on-surface-variant font-medium">Revenue trajectory for the current period</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-6 mr-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full primary-gradient"></span>
+<span class="text-xs font-bold text-on-surface-variant">2024</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-surface-container-high"></span>
+<span class="text-xs font-bold text-on-surface-variant font-medium">2023</span>
+</div>
+</div>
+<select class="bg-surface-container-low border border-emerald-50 rounded-xl text-sm font-semibold px-4 py-2 outline-none focus:ring-2 ring-primary/20 cursor-pointer">
+<option>Last 6 Months</option>
+<option>Last Year</option>
+</select>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-6 px-2 relative">
+<!-- Grid Lines -->
+<div class="absolute inset-x-0 top-0 h-full flex flex-col justify-between pointer-events-none opacity-5">
+<div class="w-full border-t border-on-surface"></div>
+<div class="w-full border-t border-on-surface"></div>
+<div class="w-full border-t border-on-surface"></div>
+<div class="w-full border-t border-on-surface"></div>
+</div>
+<!-- Chart Bars -->
+<div class="w-full flex flex-col items-center gap-4 group">
+<div class="w-full bg-surface-container-low/50 rounded-t-xl relative h-[100%] cursor-help overflow-hidden transition-all duration-300">
+<div class="absolute bottom-0 w-full bg-emerald-100 rounded-t-xl h-[40%]"></div>
+<div class="absolute bottom-0 w-full primary-gradient rounded-t-xl h-[25%] transition-all duration-500 group-hover:h-[30%] chart-bar-glow shadow-inner"></div>
+<div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/5 flex items-center justify-center transition-opacity">
+<span class="text-[10px] font-black text-emerald-900 bg-white px-2 py-1 rounded shadow-sm">$8.2k</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant font-label tracking-wider">JAN</span>
+</div>
+<div class="w-full flex flex-col items-center gap-4 group">
+<div class="w-full bg-surface-container-low/50 rounded-t-xl relative h-[100%] cursor-help overflow-hidden">
+<div class="absolute bottom-0 w-full bg-emerald-100 rounded-t-xl h-[70%]"></div>
+<div class="absolute bottom-0 w-full primary-gradient rounded-t-xl h-[65%] transition-all duration-500 group-hover:h-[75%] chart-bar-glow"></div>
+<div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/5 flex items-center justify-center transition-opacity">
+<span class="text-[10px] font-black text-emerald-900 bg-white px-2 py-1 rounded shadow-sm">$12.4k</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant font-label tracking-wider">FEB</span>
+</div>
+<div class="w-full flex flex-col items-center gap-4 group">
+<div class="w-full bg-surface-container-low/50 rounded-t-xl relative h-[100%] cursor-help overflow-hidden">
+<div class="absolute bottom-0 w-full bg-emerald-100 rounded-t-xl h-[55%]"></div>
+<div class="absolute bottom-0 w-full primary-gradient rounded-t-xl h-[45%] transition-all duration-500 group-hover:h-[55%] chart-bar-glow"></div>
+<div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/5 flex items-center justify-center transition-opacity">
+<span class="text-[10px] font-black text-emerald-900 bg-white px-2 py-1 rounded shadow-sm">$9.8k</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant font-label tracking-wider">MAR</span>
+</div>
+<div class="w-full flex flex-col items-center gap-4 group">
+<div class="w-full bg-surface-container-low/50 rounded-t-xl relative h-[100%] cursor-help overflow-hidden">
+<div class="absolute bottom-0 w-full bg-emerald-100 rounded-t-xl h-[85%]"></div>
+<div class="absolute bottom-0 w-full primary-gradient rounded-t-xl h-[80%] transition-all duration-500 group-hover:h-[90%] chart-bar-glow"></div>
+<div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/5 flex items-center justify-center transition-opacity">
+<span class="text-[10px] font-black text-emerald-900 bg-white px-2 py-1 rounded shadow-sm">$14.2k</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant font-label tracking-wider font-bold text-primary">APR</span>
+</div>
+<div class="w-full flex flex-col items-center gap-4 group">
+<div class="w-full bg-surface-container-low/50 rounded-t-xl relative h-[100%] cursor-help overflow-hidden">
+<div class="absolute bottom-0 w-full bg-emerald-100 rounded-t-xl h-[65%]"></div>
+<div class="absolute bottom-0 w-full primary-gradient rounded-t-xl h-[55%] transition-all duration-500 group-hover:h-[65%] chart-bar-glow"></div>
+<div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/5 flex items-center justify-center transition-opacity">
+<span class="text-[10px] font-black text-emerald-900 bg-white px-2 py-1 rounded shadow-sm">$11.1k</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant font-label tracking-wider">MAY</span>
+</div>
+<div class="w-full flex flex-col items-center gap-4 group">
+<div class="w-full bg-surface-container-low/50 rounded-t-xl relative h-[100%] cursor-help overflow-hidden">
+<div class="absolute bottom-0 w-full bg-emerald-100 rounded-t-xl h-[95%]"></div>
+<div class="absolute bottom-0 w-full primary-gradient rounded-t-xl h-[90%] transition-all duration-500 group-hover:h-[100%] chart-bar-glow"></div>
+<div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/5 flex items-center justify-center transition-opacity">
+<span class="text-[10px] font-black text-emerald-900 bg-white px-2 py-1 rounded shadow-sm">$15.5k</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant font-label tracking-wider">JUN</span>
+</div>
+</div>
+</div>
+<!-- Sophisticated Recent Activity -->
+<div class="col-span-12 lg:col-span-4 bg-emerald-900/5 border border-emerald-900/5 p-8 rounded-2xl animate-fade-in-up" style="animation-delay: 0.5s">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-xl font-bold text-on-surface">Recent Activity</h3>
+<span class="px-2 py-1 bg-white text-[10px] font-bold text-emerald-800 rounded ring-1 ring-emerald-100 uppercase">Live Feed</span>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-emerald-50 hover:shadow-md transition-shadow cursor-default group">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-xl" data-icon="rate_review">rate_review</span>
+</div>
+<div>
+<p class="text-[13px] font-bold text-on-surface">New review on "UX Psychology"</p>
+<p class="text-[12px] text-on-surface-variant/80 mt-0.5 line-clamp-1 italic">"Highly recommended! Practical advice."</p>
+<p class="text-[10px] font-bold text-primary mt-2 uppercase tracking-tight">2 mins ago • Sarah J.</p>
+</div>
+</div>
+<div class="flex gap-4 p-4 bg-white/60 rounded-xl border border-transparent hover:border-emerald-50 hover:bg-white transition-all cursor-default group">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 text-secondary transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-xl" data-icon="payments">payments</span>
+</div>
+<div>
+<p class="text-[13px] font-bold text-on-surface">Payout of $4,500 processed</p>
+<p class="text-[12px] text-on-surface-variant/80 mt-0.5">Transfer to Bank Account (...4901)</p>
+<p class="text-[10px] font-bold text-on-surface-variant/60 mt-2 uppercase tracking-tight">3 hours ago</p>
+</div>
+</div>
+<div class="flex gap-4 p-4 bg-white/60 rounded-xl border border-transparent hover:border-emerald-50 hover:bg-white transition-all cursor-default group">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center shrink-0 text-tertiary transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-xl" data-icon="group_add">group_add</span>
+</div>
+<div>
+<p class="text-[13px] font-bold text-on-surface">50 new students enrolled</p>
+<p class="text-[12px] text-on-surface-variant/80 mt-0.5">Campaign "Summer Skills" active</p>
+<p class="text-[10px] font-bold text-on-surface-variant/60 mt-2 uppercase tracking-tight">12 hours ago</p>
+</div>
+</div>
+<button class="w-full text-center text-[12px] font-bold text-emerald-700 mt-2 py-3 border border-dashed border-emerald-200 rounded-xl hover:bg-emerald-100/50 hover:border-emerald-300 transition-all uppercase tracking-widest">
+                    View All Activity
+                </button>
+</div>
+</div>
+<!-- Refined Best Performing Courses -->
+<div class="col-span-12 bg-white p-8 rounded-2xl ambient-shadow animate-fade-in-up" style="animation-delay: 0.6s">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h3 class="text-2xl font-bold text-on-surface">Course Performance</h3>
+<p class="text-sm text-on-surface-variant font-medium mt-1">Detailed metrics for your top-rated curriculums</p>
+</div>
+<button class="bg-emerald-50 text-emerald-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-emerald-100 transition-all">
+                    Full Inventory <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-separate border-spacing-y-2">
+<thead>
+<tr class="text-[11px] font-black font-label uppercase tracking-[0.15em] text-on-surface-variant/50 px-4">
+<th class="pb-4 pl-4 font-black">Course Content</th>
+<th class="pb-4 text-center font-black">Enrollments</th>
+<th class="pb-4 text-center font-black">Engagement</th>
+<th class="pb-4 text-center font-black">Revenue</th>
+<th class="pb-4 pr-4 text-right font-black">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="group bg-surface-container-low/30 hover:bg-emerald-50/80 transition-all duration-200">
+<td class="py-5 pl-4 rounded-l-2xl">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 rounded-xl bg-emerald-100 overflow-hidden shrink-0 shadow-sm ring-1 ring-emerald-900/5">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Advanced Web Systems Architecture course cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0Jx4WViapMb1tYnRFFDMQIs8cOQraseRzejz-p-GeIH7k9ZYmJULg-_KSBcSfwYzHuC-_q-W-nwuBI-pTC9F0AQbbngxBzaeHtBVUVjNORENgi4VMkEKEVr9DFymEc2lKkSaHDUwBPd29Lxf6QzonTAk0Ssjt7TQ7e2vxJQxtkT3hgA0skYS93Qs-dnw_Erpa8ubQ-zsR47_nqCdoOZ9ce99X-wDMyQhu46NIEBe7MvWhKDnI1SORu-lbOkE5gGrisV-29-PJkBc"/>
+</div>
+<div>
+<p class="font-extrabold text-[15px] text-on-surface group-hover:text-emerald-900 transition-colors">Advanced Web Systems Architecture</p>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-[11px] font-medium text-on-surface-variant/60">12.5 hrs</span>
+<span class="w-1 h-1 rounded-full bg-emerald-200"></span>
+<span class="text-[11px] font-medium text-on-surface-variant/60">24 Lessons</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-5 text-center font-bold text-sm text-on-surface">1,204</td>
+<td class="py-5">
+<div class="flex flex-col items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="text-[11px] font-black text-emerald-800">82%</span>
+<span class="material-symbols-outlined text-[12px] text-emerald-600" style="font-variation-settings: 'FILL' 1">bolt</span>
+</div>
+<div class="w-24 h-1.5 bg-white rounded-full overflow-hidden ring-1 ring-emerald-900/5">
+<div class="h-full primary-gradient w-[82%] rounded-full shadow-sm"></div>
+</div>
+</div>
+</td>
+<td class="py-5 text-center font-black text-sm text-on-surface tracking-tight">$6,420.00</td>
+<td class="py-5 pr-4 text-right rounded-r-2xl">
+<span class="px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase rounded-lg tracking-widest shadow-sm">Active</span>
+</td>
+</tr>
+<tr class="group bg-surface-container-low/30 hover:bg-emerald-50/80 transition-all duration-200">
+<td class="py-5 pl-4 rounded-l-2xl">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 rounded-xl bg-emerald-100 overflow-hidden shrink-0 shadow-sm ring-1 ring-emerald-900/5">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Python for Data Science Mastery course cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt2zcvabya7LmtfAfpB6BegBBzR6MAbWe7ma1flgTpxoDxMcWKZjJPJqDqJVCNwswAwxFDhIdFtZcytsAzqkBIxrQO335Etb_ANB-3PctLc3XZJGOwIhRIbyvcAgNP-2fzwN872uChc4x1yJY8vGo0j7HHY90sQ_3m-Hq8PacBCAhnla9ykK0WsA5KoAyf1_H5I3iknhkgK41LqiALRK-lStbtD4iM-j_ztxO3Ctwwf8-2-VXrXae0EP2CGW3XM4wuM-CyzPsDCZM"/>
+</div>
+<div>
+<p class="font-extrabold text-[15px] text-on-surface group-hover:text-emerald-900 transition-colors">Python for Data Science Mastery</p>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-[11px] font-medium text-on-surface-variant/60">8.2 hrs</span>
+<span class="w-1 h-1 rounded-full bg-emerald-200"></span>
+<span class="text-[11px] font-medium text-on-surface-variant/60">18 Lessons</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-5 text-center font-bold text-sm text-on-surface">948</td>
+<td class="py-5">
+<div class="flex flex-col items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="text-[11px] font-black text-emerald-800">65%</span>
+<span class="material-symbols-outlined text-[12px] text-emerald-600" style="font-variation-settings: 'FILL' 1">bolt</span>
+</div>
+<div class="w-24 h-1.5 bg-white rounded-full overflow-hidden ring-1 ring-emerald-900/5">
+<div class="h-full bg-emerald-400 w-[65%] rounded-full"></div>
+</div>
+</div>
+</td>
+<td class="py-5 text-center font-black text-sm text-on-surface tracking-tight">$4,740.00</td>
+<td class="py-5 pr-4 text-right rounded-r-2xl">
+<span class="px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase rounded-lg tracking-widest shadow-sm">Active</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<footer class="ml-64 bg-white border-t border-emerald-100 flex flex-col md:flex-row justify-between items-center px-12 py-10 gap-6">
+<div class="flex items-center gap-4">
+<div class="p-2 bg-emerald-900 rounded-lg">
+<span class="font-manrope font-black text-white text-lg tracking-tighter">SN</span>
+</div>
+<div class="flex flex-col">
+<span class="font-manrope font-bold text-emerald-900 leading-tight">SkillNest</span>
+<p class="font-inter text-[10px] tracking-[0.1em] uppercase text-emerald-600 font-bold opacity-70">The Intellectual Sanctuary © 2024</p>
+</div>
+</div>
+<div class="flex flex-wrap justify-center gap-x-10 gap-y-4">
+<a class="font-inter text-[11px] font-bold tracking-widest uppercase text-emerald-800/60 hover:text-emerald-900 transition-all border-b border-transparent hover:border-emerald-200" href="#">Terms</a>
+<a class="font-inter text-[11px] font-bold tracking-widest uppercase text-emerald-800/60 hover:text-emerald-900 transition-all border-b border-transparent hover:border-emerald-200" href="#">Privacy</a>
+<a class="font-inter text-[11px] font-bold tracking-widest uppercase text-emerald-800/60 hover:text-emerald-900 transition-all border-b border-transparent hover:border-emerald-200" href="#">Accessibility</a>
+<a class="font-inter text-[11px] font-bold tracking-widest uppercase text-emerald-800/60 hover:text-emerald-900 transition-all border-b border-transparent hover:border-emerald-200" href="#">Support</a>
+</div>
+</footer>
+</body></html>

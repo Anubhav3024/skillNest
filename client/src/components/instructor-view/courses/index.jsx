@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -14,7 +13,7 @@ import {
 } from "@/config";
 
 import { InstructorContext } from "@/context/instructor-context";
-import { Delete, Edit } from "lucide-react";
+import { Trash2, Edit3, Plus, Users, IndianRupee, BookOpen } from "lucide-react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,89 +26,123 @@ const InstructorCourses = ({ listOfCourses }) => {
     setCourseCurriculumFormData,
   } = useContext(InstructorContext);
 
-    
-
   return (
-    <div>
-      <Card className="border-2 border-indigo-100 rounded-2xl shadow-xl bg-white">
-        <CardHeader className="flex justify-between flex-row items-center border-b-2 border-indigo-100 bg-gradient-to-r from-indigo-50 to-purple-50 p-6">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            All Courses
-          </CardTitle>
-          <Button
-            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-            onClick={() => {
-              setCurrentEditedCourseId(null);
-              setCourseCurriculumFormData(courseCurriculumInitialFormData);
-              setCourseLandingFormData(courseLandingInitialFormData);
-              navigate("/instructor/create-new-course");
-            }}
-          >
-            Create A New Course
-          </Button>
-        </CardHeader>
-        <CardContent className="p-6">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="bg-white rounded-[3rem] border border-[#0d694f]/5 shadow-2xl shadow-emerald-950/5 overflow-hidden">
+        <div className="p-10 lg:p-12 border-b border-[#fcf8f1] flex flex-col md:flex-row md:items-center justify-between gap-8">
+           <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 text-[#ff7e5f] font-headline font-black text-xs uppercase tracking-[0.2em]">
+                 Asset Management
+                 <span className="w-12 h-px bg-[#ff7e5f]/30"></span>
+              </div>
+              <h3 className="text-3xl font-headline font-black text-[#0d694f]">Course Inventory</h3>
+           </div>
+           
+           <Button
+             className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl px-10 py-7 font-headline font-black text-[11px] tracking-widest uppercase shadow-xl shadow-[#0d694f]/20 transition-all border-none group"
+             onClick={() => {
+               setCurrentEditedCourseId(null);
+               setCourseCurriculumFormData(courseCurriculumInitialFormData);
+               setCourseLandingFormData(courseLandingInitialFormData);
+               navigate("/instructor/create-new-course");
+             }}
+           >
+             <Plus className="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" />
+             PUBLISH NEW VAULT
+           </Button>
+        </div>
+
+        <div className="p-10 lg:p-12">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-b-2 border-indigo-100 hover:bg-indigo-50/50">
-                  <TableHead className="font-bold text-gray-700 text-base py-4">Course</TableHead>
-                  <TableHead className="font-bold text-gray-700 text-base py-4">Students</TableHead>
-                  <TableHead className="font-bold text-gray-700 text-base py-4">Revenue</TableHead>
-                  <TableHead className="text-right font-bold text-gray-700 text-base py-4">Action</TableHead>
+                <TableRow className="border-b border-[#0d694f]/10 hover:bg-transparent">
+                  <TableHead className="font-headline font-black text-[#0d694f] text-[10px] tracking-widest uppercase py-6">Course Identity</TableHead>
+                  <TableHead className="font-headline font-black text-[#0d694f] text-[10px] tracking-widest uppercase py-6 text-center">Scholars</TableHead>
+                  <TableHead className="font-headline font-black text-[#0d694f] text-[10px] tracking-widest uppercase py-6 text-center">Earnings</TableHead>
+                  <TableHead className="text-right font-headline font-black text-[#0d694f] text-[10px] tracking-widest uppercase py-6">Modifications</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {listOfCourses && listOfCourses.length > 0
-                  ? listOfCourses.map((course) => (
-                      <TableRow 
-                        key={course._id}
-                        className="border-b border-indigo-50 hover:bg-indigo-50/50 transition-colors duration-200"
-                      >
-                        <TableCell className="font-semibold text-gray-800 py-4">
-                          {course?.title}
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm">
-                            {course?.students?.length}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <span className="font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                            Rs {course?.students?.length * course?.pricing}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right py-4">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all duration-200"
-                              onClick={() => {
-                                navigate(
-                                  `/instructor/edit-course/${course?._id}`
-                                );
-                              }}
-                            >
-                              <Edit className="h-5 w-5" />
-                            </Button>
-                            <Button 
+                {listOfCourses && listOfCourses.length > 0 ? (
+                  listOfCourses.map((course) => (
+                    <TableRow 
+                      key={course._id}
+                      className="border-b border-[#fcf8f1] hover:bg-[#fcf8f1]/50 transition-colors duration-300 group"
+                    >
+                      <TableCell className="py-8">
+                         <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 flex items-center justify-center text-[#ff7e5f] shadow-sm transform group-hover:rotate-3 transition-transform">
+                               <BookOpen className="h-6 w-6" />
+                            </div>
+                            <div>
+                               <div className="font-headline font-black text-[#0d694f] text-lg leading-tight group-hover:text-[#ff7e5f] transition-colors">{course?.title}</div>
+                               <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Status: Published</div>
+                            </div>
+                         </div>
+                      </TableCell>
+                      <TableCell className="text-center py-8">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 text-[#0d694f] font-black text-[10px] uppercase tracking-widest shadow-sm">
+                           <Users className="h-3 w-3" />
+                           {course?.students?.length} Enrolled
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center py-8">
+                        <div className="font-headline font-black text-lg text-[#0d694f]">
+                           Rs {course?.students?.length * course?.pricing}
+                        </div>
+                        <div className="text-[9px] font-black text-[#ff7e5f] uppercase tracking-widest">Gross Revenue</div>
+                      </TableCell>
+                      <TableCell className="text-right py-8">
+                        <div className="flex justify-end gap-3">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="w-12 h-12 rounded-xl border border-[#0d694f]/5 bg-white text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all shadow-sm group-hover:shadow-md"
+                            onClick={() => {
+                              navigate(
+                                `/instructor/edit-course/${course?._id}`
+                              );
+                            }}
+                          >
+                            <Edit3 className="h-5 w-5" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="w-12 h-12 rounded-xl border border-destructive/10 bg-white text-destructive hover:bg-destructive hover:text-white transition-all shadow-sm"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                     <TableCell colSpan={4} className="py-24 text-center">
+                        <div className="max-w-xs mx-auto">
+                           <div className="w-20 h-20 bg-[#fcf8f1] rounded-full flex items-center justify-center mx-auto mb-6 border border-[#0d694f]/10 shadow-inner">
+                              <BookOpen className="h-8 w-8 text-[#0d694f]/20" />
+                           </div>
+                           <h4 className="text-xl font-headline font-black text-[#0d694f] mb-2">Inventory Empty</h4>
+                           <p className="text-muted-foreground text-sm font-medium mb-8">Ready to share your knowledge with the world?</p>
+                           <Button 
+                              onClick={() => navigate("/instructor/create-new-course")}
                               variant="ghost" 
-                              size="sm"
-                              className="hover:bg-red-100 hover:text-red-600 rounded-lg transition-all duration-200"
-                            >
-                              <Delete className="h-5 w-5" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  : null}
+                              className="text-[#ff7e5f] font-black text-[10px] tracking-widest uppercase hover:bg-transparent hover:underline"
+                           >
+                              Begin Drafting
+                           </Button>
+                        </div>
+                     </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

@@ -33,7 +33,7 @@ export const signUpFormControls = [
       },
       {
         id: "instructor",
-        label: "Instructor",
+        label: "Educator",
       },
     ],
   },
@@ -179,7 +179,7 @@ export const courseLandingInitialFormData = {
   objectives: "",
   welcomeMessage: "",
   image: "",
-  imagePublicId : ""
+  imagePublicId: "",
 };
 
 export const courseCurriculumInitialFormData = [

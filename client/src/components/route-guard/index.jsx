@@ -1,21 +1,17 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const RouteGuard = ({ authenticated, user, element }) => {
   const location = useLocation();
 
-    
-  if (!authenticated && !location.pathname.includes("/auth")) {
-    return <Navigate to="/auth"></Navigate>;
-  }
-
   if (
-    authenticated &&
-    user?.role !== "instructor" &&
-    (location.pathname.includes("/instructor") ||
-      location.pathname.includes("/auth"))
+    !authenticated &&
+    !location.pathname.includes("/auth") &&
+    location.pathname !== "/" &&
+    location.pathname !== "/home"
   ) {
-    return <Navigate to="/home"></Navigate>;
+    return <Navigate to="/auth" />;
   }
 
   if (
@@ -23,10 +19,25 @@ const RouteGuard = ({ authenticated, user, element }) => {
     user?.role === "instructor" &&
     !location.pathname.includes("/instructor")
   ) {
-    return <Navigate to="/instructor"></Navigate>;
+    return <Navigate to="/instructor" />;
   }
 
-  return <Fragment>{element}</Fragment>
+  if (
+    authenticated &&
+    user?.role === "student" &&
+    (location.pathname.includes("/instructor") ||
+      location.pathname.includes("/auth"))
+  ) {
+    return <Navigate to="/home" />;
+  }
+
+  return <Fragment>{element}</Fragment>;
+};
+
+RouteGuard.propTypes = {
+  authenticated: PropTypes.bool,
+  user: PropTypes.object,
+  element: PropTypes.node,
 };
 
 export default RouteGuard;
