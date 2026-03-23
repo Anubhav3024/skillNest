@@ -6,81 +6,215 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  BarChart2,
+  PieChart,
+  Loader2,
+  BookOpen,
   ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import PropTypes from "prop-types";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Cell
+} from "recharts";
+import { useEffect, useState, useMemo } from "react";
+import { io } from "socket.io-client";
+import { toast } from "react-toastify";
+import axiosInstance from "@/api/axiosInstance";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-const InstructorEarnings = () => {
+const ENTRIES_PER_PAGE = 12;
+
+const InstructorEarnings = ({ 
+  saasAnalytics, 
+  fetchSaaSAnalytics,
+  user
+}) => {
+  const [trajectoryType, setTrajectoryType] = useState("monthly");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Breakdown states
+  const [isBreakdownModalOpen, setIsBreakdownModalOpen] = useState(false);
+  const [selectedPeriodLabel, setSelectedPeriodLabel] = useState("");
+  const [breakdownData, setBreakdownData] = useState([]);
+  const [loadingBreakdown, setLoadingBreakdown] = useState(false);
+
+  // WebSocket for Real-time Updates
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    
+    socket.emit("join-instructor", user._id);
+
+    socket.on("dashboard-update", (data) => {
+      console.log("Real-time update received:", data);
+      toast.success(data.message || "New enrollment received! 🥂", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      fetchSaaSAnalytics(trajectoryType);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?._id, trajectoryType, fetchSaaSAnalytics]);
+
+  // Initial Fetch & Trajectory Refresh
+  useEffect(() => {
+    fetchSaaSAnalytics(trajectoryType);
+  }, [fetchSaaSAnalytics, trajectoryType]);
+
+  // Reset pagination on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, trajectoryType]);
+
+  const summary = saasAnalytics?.summary;
+  const trajectory = useMemo(() => saasAnalytics?.trajectory || [], [saasAnalytics?.trajectory]);
+  const transactions = useMemo(() => saasAnalytics?.transactions || [], [saasAnalytics?.transactions]);
+
   const stats = [
     {
-      label: "NET REVENUE",
-      value: "₹1,02,482.00",
-      change: "+14.2% yield surge",
+      label: "TOTAL REVENUE",
+      value: `₹${summary?.revenue?.toLocaleString() || 0}`,
+      change: "Lifetime Yield",
       icon: TrendingUp,
       color: "text-[#0d694f]",
       bg: "bg-[#0d694f]/5"
     },
     {
       label: "ENROLLMENTS",
-      value: "1,248",
-      change: "+8.5% growth rate",
+      value: summary?.totalStudents || 0,
+      change: "Total Scholars",
       icon: Users,
       color: "text-[#0d694f]",
       bg: "bg-[#0d694f]/5"
     },
     {
       label: "AVG. RATING",
-      value: "4.92",
-      change: "Based on 856 reviews",
+      value: summary?.avgRating || "0.0",
+      change: "Scholarly Feedback",
       icon: Star,
       color: "text-[#0d694f]",
       bg: "bg-[#0d694f]/5"
     },
     {
       label: "STABILITY",
-      value: "68%",
+      value: `${summary?.stability || 100}%`,
       change: "Retention threshold",
-      icon: TrendingUp,
+      icon: BarChart2,
       color: "text-[#0d694f]",
       bg: "bg-[#0d694f]/5"
     }
   ];
 
-  const paymentHistory = [
-    {
-      date: "Oct 24, 2024",
-      student: "Adrian Locke",
-      course: "Mastering Advanced Typography",
-      status: "COMPLETED",
-      amount: "₹14,900.00",
-      avatar: "AL"
-    },
-    {
-      date: "Oct 23, 2024",
-      student: "Elena Wright",
-      course: "UI/UX Strategy & Operations",
-      status: "COMPLETED",
-      amount: "₹19,900.00",
-      avatar: "EW"
-    },
-    {
-      date: "Oct 21, 2024",
-      student: "Marcus Thorne",
-      course: "Design Systems for Scale",
-      status: "COMPLETED",
-      amount: "₹14,900.00",
-      avatar: "MS"
-    },
-    {
-      date: "Oct 20, 2024",
-      student: "Julian Hart",
-      course: "Mastering Advanced Typography",
-      status: "PENDING",
-      amount: "₹14,900.00",
-      avatar: "JH"
+  const filteredTransactions = useMemo(() => {
+    const list = transactions || [];
+    if (!searchQuery) return list;
+    return list.filter(t => 
+      t.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.courseTitle?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [transactions, searchQuery]);
+
+  const totalPages = Math.ceil(filteredTransactions.length / ENTRIES_PER_PAGE);
+
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * ENTRIES_PER_PAGE;
+    return filteredTransactions.slice(startIndex, startIndex + ENTRIES_PER_PAGE);
+  }, [filteredTransactions, currentPage]);
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const chartData = useMemo(() => {
+    const list = trajectory || [];
+    return list.map(item => {
+      const date = new Date(item.period);
+      let label = "";
+      if (trajectoryType === "monthly") {
+        label = date.toLocaleString('default', { month: 'short' });
+      } else if (trajectoryType === "weekly") {
+        label = `W${item.rawId.week}`;
+      } else if (trajectoryType === "yearly") {
+        label = item.rawId.year;
+      }
+      return {
+        name: label,
+        revenue: item.revenue,
+        period: `${item.rawId.year}-${String(item.rawId.month || '01').padStart(2, '0')}`
+      };
+    });
+  }, [trajectory, trajectoryType]);
+
+  const handleBarClick = async (data) => {
+    if (!data || !data.period) return;
+    
+    setSelectedPeriodLabel(data.name);
+    setIsBreakdownModalOpen(true);
+    setLoadingBreakdown(true);
+    setBreakdownData([]);
+
+    try {
+      const response = await axiosInstance.get(`/api/analytics/course-breakdown?period=${data.period}`);
+      if (response.data.success) {
+        setBreakdownData(response.data.data);
+      } else {
+        toast.error("Failed to fetch breakdown data");
+      }
+    } catch (error) {
+      console.error("Breakdown Fetch Error:", error);
+      toast.error("Error retrieving scholarship breakdown");
+    } finally {
+      setLoadingBreakdown(false);
     }
-  ];
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await axiosInstance.get("/api/analytics/export", {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "revenue-manifest.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Financial manifest sequestered successfully! 📊");
+    } catch (error) {
+      console.error("Export Error:", error);
+      toast.error("Failed to sequester financial manifest. Verify authentication.");
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,32 +226,62 @@ const InstructorEarnings = () => {
     visible: { y: 0, opacity: 1 }
   };
 
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 rounded-2xl border border-[#0d694f]/10 shadow-3d-orange backdrop-blur-md">
+          <p className="text-[11px] font-bold text-[#0d694f] uppercase tracking-wider mb-2">{payload[0].payload.name}</p>
+          <p className="text-sm font-headline font-bold text-[#ff7e5f]">₹{payload[0].value.toLocaleString()}</p>
+          <p className="text-[9px] font-semibold text-muted-foreground mt-1 italic">Click to view course breakdown</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  CustomTooltip.propTypes = {
+    active: PropTypes.bool,
+    payload: PropTypes.array,
+  };
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-10"
+      className="space-y-6"
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-headline font-black text-[#0d694f] tracking-tighter mb-1 uppercase">
+          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1 uppercase">
             Financial Analytics
           </h1>
-          <p className="text-muted-foreground font-medium text-sm italic opacity-70">
-            Synthesized yield reports and engagement metrics.
+          <p className="text-muted-foreground font-semibold text-sm italic opacity-70">
+            SaaS-grade production yield reports with real-time sync.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="bg-white border border-[#0d694f]/10 rounded-xl px-4 py-2.5 flex items-center gap-3 shadow-3d">
-             <div className="w-4 h-4 bg-[#0d694f]/5 rounded flex items-center justify-center">
-                <TrendingUp className="h-3 w-3 text-[#0d694f]" />
-             </div>
-             <span className="text-[9px] font-black text-[#0d694f] uppercase tracking-widest">30-DAY CYCLE</span>
+          <div className="flex bg-[#fcf8f1] p-1 rounded-xl border border-[#0d694f]/10 shadow-inner">
+            {['weekly', 'monthly', 'yearly'].map((type) => (
+              <button
+                key={type}
+                onClick={() => setTrajectoryType(type)}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                  trajectoryType === type 
+                    ? "bg-[#0d694f] text-white shadow-3d" 
+                    : "text-muted-foreground/60 hover:text-[#0d694f]"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
           </div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button className="bg-white hover:bg-[#0d694f]/5 text-[#0d694f] border border-[#0d694f]/10 rounded-xl px-4 py-4 h-auto aspect-square shadow-3d-orange transition-all border-none">
+            <Button 
+              onClick={handleExport}
+              className="bg-white hover:bg-[#0d694f]/5 text-[#0d694f] border border-[#0d694f]/10 rounded-xl px-4 py-4 h-auto aspect-square shadow-3d-orange transition-all border-none"
+            >
               <Download className="h-3.5 w-3.5" />
             </Button>
           </motion.div>
@@ -134,16 +298,16 @@ const InstructorEarnings = () => {
             className="bg-white p-8 rounded-[2rem] border border-[#0d694f]/5 shadow-3d group cursor-default"
           >
             <div className="flex flex-col gap-6">
-              <span className="text-[9px] font-black tracking-[0.2em] text-muted-foreground uppercase opacity-40 group-hover:opacity-100 transition-opacity">{stat.label}</span>
+              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase opacity-60 group-hover:opacity-100 transition-opacity">{stat.label}</span>
               <div className="space-y-1">
-                <div className="text-2xl font-headline font-black text-[#0d694f] tracking-tighter">{stat.value}</div>
-                <div className="text-[9px] font-black text-[#0d694f]/60 uppercase tracking-widest italic opacity-70">{stat.change}</div>
+                <div className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter">{stat.value}</div>
+                <div className="text-[10px] font-bold text-[#0d694f]/60 uppercase tracking-wider italic opacity-70">{stat.change}</div>
               </div>
               {stat.label === 'STABILITY' && (
                 <div className="w-full h-1 bg-[#fcf8f1] rounded-full overflow-hidden">
                    <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: "68%" }}
+                    animate={{ width: `${summary?.stability || 100}%` }}
                     transition={{ duration: 1.5, delay: 0.5 }}
                     className="h-full bg-primary-gradient rounded-full"
                    ></motion.div>
@@ -155,148 +319,247 @@ const InstructorEarnings = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Revenue Trends */}
-        <motion.div variants={itemVariants} className="lg:col-span-8 bg-white p-10 rounded-[2.5rem] border border-[#0d694f]/5 shadow-3d relative overflow-hidden">
+        {/* Financial Trajectory */}
+        <motion.div variants={itemVariants} className="lg:col-span-12 bg-white p-8 rounded-2xl border border-[#0d694f]/5 shadow-3d relative overflow-hidden">
           <div className="flex items-center justify-between mb-12 relative z-10">
-            <h3 className="text-lg font-headline font-black text-[#0d694f] uppercase tracking-tight">Yield Progression</h3>
+            <h3 className="text-lg font-headline font-bold text-[#0d694f] uppercase tracking-tight">Financial Trajectory</h3>
             <div className="flex items-center gap-6">
                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#0d694f]"></div>
-                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-60">ACTIVE</span>
-               </div>
-               <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#ff7e5f]"></div>
-                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-60">FORMER</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-60">Revenue Performance</span>
                </div>
             </div>
           </div>
           
-          <div className="h-80 relative flex items-end justify-between px-6 pb-2 z-10">
-             {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'].map((month, i) => (
-               <div key={i} className="flex flex-col items-center gap-6 w-full group">
-                  <div className="flex gap-1.5 items-end">
-                     <div className="w-7 bg-[#0d694f]/5 rounded-t-lg relative h-48 overflow-hidden group-hover:bg-[#0d694f]/10 transition-colors">
-                        <motion.div 
-                          initial={{ height: 0 }}
-                          animate={{ height: `${[40, 55, 70, 50, 85, 95][i]}%` }}
-                          transition={{ duration: 1.5, delay: 0.6 + (i * 0.1) }}
-                          className="absolute bottom-0 left-0 right-0 bg-primary-gradient rounded-t-lg shadow-[0_0_10px_rgba(13,105,79,0.1)]"
-                        ></motion.div>
-                     </div>
-                     <div className="w-7 bg-[#ff7e5f]/5 rounded-t-lg relative h-48 overflow-hidden group-hover:bg-[#ff7e5f]/10 transition-colors">
-                        <motion.div 
-                          initial={{ height: 0 }}
-                          animate={{ height: `${[30, 40, 50, 45, 60, 70][i]}%` }}
-                          transition={{ duration: 1.5, delay: 0.8 + (i * 0.1) }}
-                          className="absolute bottom-0 left-0 right-0 bg-[#ff7e5f]/40 rounded-t-lg"
-                        ></motion.div>
-                     </div>
-                  </div>
-                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.2em] group-hover:text-[#0d694f] transition-colors">{month}</span>
-               </div>
-             ))}
+          <div className="h-80 relative z-10">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#0d694f10" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#0d694f60' }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#0d694f60' }}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#0d694f05', radius: 12 }} />
+                <Bar 
+                  dataKey="revenue" 
+                  radius={[12, 12, 0, 0]} 
+                  barSize={40}
+                  onClick={(data) => handleBarClick(data)}
+                  className="cursor-pointer"
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill="url(#barGradient)" 
+                      className="transition-all duration-500 hover:opacity-80"
+                    />
+                  ))}
+                </Bar>
+                <defs>
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#0d694f" />
+                    <stop offset="100%" stopColor="#ff7e5f" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32 opacity-30"></div>
         </motion.div>
-
-        {/* Top Performing */}
-        <motion.div variants={itemVariants} className="lg:col-span-4 bg-[#dfede9] p-10 rounded-[2.5rem] border border-[#0d694f]/10 shadow-3d">
-          <h3 className="text-lg font-headline font-black text-[#0d694f] mb-10 uppercase tracking-tight">Prime Assets</h3>
-          <div className="space-y-8">
-            {[
-              { title: "Mastering Advanced Typography", earn: "₹4,29,000.00 earned", img: "https://images.unsplash.com/photo-1541462608141-ad511a7ee596?auto=format&fit=crop&q=80&w=100" },
-              { title: "UI/UX Strategy & Operations", earn: "₹3,15,000.00 earned", img: "https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?auto=format&fit=crop&q=80&w=100" },
-              { title: "Design Systems for Scale", earn: "₹2,84,000.00 earned", img: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=100" }
-            ].map((course, index) => (
-              <motion.div 
-                key={index} 
-                whileHover={{ x: 4 }}
-                className="flex items-center gap-4 group cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-xl overflow-hidden shadow-3d border border-white/20 grayscale group-hover:grayscale-0 transition-all duration-700">
-                   <img src={course.img} alt="" className="w-full h-full object-cover" />
-                </div>
-                <div className="min-w-0 flex-1">
-                   <div className="text-[11px] font-headline font-black text-[#0d694f] truncate uppercase tracking-tight group-hover:text-[#ff7e5f] transition-colors">{course.title}</div>
-                   <div className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest mt-1 italic">{course.earn}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          <button className="w-full mt-12 text-[9px] font-black text-[#0d694f] hover:text-[#ff7e5f] uppercase tracking-[0.2em] transition-all flex items-center justify-between group/btn">
-            ANALYZE ALL VAULTS
-            <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-          </button>
-        </motion.div>
       </div>
 
-      {/* Payment History */}
-      <motion.div variants={itemVariants} className="bg-white p-10 rounded-[3rem] border border-[#0d694f]/5 shadow-3d">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <h3 className="text-lg font-headline font-black text-[#0d694f] uppercase tracking-tight">Transaction Manifest</h3>
+      {/* Transaction Manifest */}
+      <motion.div variants={itemVariants} className="bg-white p-8 rounded-2xl border border-[#0d694f]/5 shadow-3d">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+          <h3 className="text-lg font-headline font-bold text-[#0d694f] uppercase tracking-tight">Transaction Manifest</h3>
           <div className="relative group">
              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40 group-focus-within:text-[#0d694f] transition-colors" />
              <input 
               type="text" 
               placeholder="Query protocol logs..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-[#fcf8f1] border border-[#0d694f]/5 rounded-xl pl-11 pr-6 py-3 text-[11px] font-medium focus:ring-4 focus:ring-[#0d694f]/5 outline-none w-full md:w-72 transition-all"
              />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-visible">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-y border-[#fcf8f1]">
-                <th className="py-5 px-6 text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">EPOCH</th>
-                <th className="py-5 px-6 text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">SCHOLAR</th>
-                <th className="py-5 px-6 text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">ARCHIVE IDENTIFIER</th>
-                <th className="py-5 px-6 text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] text-center">PROTOCOL</th>
-                <th className="py-5 px-6 text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] text-right">VALUATION</th>
-              </tr>
+                <tr className="border-y border-[#fcf8f1]">
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">EPOCH</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">SCHOLAR</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">ARCHIVE IDENTIFIER</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider text-center">PROTOCOL</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider text-right">VALUATION</th>
+                </tr>
             </thead>
             <tbody className="divide-y divide-[#fcf8f1]">
-              {paymentHistory.map((payment, index) => (
-                <motion.tr 
-                  key={index} 
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 * index }}
-                  className="group hover:bg-[#fcf8f1]/50 transition-colors cursor-pointer"
-                >
-                  <td className="py-6 px-6 text-[10px] text-muted-foreground/60 font-black uppercase tracking-widest">{payment.date}</td>
-                  <td className="py-6 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[#fcf8f1] border border-[#0d694f]/10 flex items-center justify-center text-[9px] font-black text-[#0d694f] shadow-inner group-hover:rotate-6 transition-transform">
-                         {payment.avatar}
+              <AnimatePresence mode="popLayout">
+                {paginatedTransactions.map((payment, index) => (
+                  <motion.tr 
+                    key={payment._id} 
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: 0.05 * index }}
+                    className="group hover:bg-[#fcf8f1]/50 transition-colors cursor-pointer"
+                  >
+                    <td className="py-3.5 px-4 text-[11px] text-muted-foreground/60 font-bold uppercase tracking-wider">
+                      {new Date(payment.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#fcf8f1] border border-[#0d694f]/10 flex items-center justify-center text-[10px] font-bold text-[#0d694f] shadow-inner group-hover:rotate-6 transition-transform">
+                           {payment.userName?.substring(0, 2).toUpperCase() || '??'}
+                        </div>
+                        <span className="text-[13px] font-headline font-bold text-[#0d694f] uppercase tracking-tight group-hover:text-[#ff7e5f] transition-colors">{payment.userName}</span>
                       </div>
-                      <span className="text-[12px] font-headline font-black text-[#0d694f] uppercase tracking-tight group-hover:text-[#ff7e5f] transition-colors">{payment.student}</span>
-                    </div>
+                    </td>
+                    <td className="py-3.5 px-4 text-[11px] font-medium text-muted-foreground italic group-hover:text-[#0d694f] transition-colors">{payment.courseTitle}</td>
+                    <td className="py-3.5 px-4 text-center">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${payment.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'} group-hover:bg-[#0d694f] group-hover:text-white transition-all`}>
+                        {payment.paymentStatus}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right text-[12px] font-headline font-black text-[#0d694f] tracking-tighter">₹{payment.coursePricing}</td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+              {paginatedTransactions.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="py-20 text-center text-muted-foreground opacity-30 text-[10px] uppercase font-black tracking-widest">
+                    No transactions recorded in the manifest
                   </td>
-                  <td className="py-6 px-6 text-[11px] font-medium text-muted-foreground italic group-hover:text-[#0d694f] transition-colors">{payment.course}</td>
-                  <td className="py-6 px-6 text-center">
-                    <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em] border ${payment.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'} group-hover:bg-[#0d694f] group-hover:text-white transition-all`}>
-                      {payment.status}
-                    </span>
-                  </td>
-                  <td className="py-6 px-6 text-right text-[12px] font-headline font-black text-[#0d694f] tracking-tighter">{payment.amount}</td>
-                </motion.tr>
-              ))}
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
         
         <div className="mt-10 flex items-center justify-between border-t border-[#fcf8f1] pt-10">
-           <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">INDEX 4 OF 128 ENTRIES</span>
+           <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">
+            SHOWING {filteredTransactions.length > 0 ? (currentPage - 1) * ENTRIES_PER_PAGE + 1 : 0}-
+            {Math.min(currentPage * ENTRIES_PER_PAGE, filteredTransactions.length)} OF {filteredTransactions.length} ENTRIES
+           </span>
            <div className="flex items-center gap-3">
-              <motion.button whileHover={{ y: -2 }} whileTap={{ y: 0 }} className="h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[9px] font-black uppercase tracking-widest text-[#0d694f] flex items-center gap-2 hover:bg-[#fcf8f1] transition-all shadow-3d"><ChevronLeft className="h-3.5 w-3.5" /> PREVIOUS</motion.button>
-              <motion.button whileHover={{ y: -2 }} whileTap={{ y: 0 }} className="h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[9px] font-black uppercase tracking-widest text-[#0d694f] flex items-center gap-2 hover:bg-[#fcf8f1] transition-all shadow-3d">NEXT <ChevronRight className="h-3.5 w-3.5" /></motion.button>
+              <motion.button 
+                whileHover={currentPage > 1 ? { y: -2 } : {}} 
+                whileTap={currentPage > 1 ? { y: 0 } : {}} 
+                onClick={handlePrevious}
+                disabled={currentPage === 1}
+                className={`h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[10px] font-bold uppercase tracking-wider text-[#0d694f] flex items-center gap-2 transition-all shadow-3d ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-[#fcf8f1]'}`}
+              >
+                <ChevronLeft className="h-3.5 w-3.5" /> PREVIOUS
+              </motion.button>
+              <motion.button 
+                whileHover={currentPage < totalPages ? { y: -2 } : {}} 
+                whileTap={currentPage < totalPages ? { y: 0 } : {}} 
+                onClick={handleNext}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className={`h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[10px] font-bold uppercase tracking-wider text-[#0d694f] flex items-center gap-2 transition-all shadow-3d ${currentPage === totalPages || totalPages === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-[#fcf8f1]'}`}
+              >
+                NEXT <ChevronRight className="h-3.5 w-3.5" />
+              </motion.button>
            </div>
         </div>
       </motion.div>
+
+      {/* Course Breakdown Dialog */}
+      <Dialog open={isBreakdownModalOpen} onOpenChange={setIsBreakdownModalOpen}>
+        <DialogContent className="sm:max-w-2xl bg-white rounded-[3rem] border border-[#0d694f]/10 shadow-2xl p-10 overflow-hidden font-body">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-[#0d694f]/5 rounded-full blur-3xl -mr-24 -mt-24"></div>
+          
+          <DialogHeader className="relative z-10 mb-8">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-headline font-bold text-[#0d694f] uppercase tracking-tighter flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#0d694f] text-white flex items-center justify-center shadow-lg shadow-[#0d694f]/20">
+                  <PieChart className="h-6 w-6" />
+                </div>
+                Yield Breakdown
+              </DialogTitle>
+              <div className="bg-[#fcf8f1] px-5 py-2 rounded-xl border border-[#0d694f]/5 text-[11px] font-bold text-[#0d694f] uppercase tracking-wider">
+                {selectedPeriodLabel}
+              </div>
+            </div>
+            <DialogDescription className="text-xs font-medium text-muted-foreground/70 italic mt-4">
+              Detailed course-level revenue distribution for the selected temporal manifest.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="relative z-10 space-y-6">
+            {loadingBreakdown ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-4">
+                <Loader2 className="h-10 w-10 text-[#0d694f] animate-spin" />
+                <span className="text-[10px] font-black text-[#0d694f]/40 uppercase tracking-[0.2em]">Sequestering Data...</span>
+              </div>
+            ) : breakdownData.length > 0 ? (
+              <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                {breakdownData.map((course, index) => (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="group bg-[#fcf8f1]/50 border border-[#0d694f]/5 rounded-[1.5rem] p-5 hover:bg-[#0d694f] transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-[#0d694f]/10 flex items-center justify-center text-[#0d694f] group-hover:rotate-6 transition-transform">
+                          <BookOpen className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="text-[13px] font-headline font-black text-[#0d694f] uppercase tracking-tight group-hover:text-white transition-colors">{course.title}</div>
+                          <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-0.5 group-hover:text-white/60 transition-colors">Manifest ID: {course._id.substring(0, 8)}...</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6 text-right">
+                         <div className="space-y-0.5">
+                            <div className="text-sm font-headline font-bold text-[#ff7e5f] group-hover:text-white transition-colors">₹{course.revenue.toLocaleString()}</div>
+                            <div className="text-[10px] font-bold text-[#0d694f]/40 uppercase tracking-wider group-hover:text-white/40 transition-colors">Course Yield</div>
+                         </div>
+                         <ArrowRight className="h-4.5 w-4.5 text-[#0d694f]/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-20 text-center space-y-4 opacity-30">
+                 <Users className="h-12 w-12 mx-auto" />
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em]">No Temporal Insights Found</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-10 flex justify-end">
+             <Button 
+              onClick={() => setIsBreakdownModalOpen(false)}
+              className="bg-[#0d694f]/5 hover:bg-[#ff7e5f]/10 text-[#0d694f] hover:text-[#ff7e5f] rounded-xl px-10 py-5 h-auto text-[10px] font-black uppercase tracking-widest border-none transition-all"
+             >
+              Dismiss Manifest
+             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
+};
+
+InstructorEarnings.propTypes = {
+  saasAnalytics: PropTypes.object,
+  fetchSaaSAnalytics: PropTypes.func,
+  user: PropTypes.object,
 };
 
 export default InstructorEarnings;

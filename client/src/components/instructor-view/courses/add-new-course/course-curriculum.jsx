@@ -264,7 +264,7 @@ const CourseCurriculum = () => {
           </Button>
           
           <Button
-            disabled={!courseCurriculumFormData.every(item => item.title.trim() !== "" && item.videoUrl.trim() !== "") || mediaUploadProgress}
+            disabled={mediaUploadProgress}
             onClick={handleNewLecture}
             className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl px-10 py-5 h-auto font-headline font-black text-[10px] tracking-widest uppercase shadow-3d transition-all border-none disabled:bg-[#0d694f]/20"
           >

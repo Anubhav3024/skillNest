@@ -5,7 +5,12 @@ const { deleteMediaFromCloudinary } = require("../../../utils/cloudinary");
 const addNewCourse = async (req, res) => {
 // ... existing code ...
   try {
-    const savedCourse = await Course.create(req.body);
+    const courseData = {
+      ...req.body,
+      instructorId: req.user?._id || req.body.instructorId,
+      instructorName: req.user?.userName || req.body.instructorName,
+    };
+    const savedCourse = await Course.create(courseData);
 
     return res.status(201).json({
       success: true,
@@ -23,6 +28,7 @@ const addNewCourse = async (req, res) => {
 const getAllCourses = async (req, res) => {
   try {
     const { instructorId } = req.params;
+    const { search = "", sort = "" } = req.query;
 
     if (!instructorId) {
       return res.status(400).json({
@@ -31,7 +37,43 @@ const getAllCourses = async (req, res) => {
       });
     }
 
-    const courseList = await Course.find({ instructorId });
+    // Prepare match stage for filtering
+    let matchQuery = { instructorId: String(instructorId) };
+    if (search) {
+      matchQuery.title = { $regex: search, $options: "i" };
+    }
+
+    // Aggregation pipeline for advanced sorting and calculated fields
+    const pipeline = [
+      { $match: matchQuery },
+      {
+        $addFields: {
+          revenue: { $sum: "$students.paidAmount" },
+          studentCount: { $size: "$students" }
+        }
+      }
+    ];
+
+    // Sorting logic based on sort parameter
+    let sortStage = { $sort: { createdAt: -1 } }; // Default: Newest first
+
+    switch (sort.toLowerCase()) {
+      case "mostpopular":
+        sortStage = { $sort: { studentCount: -1, createdAt: -1 } };
+        break;
+      case "recententries":
+        sortStage = { $sort: { createdAt: -1 } };
+        break;
+      case "maxrevenue":
+        sortStage = { $sort: { revenue: -1, createdAt: -1 } };
+        break;
+      default:
+        sortStage = { $sort: { createdAt: -1 } };
+    }
+
+    pipeline.push(sortStage);
+
+    const courseList = await Course.aggregate(pipeline);
 
     return res.status(200).json({
       success: true,
@@ -39,6 +81,7 @@ const getAllCourses = async (req, res) => {
       courseList,
     });
   } catch (error) {
+    console.error("Error fetching courses:", error);
     return res.status(500).json({
       success: false,
       message: "Error fetching all courses",
@@ -83,17 +126,31 @@ const updateCourseById = async (req, res) => {
   try {
     const { id } = req.params;
     const update = req.body;
+    const requesterId = String(req.user?._id || "");
+    console.log("Update attempt:", { courseId: id, requesterId });
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      console.log("Update failed: Course not found", id);
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    console.log("Course owner check:", { ownerId: course.instructorId, requesterId });
+    if (String(course.instructorId) !== requesterId) {
+      console.log("Update failed: Permission denied", { ownerId: course.instructorId, requesterId });
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: you can only update your own courses",
+      });
+    }
 
     const updatedCourse = await Course.findByIdAndUpdate(id, update, {
       new: true,
     });
-
-    if (!updatedCourse) {
-      return res.status(404).json({
-        success: false,
-        message: "Error updating course",
-      });
-    }
 
     return res.status(200).json({
       success: true,

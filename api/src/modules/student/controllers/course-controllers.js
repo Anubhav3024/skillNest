@@ -1,5 +1,6 @@
 const Course = require("../../../models/course");
 const StudentCourses = require("../../../models/student-courses");
+const User = require("../../../models/user");
 
 const getAllStudentViewCourses = async (req, res) => {
   try {
@@ -72,7 +73,7 @@ const getStudentViewCourseDetails = async (req, res) => {
       return;
     }
 
-    const courseDetails = await Course.findById(id);
+    const courseDetails = await Course.findById(id).lean();
 
     if (!courseDetails) {
       return res.status(404).json({
@@ -81,10 +82,18 @@ const getStudentViewCourseDetails = async (req, res) => {
       });
     }
 
+    // Fetch instructor details to include avatar and bio
+    const instructorDetails = await User.findById(courseDetails.instructorId)
+      .select("avatar philosophy socialLinks experience userName userEmail")
+      .lean();
+
     return res.status(200).json({
       success: true,
       message: "Course details fetched successfully",
-      courseDetails,
+      courseDetails: {
+        ...courseDetails,
+        instructorDetails
+      },
     });
   } catch (error) {
     return res.status(500).json({

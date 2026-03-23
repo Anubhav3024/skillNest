@@ -9,16 +9,18 @@ import {
   courseCurriculumInitialFormData,
   courseLandingInitialFormData,
 } from "@/config";
+import { ClipLoader } from "react-spinners";
 import { InstructorContext } from "@/context/instructor-context";
+import { AuthContext } from "@/context/auth-context";
 import {
   addNewCourseService,
   fetchInstructorCourseDetailsService,
   updateCourseByIdService,
 } from "@/services";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronRight, Save, XCircle, Sparkles, Send } from "lucide-react";
 
 const AddNewCoursePage = () => {
@@ -29,47 +31,49 @@ const AddNewCoursePage = () => {
     setCourseCurriculumFormData,
     currentEditedCourseId,
     setCurrentEditedCourseId,
+    setActiveTab,
   } = useContext(InstructorContext);
+  const authContext = useContext(AuthContext);
+  const auth = authContext?.auth;
 
   const navigate = useNavigate();
   const params = useParams();
-
-  const isEmpty = (value) => {
-    if (Array.isArray(value)) return value.length === 0;
-    return value === "" || value === null || value === undefined;
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateFormData = () => {
-    return Object.entries(courseLandingFormData).every(([key, value]) => {
-      if (key === "image" || key === "imagePublicId" || key === "isPublished") return true;
-      return !isEmpty(value);
-    }) && courseCurriculumFormData.every((item) => !isEmpty(item.title) && !isEmpty(item.videoUrl));
+    return true; // Allow saving at any time to prevent blocking the user
   };
 
   const handleCreateCourse = async () => {
     const courseFinalFormData = {
-      instructorId: "instructor_1", // In real app, get from auth context
-      instructorName: "Professor Anubhav",
+      instructorId: auth?.user?._id,
+      instructorName: auth?.user?.userName,
       date: new Date(),
       ...courseLandingFormData,
       curriculum: courseCurriculumFormData,
       isPublished: courseLandingFormData.isPublished || false,
     };
 
+    console.log("Submitting course data:", courseFinalFormData);
     try {
       const response =
         currentEditedCourseId !== null
           ? await updateCourseByIdService(currentEditedCourseId, courseFinalFormData)
           : await addNewCourseService(courseFinalFormData);
 
+      console.log("Update response:", response);
       if (response?.success) {
         setCourseLandingFormData(courseLandingInitialFormData);
         setCourseCurriculumFormData(courseCurriculumInitialFormData);
-        navigate(-1);
+        navigate("/instructor");
+        setActiveTab("courses");
         setCurrentEditedCourseId(null);
         toast.success(currentEditedCourseId !== null ? "Vault records updated." : "New course forged successfully.");
+      } else {
+        toast.error(response?.message || "Operation failed.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Transmission error:", error);
       toast.error("Transmission error: Matrix unstable.");
     }
   };
@@ -77,13 +81,26 @@ const AddNewCoursePage = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
+        setIsLoading(true);
         const response = await fetchInstructorCourseDetailsService(params.courseId);
         if (response?.success) {
-          setCourseLandingFormData(response.courseDetails);
-          setCourseCurriculumFormData(response.courseDetails.curriculum);
+          const courseDetails = response.courseDetails;
+          
+          // Map only relevant fields to avoid polluting form data with DB artifacts
+          const landingData = {};
+          Object.keys(courseLandingInitialFormData).forEach(key => {
+             landingData[key] = courseDetails[key] || "";
+          });
+          landingData.isPublished = courseDetails.isPublished;
+
+          setCourseLandingFormData(landingData);
+          setCourseCurriculumFormData(courseDetails.curriculum || []);
+          setCurrentEditedCourseId(params.courseId);
         }
       } catch {
         toast.error("Resource retrieval failed.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -96,6 +113,14 @@ const AddNewCoursePage = () => {
       setCourseCurriculumFormData(courseCurriculumInitialFormData);
     }
   }, [params.courseId, setCurrentEditedCourseId, setCourseLandingFormData, setCourseCurriculumFormData]);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-[#fcf8f1] flex items-center justify-center z-[100]">
+        <ClipLoader color="#0d694f" size={70} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fcf8f1] font-sans selection:bg-[#0d694f]/10">
@@ -163,7 +188,7 @@ const AddNewCoursePage = () => {
               </div>
             </div>
 
-            <AnimatePresence mode="wait">
+            <div className="mt-8">
               <TabsContent value="curriculum">
                 <CourseCurriculum />
               </TabsContent>
@@ -173,7 +198,7 @@ const AddNewCoursePage = () => {
               <TabsContent value="settings">
                 <CourseSettings />
               </TabsContent>
-            </AnimatePresence>
+            </div>
           </Tabs>
         </motion.div>
       </main>

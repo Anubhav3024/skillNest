@@ -19,6 +19,7 @@ import { ArrowUpDown, Search, Filter, BookOpen, Star, BarChart, ChevronRight, Ch
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { motion } from "framer-motion";
 
 const createSearchParamsHelper = (filterParams) => {
   const queryParams = [];
@@ -196,65 +197,71 @@ const StudentViewCoursesPage = () => {
                   <div 
                     key={course._id}
                     onClick={() => handleCourseNavigate(course._id)}
-                    className="bg-white rounded-[3rem] overflow-hidden border border-[#0d694f]/5 hover:shadow-[0_40px_80px_-20px_rgba(13,105,79,0.12)] hover:-translate-y-3 transition-all duration-700 group cursor-pointer flex flex-col relative"
+                    className="group relative bg-[#011c14]/5 backdrop-blur-xl border border-[#0d694f]/20 rounded-[3rem] p-4 transition-all duration-700 hover:shadow-2xl hover:bg-[#011c14]/10 cursor-pointer flex flex-col"
                   >
-                    <div className="h-64 overflow-hidden relative">
+                    <div className="relative aspect-[16/10] overflow-hidden rounded-[2.5rem] bg-[#fcf8f1] border border-[#0d694f]/5 mb-8 shadow-inner">
                       <LazyLoadImage 
                         src={course.image} 
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                        className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110 opacity-90 group-hover:opacity-100" 
                         effect="blur"
                       />
-                      <div className="absolute top-6 left-6 flex gap-2">
-                         <span className="bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-headline font-black text-[#0d694f] border border-emerald-50 shadow-lg uppercase tracking-widest">
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#011c14]/40 to-transparent"></div>
+                      
+                      {/* Top Badges */}
+                      <div className="absolute top-5 left-5 right-5 flex justify-between items-center">
+                         <span className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl text-[9px] font-black text-white border border-white/20 uppercase tracking-[0.2em] shadow-lg">
                            {course.category}
                          </span>
-                      </div>
-                      <div className="absolute top-6 right-6">
-                        <div className="bg-white/95 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 shadow-lg border border-emerald-50">
-                           <Star className="h-4 w-4 text-[#ff7e5f] fill-current" />
-                           <span className="text-[10px] font-headline font-black text-foreground">4.9</span>
-                        </div>
+                         <div className="bg-white/10 backdrop-blur-md px-3 py-2 rounded-2xl flex items-center gap-1.5 border border-white/20 shadow-lg">
+                           <Star className="h-3.5 w-3.5 text-[#ff7e5f] fill-current" />
+                           <span className="text-[10px] font-black text-white">4.9</span>
+                         </div>
                       </div>
                     </div>
                     
-                    <div className="p-10 pb-8 flex-1 flex flex-col">
-                      <h3 className="text-2xl font-headline font-black text-[#0d694f] leading-tight mb-4 group-hover:text-[#ff7e5f] transition-colors line-clamp-2">
-                        {course.title}
-                      </h3>
-                      
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="w-10 h-10 rounded-2xl bg-[#fcf8f1] flex items-center justify-center text-xs font-black text-[#0d694f] border border-[#0d694f]/10 shadow-sm uppercase">
-                          {course.instructorName?.[0]}
+                    <div className="px-4 pb-4 flex-1 flex flex-col justify-between">
+                      <div className="space-y-6">
+                        <h3 className="text-2xl font-headline font-black text-[#0d694f] leading-none group-hover:text-[#ff7e5f] transition-all uppercase tracking-tight line-clamp-1">
+                          {course.title}
+                        </h3>
+                        
+                        <div className="flex items-center gap-4 bg-white/30 backdrop-blur-sm p-4 rounded-[1.8rem] border border-white/40">
+                          <div className="w-12 h-12 rounded-2xl bg-[#0d694f] flex items-center justify-center text-xs font-black text-white shadow-lg border-2 border-white/20">
+                            {course.instructorName?.[0]}
+                          </div>
+                          <div className="flex-1">
+                             <div className="text-[8px] font-black text-[#ff7e5f] uppercase tracking-widest opacity-60">Architect</div>
+                             <div className="text-sm font-headline font-black text-[#0d694f] tracking-tight">{course.instructorName}</div>
+                          </div>
                         </div>
-                        <div className="space-y-0.5">
-                           <div className="text-[10px] font-black text-[#ff7e5f] uppercase tracking-widest">Master</div>
-                           <div className="text-sm font-headline font-bold text-muted-foreground">{course.instructorName}</div>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center justify-between pt-8 border-t border-[#fcf8f1] mt-auto">
-                        <div className="flex gap-4">
-                           <div className="flex items-center gap-2 text-muted-foreground">
-                              <BookOpen className="h-4 w-4 text-[#0d694f]/40" />
-                              <span className="text-[10px] font-black uppercase tracking-widest">{course.curriculum?.length} Lessons</span>
+                        <div className="flex items-center gap-6 px-2">
+                           <div className="flex items-center gap-2 text-[#0d694f]/40 font-black text-[9px] uppercase tracking-widest">
+                              <BookOpen className="h-4 w-4 opacity-40 text-[#0d694f]" />
+                              {course.curriculum?.length} Lessons
                            </div>
-                           <div className="flex items-center gap-2 text-muted-foreground">
-                              <BarChart className="h-4 w-4 text-[#0d694f]/40" />
-                              <span className="text-[10px] font-black uppercase tracking-widest">{course.level}</span>
+                           <div className="flex items-center gap-2 text-[#0d694f]/40 font-black text-[9px] uppercase tracking-widest">
+                              <BarChart className="h-4 w-4 opacity-40 text-[#0d694f]" />
+                              {course.level}
                            </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between mt-10">
+                      <div className="flex items-center justify-between mt-10 p-2">
                         <div className="flex flex-col">
-                           <span className="text-[10px] font-black text-[#ff7e5f] uppercase tracking-widest mb-1">Investment</span>
-                           <span className="text-3xl font-headline font-black text-[#0d694f]">Rs {course.pricing}</span>
+                           <span className="text-[10px] font-black text-[#ff7e5f] uppercase tracking-widest leading-none mb-1 opacity-70">Scholarly Investment</span>
+                           <span className="text-3xl font-headline font-black text-[#0d694f]">₹{course.pricing}</span>
                         </div>
-                        <Button className="rounded-2xl w-14 h-14 bg-[#0d694f] hover:bg-[#ff7e5f] text-white p-0 shadow-lg shadow-[#0d694f]/20 transition-all border-none">
-                          <ChevronRight className="h-6 w-6" />
-                        </Button>
+                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                          <Button className="rounded-[1.2rem] w-14 h-14 bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white p-0 shadow-3d-orange border-none transition-all flex items-center justify-center">
+                            <ChevronRight className="h-6 w-6" />
+                          </Button>
+                        </motion.div>
                       </div>
                     </div>
+
+                    {/* Decorative Element */}
+                    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#0d694f]/5 rounded-full blur-3xl -z-10 group-hover:bg-[#0d694f]/10 transition-all duration-700"></div>
                   </div>
                 ))}
               </div>

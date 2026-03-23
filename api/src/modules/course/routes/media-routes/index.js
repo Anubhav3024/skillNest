@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const os = require("os");
 
 const {
   uploadMediaToCloudinary,
@@ -10,7 +11,7 @@ const { performance } = require("perf_hooks");
 
 const router = express.Router();
 
-const upload = multer({ dest: path.join("/tmp", "uploads") });
+const upload = multer({ dest: path.join(os.tmpdir(), "uploads") });
 
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {

@@ -7,6 +7,9 @@ import {
   fetchInstructorCourseListService,
   fetchInstructorAnalyticsService,
   deleteInstructorCourseService,
+  fetchSaaSAnalyticsSummaryService,
+  fetchSaaSAnalyticsTrajectoryService,
+  fetchSaaSAnalyticsTransactionsService,
 } from "@/services";
 import PropTypes from "prop-types";
 
@@ -27,13 +30,25 @@ export default function InstructorProvider({ children }) {
 
   const [instructorCoursesList, setInstructorCoursesList] = useState([]);
   const [analytics, setAnalytics] = useState(null);
+  const [saasAnalytics, setSaasAnalytics] = useState({
+    summary: null,
+    trajectory: [],
+    transactions: [],
+  });
 
   const [currentEditedCourseId, setCurrentEditedCourseId] = useState(null);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
-  const fetchInstructorCourseList = useCallback(async (instructorId) => {
+  const fetchInstructorCourseList = useCallback(async (instructorId, search = "", sort = "") => {
     if (!instructorId) return;
     try {
-      const response = await fetchInstructorCourseListService(instructorId);
+      const queryParams = new URLSearchParams();
+      if (search) queryParams.set("search", search);
+      if (sort) queryParams.set("sort", sort);
+
+      const queryString = queryParams.toString();
+      const response = await fetchInstructorCourseListService(instructorId, queryString);
+      
       if (response?.success) {
         setInstructorCoursesList(response.courseList);
       }
@@ -45,12 +60,33 @@ export default function InstructorProvider({ children }) {
   const fetchInstructorAnalytics = useCallback(async (instructorId, range = "6m") => {
     if (!instructorId) return;
     try {
+      // Legacy Analytics
       const response = await fetchInstructorAnalyticsService(instructorId, range);
       if (response?.success) {
         setAnalytics(response.data);
       }
     } catch (error) {
       console.error("Error fetching instructor analytics:", error);
+    }
+  }, []);
+
+  const fetchSaaSAnalytics = useCallback(async (trajectoryType = "monthly") => {
+    try {
+      const [summaryRes, trajectoryRes, transactionsRes] = await Promise.all([
+        fetchSaaSAnalyticsSummaryService(),
+        fetchSaaSAnalyticsTrajectoryService(trajectoryType),
+        fetchSaaSAnalyticsTransactionsService(),
+      ]);
+
+      if (summaryRes.success && trajectoryRes.success && transactionsRes.success) {
+        setSaasAnalytics({
+          summary: summaryRes.data,
+          trajectory: trajectoryRes.data,
+          transactions: transactionsRes.data,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching SaaS Analytics:", error);
     }
   }, []);
 
@@ -83,11 +119,16 @@ export default function InstructorProvider({ children }) {
         setInstructorCoursesList,
         analytics,
         setAnalytics,
+        saasAnalytics,
+        setSaasAnalytics,
         currentEditedCourseId,
         setCurrentEditedCourseId,
         fetchInstructorCourseList,
         fetchInstructorAnalytics,
+        fetchSaaSAnalytics,
         deleteCourse,
+        activeTab,
+        setActiveTab,
       }}
     >
       {children}

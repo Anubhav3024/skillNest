@@ -316,38 +316,64 @@ const StudentDashboard = () => {
             {courses.map((course) => (
               <motion.div 
                 key={course.id} 
-                whileHover={{ y: -8 }}
-                className="bg-white rounded-[2rem] overflow-hidden shadow-3d border border-primary/5 transition-all duration-500 group cursor-pointer"
+                whileHover={{ y: -8, scale: 1.01 }}
+                className="group relative bg-[#011c14]/5 backdrop-blur-xl border border-[#0d694f]/20 rounded-[2.5rem] p-4 transition-all duration-500 hover:shadow-2xl hover:bg-[#011c14]/10 cursor-pointer"
               >
-                <div className="h-44 bg-muted relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                <div className="relative aspect-video overflow-hidden rounded-[2rem] bg-[#fcf8f1] border border-[#0d694f]/5 mb-5 shadow-inner">
                   <img 
                     src={`https://images.unsplash.com/photo-${course.id === 1 ? '1550751827-4bd374c3f58b' : course.id === 2 ? '1579783902614-a3fb3927b6a5' : '1551288049-bbda38a661a5'}?q=80&w=800`} 
                     alt={course.title}
-                    className="w-full h-full object-cover scale-105 group-hover:scale-115 transition-all duration-1000"
+                    className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-all duration-1000 grayscale group-hover:grayscale-0"
                   />
-                  <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors"></div>
-                </div>
-                <div className="p-8 space-y-4">
-                  <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                    <span className="text-muted-foreground/40 group-hover:text-primary transition-colors">{course.category}</span>
-                    <div className="flex items-center gap-1.5 text-secondary">
-                      <Star className="h-3 w-3 fill-current" />
-                      {course.rating.toFixed(1)}
-                    </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#011c14]/40 to-transparent transition-opacity group-hover:opacity-60"></div>
+                  
+                  {/* Category Tag */}
+                  <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-widest border border-white/20">
+                    {course.category}
                   </div>
-                  <h4 className="text-lg font-headline font-black text-primary leading-tight group-hover:text-[#ff7e5f] transition-colors uppercase tracking-tight">{course.title}</h4>
-                  <div className="pt-2">
-                    <div className="h-1 w-full bg-[#fcf8f1] rounded-full overflow-hidden">
+                </div>
+
+                <div className="px-2 space-y-4">
+                  <div className="space-y-1">
+                    <h4 className="text-base font-headline font-black text-[#0d694f] leading-tight group-hover:text-[#ff7e5f] transition-colors uppercase tracking-tight line-clamp-2 min-h-[2.5rem]">
+                      {course.title}
+                    </h4>
+                    <p className="text-[9px] font-medium text-slate-400 italic">Phase Accelerator Protocol Active</p>
+                  </div>
+
+                  <div className="flex items-center justify-between bg-white/30 backdrop-blur-sm p-3 rounded-[1.2rem] border border-white/40 shadow-sm">
+                     <div className="flex flex-col gap-0.5">
+                        <span className="text-[7px] font-black text-[#0d694f]/40 uppercase tracking-widest">Momentum</span>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`h-2.5 w-2.5 ${star <= Math.floor(course.rating) ? 'fill-[#0d694f] text-[#0d694f]' : 'fill-[#0d694f]/10 text-[#0d694f]/10'}`} />
+                          ))}
+                        </div>
+                     </div>
+                     <div className="text-[10px] font-black text-[#0d694f]">
+                        {course.rating.toFixed(1)}
+                     </div>
+                  </div>
+
+                  <div className="pt-2 space-y-2">
+                    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest text-[#0d694f]">
+                      <span className="opacity-40">Sync Level</span>
+                      <span>{course.progress}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/50 rounded-full overflow-hidden border border-white/40">
                        <motion.div 
                         initial={{ width: 0 }}
                         whileInView={{ width: `${course.progress}%` }}
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.5 }}
-                        className="h-full bg-primary rounded-full"
+                        className="h-full bg-[#0d694f] rounded-full transition-all shadow-[0_0_10px_rgba(13,105,79,0.3)]"
                       ></motion.div>
                     </div>
                   </div>
                 </div>
+
+                {/* Decorative Background Element */}
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#0d694f]/5 rounded-full blur-3xl -z-10 group-hover:bg-[#0d694f]/10 transition-all"></div>
               </motion.div>
             ))}
           </div>

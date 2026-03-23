@@ -11,9 +11,13 @@ export default {
                 xl: 'calc(var(--radius) + 4px)',
     		},
             fontFamily: {
-                headline: ['Manrope', 'sans-serif'],
-                body: ['Inter', 'sans-serif'],
-                label: ['Inter', 'sans-serif']
+                headline: ['Montserrat', 'sans-serif'],
+                body: ['"Open Sans"', 'sans-serif'],
+                content: ['Roboto', 'sans-serif'],
+                subheader: ['Lato', 'sans-serif'],
+                display: ['"Playfair Display"', 'serif'],
+                serif: ['Merriweather', 'serif'],
+                label: ['"Open Sans"', 'sans-serif']
             },
     		colors: {
     			background: 'hsl(var(--background))',

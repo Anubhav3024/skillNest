@@ -58,6 +58,15 @@ const UserSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    upiId: {
+      type: String,
+      default: "",
+    },
+    bankDetails: {
+      accountNumber: { type: String, default: "" },
+      ifsc: { type: String, default: "" },
+      bankName: { type: String, default: "" },
+    },
   },
   { timestamps: true },
 );

@@ -357,6 +357,42 @@ const StudentViewCourseDetailsPage = () => {
                </div>
             </section>
 
+            {/* About the Educator */}
+            <section className="space-y-8">
+               <h3 className="text-3xl font-headline font-black text-[#0d694f] flex items-center gap-4">
+                  Meet Your Educator
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#0d694f]/40"></span>
+               </h3>
+               <div className="bg-white rounded-[3rem] p-10 border border-[#0d694f]/5 shadow-xl flex flex-col md:flex-row gap-10 items-center overflow-hidden relative">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#0d694f]/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                  
+                  <div className="w-32 h-32 rounded-full border-4 border-[#ff7e5f]/5 p-1 flex items-center justify-center overflow-hidden bg-[#fcf8f1] shrink-0">
+                     {studentViewCourseDetails?.instructorDetails?.avatar ? (
+                        <img src={studentViewCourseDetails.instructorDetails.avatar} alt="Educator" className="w-full h-full object-cover rounded-full" />
+                     ) : (
+                        <div className="w-full h-full bg-[#0d694f]/10 flex items-center justify-center rounded-full">
+                           <Globe className="h-8 w-8 text-[#0d694f]/30" />
+                        </div>
+                     )}
+                  </div>
+                  
+                  <div className="flex-1 space-y-4">
+                     <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#ff7e5f] mb-1 block">Course Architect</span>
+                        <h4 className="text-3xl font-headline font-black text-[#0d694f] tracking-tight truncate uppercase">
+                           {studentViewCourseDetails?.instructorDetails?.userName || studentViewCourseDetails?.instructorName}
+                        </h4>
+                        <p className="text-[#0d694f]/60 font-medium text-xs mt-1 uppercase tracking-widest">
+                           {studentViewCourseDetails?.instructorDetails?.experience || 0} Years of Command
+                        </p>
+                     </div>
+                     <p className="text-base text-muted-foreground leading-relaxed italic font-medium">
+                        &quot;{studentViewCourseDetails?.instructorDetails?.philosophy || "Dedicated to scholarly evolution and intellectual synchronicity."}&quot;
+                     </p>
+                  </div>
+               </div>
+            </section>
+
             {/* Curriculum */}
             <section className="space-y-8">
                <h3 className="text-3xl font-headline font-black text-[#0d694f] flex items-center gap-4">

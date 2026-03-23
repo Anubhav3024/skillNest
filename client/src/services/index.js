@@ -49,8 +49,9 @@ export const mediaDeleteService = async (id) => {
   return res.data;
 };
 
-export const fetchInstructorCourseListService = async (instructorId) => {
-  const res = await axiosInstance.get(`/instructor/course/get/${instructorId}`);
+export const fetchInstructorCourseListService = async (instructorId, queryString = "") => {
+  const url = `/instructor/course/get/${instructorId}${queryString ? `?${queryString}` : ""}`;
+  const res = await axiosInstance.get(url);
   return res.data;
 };
 
@@ -102,6 +103,27 @@ export const fetchInstructorRevenueService = async (instructorId) => {
 
 export const fetchInstructorStudentsService = async (instructorId) => {
   const res = await axiosInstance.get(`/instructor/students/${instructorId}`);
+  return res.data;
+};
+
+// SaaS Analytics Services
+export const fetchSaaSAnalyticsSummaryService = async () => {
+  const res = await axiosInstance.get("/api/analytics/summary");
+  return res.data;
+};
+
+export const fetchSaaSAnalyticsTrajectoryService = async (type = "monthly") => {
+  const res = await axiosInstance.get(`/api/analytics/trajectory?type=${type}`);
+  return res.data;
+};
+
+export const fetchSaaSAnalyticsTransactionsService = async () => {
+  const res = await axiosInstance.get("/api/analytics/transactions");
+  return res.data;
+};
+
+export const createStripeCheckoutService = async (courseId) => {
+  const res = await axiosInstance.post("/api/analytics/checkout", { courseId });
   return res.data;
 };
 

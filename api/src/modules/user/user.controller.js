@@ -15,7 +15,9 @@ const updateUserProfile = async (req, res) => {
       socialLinks, 
       avatar, 
       experience, 
-      skills 
+      skills,
+      upiId,
+      bankDetails
     } = req.body;
     const requesterId = String(req.user?._id || "");
     const targetUserId = userId ? String(userId) : requesterId;
@@ -27,35 +29,50 @@ const updateUserProfile = async (req, res) => {
       });
     }
 
-    const updateData = { userName, userEmail };
-    if (philosophy !== undefined) updateData.philosophy = philosophy;
-    if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
-    if (avatar !== undefined) updateData.avatar = avatar;
-    if (experience !== undefined) updateData.experience = experience;
-    if (skills !== undefined) updateData.skills = skills;
-
-    const updatedUser = await User.findByIdAndUpdate(
-      targetUserId,
-      { $set: updateData },
-      { new: true },
-    );
-
-    if (!updatedUser) {
+    const user = await User.findById(targetUserId);
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
+    // Duplicate checks if email or username is changing
+    if (userEmail && userEmail.toLowerCase() !== user.userEmail.toLowerCase()) {
+      const existingEmail = await User.findOne({ userEmail: userEmail.toLowerCase() });
+      if (existingEmail) {
+        return res.status(409).json({ success: false, message: "Email already in use" });
+      }
+    }
+
+    if (userName && userName.toLowerCase() !== user.userName.toLowerCase()) {
+      const existingName = await User.findOne({ userName: userName.toLowerCase() });
+      if (existingName) {
+        return res.status(409).json({ success: false, message: "Username already taken" });
+      }
+    }
+
+    const updateData = {};
+    if (userName) updateData.userName = userName.toLowerCase();
+    if (userEmail) updateData.userEmail = userEmail.toLowerCase();
+    if (philosophy !== undefined) updateData.philosophy = philosophy;
+    if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
+    if (avatar !== undefined) updateData.avatar = avatar;
+    if (experience !== undefined) updateData.experience = experience;
+    if (skills !== undefined) updateData.skills = skills;
+    if (upiId !== undefined) updateData.upiId = upiId;
+    if (bankDetails !== undefined) updateData.bankDetails = bankDetails;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      targetUserId,
+      { $set: updateData },
+      { new: true },
+    ).select("-userPassword");
+
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user: {
-        _id: updatedUser._id,
-        userName: updatedUser.userName,
-        userEmail: updatedUser.userEmail,
-        role: updatedUser.role,
-      },
+      user: updatedUser,
     });
   } catch (error) {
     console.error(error);
