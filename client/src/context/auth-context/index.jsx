@@ -44,6 +44,7 @@ export default function AuthProvider({ children }) {
       return;
     }
     try {
+      setLoading(true);
       const data = await registerService(signUpFormData);
 
       if (data.success) {
@@ -67,6 +68,7 @@ export default function AuthProvider({ children }) {
           "Registration failed: backend is not reachable",
       );
     } finally {
+      setLoading(false);
       setSignUpFormData(initalSignUpFormData);
     }
   };

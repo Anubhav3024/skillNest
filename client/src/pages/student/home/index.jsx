@@ -1,11 +1,14 @@
+import { useContext, useEffect } from "react";
+import { AuthContext } from "@/context/auth-context";
+import StudentDashboard from "@/components/student-view/dashboard";
 import { Button } from "@/components/ui/button";
 import { StudentContext } from "@/context/student-context";
 import { fetchStudentViewCourseListService } from "@/services";
 import { PlayCircle, CheckCircle2, Star, Users, ArrowRight } from "lucide-react";
-import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const StudentHomePage = () => {
+  const { auth } = useContext(AuthContext);
   const { setStudentViewCoursesList } = useContext(StudentContext);
   const navigate = useNavigate();
 
@@ -20,6 +23,10 @@ const StudentHomePage = () => {
     };
     fetchAllCoursesOfStudent();
   }, [setStudentViewCoursesList]);
+
+  if (auth?.authenticated) {
+    return <StudentDashboard />;
+  }
 
   const categories = [
     { title: "Language", icon: "language", desc: "Master new tongues with our immersive linguistic journeys.", color: "bg-orange-50" },

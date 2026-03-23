@@ -8,8 +8,7 @@ const RouteGuard = ({ authenticated, user, element }) => {
   if (
     !authenticated &&
     !location.pathname.includes("/auth") &&
-    location.pathname !== "/" &&
-    location.pathname !== "/home"
+    location.pathname !== "/"
   ) {
     return <Navigate to="/auth" />;
   }
@@ -28,7 +27,7 @@ const RouteGuard = ({ authenticated, user, element }) => {
     (location.pathname.includes("/instructor") ||
       location.pathname.includes("/auth"))
   ) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/" />;
   }
 
   return <Fragment>{element}</Fragment>;

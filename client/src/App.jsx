@@ -3,7 +3,7 @@ import { useContext, lazy, Suspense } from "react";
 import { AuthContext } from "./context/auth-context";
 import RouteGuard from "./components/route-guard";
 import StudentViewCommonLayout from "./components/student-view/common-layout";
-import NotFoundPage from "./pages/not-found page";
+import NotFoundPage from "./pages/not-found";
 
 import { ClipLoader } from "react-spinners";
 import StudentHomePage from "./pages/student/home";

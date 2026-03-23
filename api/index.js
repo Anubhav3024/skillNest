@@ -1,19 +1,19 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./connect");
-const authRoutes = require("./routes/auth-routes/index");
-const mediaRoutes = require("./routes/instructor-routes/media-routes/index");
-const instructorCourseRoutes = require("./routes/instructor-routes/course-routes");
-const instructorAnalyticsRoutes = require("./routes/instructor-routes/analytics-routes");
-const studentViewCourseRoutes = require("./routes/student-routes/course-routes");
-const studentViewOrderRoutes = require("./routes/student-routes/order-routes");
-const studentCoursesRoutes = require("./routes/student-routes/student-courses-routes");
-const studentCourseProgressRoutes = require("./routes/student-routes/course-progress-routes");
-const userRoutes = require("./routes/user-routes");
-const studentReviewRoutes = require("./routes/student-routes/review-routes");
-const studentDiscoveryRoutes = require("./routes/student-routes/discovery-routes");
-const adminUserRoutes = require("./routes/admin-routes/user-routes");
+const connectDB = require("./src/config/db");
+const authRoutes = require("./src/modules/auth/routes/index");
+const mediaRoutes = require("./src/modules/course/routes/media-routes/index");
+const instructorCourseRoutes = require("./src/modules/course/routes/course-routes");
+const instructorAnalyticsRoutes = require("./src/modules/course/routes/analytics-routes");
+const studentViewCourseRoutes = require("./src/modules/student/routes/course-routes");
+const studentViewOrderRoutes = require("./src/modules/student/routes/order-routes");
+const studentCoursesRoutes = require("./src/modules/student/routes/student-courses-routes");
+const studentCourseProgressRoutes = require("./src/modules/student/routes/course-progress-routes");
+const studentReviewRoutes = require("./src/modules/student/routes/review-routes");
+const studentDiscoveryRoutes = require("./src/modules/student/routes/discovery-routes");
+const userRoutes = require("./src/modules/user/routes/index");
+const adminUserRoutes = require("./src/modules/admin/routes/user-routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,7 +30,6 @@ const allowedOrigins = new Set(
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow non-browser requests (like Postman/curl) and localhost dev origins.
     if (
       !origin ||
       allowedOrigins.has(origin) ||
@@ -54,7 +53,7 @@ app.get("/health", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/media", mediaRoutes);
 app.use("/instructor/course", instructorCourseRoutes);
-app.use("/instructor", instructorAnalyticsRoutes);
+app.use("/instructor/analytics", instructorAnalyticsRoutes);
 app.use("/student/course", studentViewCourseRoutes);
 app.use("/student/order", studentViewOrderRoutes);
 app.use("/student/courses-bought", studentCoursesRoutes);
@@ -65,7 +64,7 @@ app.use("/user", userRoutes);
 app.use("/admin", adminUserRoutes);
 
 app.use((err, req, res, next) => {
-  res.status(500).json({ message: "Something went wrong" });
+  res.status(500).json({ success: false, message: err.message || "Something went wrong" });
 });
 
 connectDB().then(() => {
