@@ -2,7 +2,6 @@ import InstructorCourses from "@/components/instructor-view/courses";
 import InstructorDashboard from "@/components/instructor-view/dashboard";
 import InstructorEarnings from "@/components/instructor-view/earnings";
 import InstructorStudents from "@/components/instructor-view/students";
-import InstructorProfile from "@/components/instructor-view/profile";
 import InstructorSettings from "@/components/instructor-view/settings";
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/context/auth-context";
@@ -26,6 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const InstructorDashboardPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedRange, setSelectedRange] = useState("6m");
   const { 
     instructorCoursesList, 
     fetchInstructorCourseList, 
@@ -38,9 +38,13 @@ const InstructorDashboardPage = () => {
   useEffect(() => {
     if (auth?.user?._id) {
        fetchInstructorCourseList(auth?.user?._id);
-       fetchInstructorAnalytics(auth?.user?._id);
+       fetchInstructorAnalytics(auth?.user?._id, selectedRange);
     }
-  }, [fetchInstructorCourseList, fetchInstructorAnalytics, auth?.user?._id]);
+  }, [fetchInstructorCourseList, fetchInstructorAnalytics, auth?.user?._id, selectedRange]);
+
+  function handleRangeChange(range) {
+    setSelectedRange(range);
+  }
 
   function handleLogout() {
     resetCredentials();
@@ -57,6 +61,8 @@ const InstructorDashboardPage = () => {
           listOfCourses={instructorCoursesList}
           analytics={analytics}
           auth={auth}
+          onRangeChange={handleRangeChange}
+          selectedRange={selectedRange}
         />
       ),
     },
@@ -77,12 +83,6 @@ const InstructorDashboardPage = () => {
       label: "Earnings",
       value: "earnings",
       component: <InstructorEarnings />,
-    },
-    {
-      icon: UserCircle,
-      label: "Profile",
-      value: "profile",
-      component: <InstructorProfile auth={auth} />,
     },
     {
       icon: Settings,
@@ -153,65 +153,54 @@ const InstructorDashboardPage = () => {
             <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-[#0d694f]/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
           </motion.div>
 
-          <div className="flex items-center gap-3 p-1.5 bg-white rounded-full shadow-3d pr-5 cursor-pointer hover:shadow-[#0d694f]/10 transition-all group">
-            <div className="w-9 h-9 rounded-full bg-[#fcf8f1] overflow-hidden border-2 border-[#ff7e5f]/20 group-hover:scale-110 transition-transform flex items-center justify-center font-black text-[10px] text-[#ff7e5f]">
-              {auth?.user?.avatar ? (
-                <img src={auth?.user?.avatar} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                auth?.user?.userName?.charAt(0)
-              )}
-            </div>
-            <div className="flex flex-col">
-               <span className="text-[11px] font-headline font-black text-[#0d694f] tracking-tight truncate max-w-[120px]">{auth?.user?.userName}</span>
-               <span className="text-[8px] font-black text-muted-foreground opacity-40 uppercase tracking-widest">Educator</span>
-            </div>
-          </div>
-
-          <button 
-            onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-6 py-4 font-headline font-bold text-[10px] tracking-[0.2em] text-muted-foreground hover:text-destructive transition-colors group"
-          >
-            <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            DISCONNECT
-          </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-72 p-10 lg:p-14 overflow-y-auto max-w-7xl mx-auto w-full custom-scrollbar relative">
+      <main className="flex-1 ml-72 overflow-y-auto w-full custom-scrollbar relative scroll-smooth">
         {/* Header */}
         <motion.header 
-          initial={{ y: -20, opacity: 0 }}
+          initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex items-center justify-between gap-10 mb-10 sticky top-0 z-10 bg-[#fcf8f1]/80 backdrop-blur-xl p-4 -m-4 rounded-b-3xl"
+          className="flex items-center justify-between gap-10 sticky top-0 z-40 bg-[#0d694f] px-10 lg:px-14 py-6 shadow-2xl shadow-[#0d694f]/20 border-b border-white/5"
         >
           <div className="flex-1 relative flex items-center group max-w-xl">
-            <Search className="absolute left-6 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-[#0d694f]" />
+            <Search className="absolute left-6 h-4 w-4 text-white/50 transition-colors group-focus-within:text-white" />
             <input
               type="text"
               placeholder="Search manifests..."
-              className="w-full pl-14 pr-8 py-4 rounded-2xl bg-white border border-[#0d694f]/5 shadow-3d focus:shadow-[#0d694f]/10 transition-all outline-none text-xs font-medium"
+              className="w-full pl-14 pr-8 py-3.5 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md text-white placeholder:text-white/40 focus:bg-white/15 transition-all outline-none text-xs font-medium focus:ring-1 focus:ring-white/20"
             />
           </div>
 
-          <div className="flex items-center gap-5">
-            <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-muted-foreground hover:text-[#0d694f] transition-all shadow-3d relative group">
+          <div className="flex items-center gap-6">
+            <button className="w-11 h-11 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all relative group hover:bg-white/20">
               <Bell className="h-5 w-5" />
-              <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-[#ff7e5f] rounded-full border-2 border-white animate-pulse"></span>
+              <span className="absolute top-3 right-3 w-2 h-2 bg-[#ff7e5f] rounded-full border-2 border-[#0d694f] animate-pulse"></span>
             </button>
             
-            <div className="flex items-center gap-3 p-1.5 bg-white rounded-full shadow-3d pr-5 cursor-pointer hover:shadow-[#0d694f]/10 transition-all group">
-              <div className="w-9 h-9 rounded-full bg-muted overflow-hidden border-2 border-[#ff7e5f]/20 group-hover:scale-110 transition-transform">
+            <div className="flex items-center gap-3 p-1 bg-white/10 border border-white/10 rounded-full pr-5 cursor-pointer hover:bg-white/20 transition-all group">
+              <div className="w-9 h-9 rounded-full bg-white/10 overflow-hidden border border-white/20 group-hover:scale-105 transition-transform flex items-center justify-center">
                 {auth?.user?.avatar ? (
                   <img src={auth?.user?.avatar} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <UserCircle className="h-full w-full text-muted-foreground" />
+                  <UserCircle className="h-5 w-5 text-white/80" />
                 )}
               </div>
-              <span className="text-[11px] font-headline font-black text-[#0d694f] tracking-tight">{auth?.user?.userName?.split(" ")[0]}</span>
+              <span className="text-[11px] font-headline font-black text-white tracking-tight">{auth?.user?.userName?.split(" ")[0]}</span>
             </div>
+
+            <button 
+              onClick={handleLogout}
+              className="w-11 h-11 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all relative group hover:bg-white/20"
+              title="Disconnect"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </motion.header>
+
+        <div className="p-10 lg:p-14 max-w-7xl mx-auto w-full">
 
         {/* Welcome Section */}
         <motion.section 
@@ -244,6 +233,7 @@ const InstructorDashboardPage = () => {
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
       </main>
     </div>
   );

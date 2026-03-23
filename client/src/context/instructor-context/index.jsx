@@ -40,10 +40,10 @@ export default function InstructorProvider({ children }) {
     }
   }, []);
 
-  const fetchInstructorAnalytics = useCallback(async (instructorId) => {
+  const fetchInstructorAnalytics = useCallback(async (instructorId, range = "6m") => {
     if (!instructorId) return;
     try {
-      const response = await fetchInstructorAnalyticsService(instructorId);
+      const response = await fetchInstructorAnalyticsService(instructorId, range);
       if (response?.success) {
         setAnalytics(response.data);
       }

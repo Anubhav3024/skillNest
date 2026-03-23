@@ -90,8 +90,8 @@ export const reorderInstructorCourseLecturesService = async (
   return res.data;
 };
 
-export const fetchInstructorAnalyticsService = async (instructorId) => {
-  const res = await axiosInstance.get(`/instructor/analytics/${instructorId}`);
+export const fetchInstructorAnalyticsService = async (instructorId, range = "6m") => {
+  const res = await axiosInstance.get(`/instructor/analytics/${instructorId}?range=${range}`);
   return res.data;
 };
 

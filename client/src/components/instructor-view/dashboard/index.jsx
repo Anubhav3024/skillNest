@@ -15,7 +15,7 @@ const InstructorDashboard = ({ listOfCourses, analytics, auth }) => {
   const stats = [
     {
       label: "TOTAL REVENUE",
-      value: `₹${analytics?.reduce((acc, item) => acc + item.revenue, 0) || 0}`,
+      value: `₹${analytics?.totalRevenue || 0}`,
       change: "Lifetime Earnings",
       icon: TrendingUp,
       color: "text-[#0d694f]",
@@ -23,7 +23,7 @@ const InstructorDashboard = ({ listOfCourses, analytics, auth }) => {
     },
     {
       label: "TOTAL SCHOLARS",
-      value: analytics?.reduce((acc, item) => acc + item.students.length, 0) || 0,
+      value: analytics?.totalStudents || 0,
       change: "Enrolled Students",
       icon: Users,
       color: "text-[#0d694f]",
@@ -31,8 +31,8 @@ const InstructorDashboard = ({ listOfCourses, analytics, auth }) => {
     },
     {
       label: "COURSE RATING",
-      value: "4.8 / 5.0",
-      change: "Platform Average",
+      value: analytics?.avgRating ? `${analytics.avgRating} / 5.0` : "0.0 / 5.0",
+      change: analytics?.avgRating ? "Platform Average" : "No Reviews Yet",
       icon: Star,
       color: "text-[#0d694f]",
       bg: "bg-[#0d694f]/5"
@@ -133,26 +133,41 @@ const InstructorDashboard = ({ listOfCourses, analytics, auth }) => {
         <motion.div variants={itemVariants} className="lg:col-span-8 bg-white p-10 rounded-[2.5rem] border border-[#0d694f]/5 shadow-3d relative overflow-hidden">
           <div className="flex items-center justify-between mb-12 relative z-10">
             <h3 className="text-lg font-headline font-black text-[#0d694f] uppercase tracking-tight">Financial Trajectory</h3>
-            <select className="bg-[#fcf8f1] border border-[#0d694f]/10 rounded-xl px-4 py-2 text-[9px] font-black uppercase tracking-widest outline-none shadow-sm cursor-pointer hover:border-[#0d694f]/20 transition-all">
-              <option>Last 6 Months</option>
-              <option>Last Year</option>
+            <select 
+              value={selectedRange}
+              onChange={(e) => onRangeChange(e.target.value)}
+              className="bg-[#fcf8f1] border border-[#0d694f]/10 rounded-xl px-4 py-2 text-[9px] font-black uppercase tracking-widest outline-none shadow-sm cursor-pointer hover:border-[#0d694f]/20 transition-all"
+            >
+              <option value="30d">Last 30 Days</option>
+              <option value="6m">Last 6 Months</option>
+              <option value="1y">Last Year</option>
             </select>
           </div>
           
           <div className="h-64 relative flex items-end justify-between px-4 pb-8 z-10">
-            {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'].map((month, i) => (
-              <div key={i} className="flex flex-col items-center gap-4 w-full group">
-                <div className="w-full max-w-[32px] bg-[#fcf8f1] rounded-t-lg relative overflow-hidden h-40 group-hover:bg-[#0d694f]/5 transition-colors">
-                  <motion.div 
-                    initial={{ height: 0 }}
-                    animate={{ height: `${[30, 45, 60, 40, 75, 90][i]}%` }}
-                    transition={{ duration: 1.5, delay: 0.5 + (i * 0.1) }}
-                    className="absolute bottom-0 left-0 right-0 bg-primary-gradient shadow-[0_0_15px_rgba(13,105,79,0.2)]"
-                  ></motion.div>
+            {analytics?.monthlyRevenue?.map((data, i) => {
+              const maxRevenue = Math.max(...analytics.monthlyRevenue.map(r => r.revenue), 1);
+              const heightPercentage = (data.revenue / maxRevenue) * 100;
+
+              return (
+                <div key={i} className="flex flex-col items-center gap-4 w-full group">
+                  <div className="w-full max-w-[32px] bg-[#fcf8f1] rounded-t-lg relative overflow-hidden h-40 group-hover:bg-[#0d694f]/5 transition-colors">
+                    <motion.div 
+                      initial={{ height: 0 }}
+                      animate={{ height: `${Math.max(heightPercentage, 5)}%` }} // Minimum height for visibility
+                      transition={{ duration: 1.5, delay: 0.2 + (i * 0.05) }}
+                      className="absolute bottom-0 left-0 right-0 bg-primary-gradient shadow-[0_0_15px_rgba(13,105,79,0.2)]"
+                    ></motion.div>
+                  </div>
+                  <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest group-hover:text-[#0d694f] transition-colors">{data.label}</span>
                 </div>
-                <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest group-hover:text-[#0d694f] transition-colors">{month}</span>
+              );
+            })}
+            {!analytics?.monthlyRevenue && (
+              <div className="w-full text-center text-muted-foreground opacity-30 text-[10px] uppercase font-black tracking-widest pb-12">
+                No financial projections available
               </div>
-            ))}
+            )}
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
         </motion.div>
@@ -265,8 +280,10 @@ const InstructorDashboard = ({ listOfCourses, analytics, auth }) => {
 
 InstructorDashboard.propTypes = {
   listOfCourses: PropTypes.array,
-  analytics: PropTypes.array,
+  analytics: PropTypes.object,
   auth: PropTypes.object.isRequired,
+  onRangeChange: PropTypes.func,
+  selectedRange: PropTypes.string,
 };
 
 export default InstructorDashboard;
