@@ -6,7 +6,9 @@ import { createContext, useState, useCallback } from "react";
 import {
   fetchInstructorCourseListService,
   fetchInstructorAnalyticsService,
+  deleteInstructorCourseService,
 } from "@/services";
+import PropTypes from "prop-types";
 
 export const InstructorContext = createContext(null);
 
@@ -52,6 +54,20 @@ export default function InstructorProvider({ children }) {
     }
   }, []);
 
+  const deleteCourse = useCallback(async (courseId, instructorId) => {
+    try {
+      const response = await deleteInstructorCourseService(courseId);
+      if (response?.success) {
+        fetchInstructorCourseList(instructorId);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      return false;
+    }
+  }, [fetchInstructorCourseList]);
+
   return (
     <InstructorContext.Provider
       value={{
@@ -71,9 +87,14 @@ export default function InstructorProvider({ children }) {
         setCurrentEditedCourseId,
         fetchInstructorCourseList,
         fetchInstructorAnalytics,
+        deleteCourse,
       }}
     >
       {children}
     </InstructorContext.Provider>
   );
 }
+
+InstructorProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

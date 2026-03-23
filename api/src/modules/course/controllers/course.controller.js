@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const Course = require("../../../models/course");
+const { deleteMediaFromCloudinary } = require("../../../utils/cloudinary");
 
 const addNewCourse = async (req, res) => {
+// ... existing code ...
   try {
     const savedCourse = await Course.create(req.body);
 
@@ -127,6 +129,35 @@ const deleteCourse = async (req, res) => {
       });
     }
 
+    // Cascading Delete: Purge Cloudinary Assets
+    try {
+      // 1. Delete course thumbnail
+      if (course.imagePublicId) {
+        await deleteMediaFromCloudinary(course.imagePublicId);
+      }
+
+      // 2. Delete curriculum media (Videos and Resources)
+      if (course.curriculum && course.curriculum.length > 0) {
+        for (const lecture of course.curriculum) {
+          // Delete video
+          if (lecture.public_id) {
+            await deleteMediaFromCloudinary(lecture.public_id);
+          }
+          // Delete resources
+          if (lecture.resources && lecture.resources.length > 0) {
+            for (const resource of lecture.resources) {
+              if (resource.public_id) {
+                await deleteMediaFromCloudinary(resource.public_id);
+              }
+            }
+          }
+        }
+      }
+    } catch (mediaError) {
+      console.error("Error purging media assets during course deletion:", mediaError);
+      // We continue deletion of the DB record even if media purging fails partly
+    }
+
     const deleted = await Course.findByIdAndDelete(id);
 
     if (!deleted) {
@@ -138,7 +169,7 @@ const deleteCourse = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Course deleted successfully",
+      message: "Course and associated media deleted successfully",
     });
   } catch (error) {
     return res.status(500).json({

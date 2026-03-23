@@ -14,6 +14,7 @@ import {
   PlayCircle
 } from "lucide-react";
 import { useContext } from "react";
+import { AuthContext } from "@/context/auth-context";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { motion } from "framer-motion";
@@ -25,7 +26,18 @@ const InstructorCourses = ({ listOfCourses }) => {
     setCurrentEditedCourseId,
     setCourseLandingFormData,
     setCourseCurriculumFormData,
+    deleteCourse,
   } = useContext(InstructorContext);
+  const { auth } = useContext(AuthContext);
+
+  async function handleDeleteCourse(courseId) {
+    if (window.confirm("Are you certain you wish to delete this curriculum vault? This action is irreversible.")) {
+      const success = await deleteCourse(courseId, auth?.user?._id);
+      if (success) {
+        // Optional: Add a toast notification here if available
+      }
+    }
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -154,6 +166,7 @@ const InstructorCourses = ({ listOfCourses }) => {
                    <motion.button 
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => handleDeleteCourse(course._id)}
                     className="ml-4 w-12 h-12 rounded-xl border border-destructive/5 bg-red-50 text-destructive hover:bg-destructive hover:text-white transition-all flex items-center justify-center shadow-sm"
                    >
                      <Trash2 className="h-4 w-4" />

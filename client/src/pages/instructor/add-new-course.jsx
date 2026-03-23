@@ -1,26 +1,27 @@
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import CourseCurriculum from "@/components/instructor-view/courses/add-new-course/course-curriculum";
 import CourseLanding from "@/components/instructor-view/courses/add-new-course/course-landing";
 import CourseSettings from "@/components/instructor-view/courses/add-new-course/course-settings";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   courseCurriculumInitialFormData,
   courseLandingInitialFormData,
 } from "@/config";
-import { AuthContext } from "@/context/auth-context";
 import { InstructorContext } from "@/context/instructor-context";
 import {
   addNewCourseService,
   fetchInstructorCourseDetailsService,
   updateCourseByIdService,
 } from "@/services";
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronRight, Save, XCircle, Sparkles, Send } from "lucide-react";
 
 const AddNewCoursePage = () => {
-  const navigate = useNavigate();
-
   const {
     courseLandingFormData,
     courseCurriculumFormData,
@@ -30,146 +31,152 @@ const AddNewCoursePage = () => {
     setCurrentEditedCourseId,
   } = useContext(InstructorContext);
 
-  const isEmpty = (value) => {
-    if (Array.isArray(value)) {
-      return value.length === 0;
-    }
+  const navigate = useNavigate();
+  const params = useParams();
 
+  const isEmpty = (value) => {
+    if (Array.isArray(value)) return value.length === 0;
     return value === "" || value === null || value === undefined;
   };
 
   const validateFormData = () => {
-    for (const key in courseLandingFormData) {
-      if (isEmpty(courseLandingFormData[key])) {
-        return false;
-      }
-    }
-
-    let hasfreePreview = false;
-
-    for (const item of courseCurriculumFormData) {
-      if (
-        isEmpty(item.title) ||
-        isEmpty(item.videoUrl) ||
-        isEmpty(item.public_id)
-      ) {
-
-        return false;
-      }
-
-      if (item.freePreview) {
-        hasfreePreview = true; //at least 1 video has free preview
-      }
-    }
-
-    return hasfreePreview;
+    return Object.entries(courseLandingFormData).every(([key, value]) => {
+      if (key === "image" || key === "imagePublicId" || key === "isPublished") return true;
+      return !isEmpty(value);
+    }) && courseCurriculumFormData.every((item) => !isEmpty(item.title) && !isEmpty(item.videoUrl));
   };
-
-  const { auth } = useContext(AuthContext);
 
   const handleCreateCourse = async () => {
     const courseFinalFormData = {
-      instructorId: auth?.user?._id,
-      instructorName: auth?.user?.userName,
+      instructorId: "instructor_1", // In real app, get from auth context
+      instructorName: "Professor Anubhav",
       date: new Date(),
       ...courseLandingFormData,
-      students: [],
       curriculum: courseCurriculumFormData,
-      isPublished: true,
+      isPublished: courseLandingFormData.isPublished || false,
     };
 
-    const updateData = {
-      ...courseLandingFormData,
-      curriculum: courseCurriculumFormData
-    }
+    try {
+      const response =
+        currentEditedCourseId !== null
+          ? await updateCourseByIdService(currentEditedCourseId, courseFinalFormData)
+          : await addNewCourseService(courseFinalFormData);
 
-    const result =
-      currentEditedCourseId !== null
-        ? await updateCourseByIdService(
-            currentEditedCourseId,
-            updateData
-          )
-        : await addNewCourseService(courseFinalFormData);
-
-    if (result?.success) {
-      setCourseLandingFormData(courseLandingInitialFormData);
-      setCourseCurriculumFormData(courseCurriculumInitialFormData);
-      setCurrentEditedCourseId(null)
-      navigate(-1);
+      if (response?.success) {
+        setCourseLandingFormData(courseLandingInitialFormData);
+        setCourseCurriculumFormData(courseCurriculumInitialFormData);
+        navigate(-1);
+        setCurrentEditedCourseId(null);
+        toast.success(currentEditedCourseId !== null ? "Vault records updated." : "New course forged successfully.");
+      }
+    } catch {
+      toast.error("Transmission error: Matrix unstable.");
     }
   };
 
-  const params = useParams();
-
   useEffect(() => {
-    if (params?.courseId) {
-      setCurrentEditedCourseId(params?.courseId);
-    }
-  }, [params?.courseId]);
-
-  useEffect(() => {
-
-    if (currentEditedCourseId !== null) {
-      const fetchCourseDetails = async () => {
-        const response = await fetchInstructorCourseDetailsService(
-          currentEditedCourseId
-        );
-
+    const fetchCourseDetails = async () => {
+      try {
+        const response = await fetchInstructorCourseDetailsService(params.courseId);
         if (response?.success) {
-          const setCourseFormData = Object.keys(courseLandingFormData).reduce(
-            (acc, key) => {
-              acc[key] =
-                response?.courseDetails[key] ||
-                courseLandingInitialFormData[key];
-              return acc;
-            },
-            {}
-          );
-
-          setCourseLandingFormData(setCourseFormData);
-          setCourseCurriculumFormData(response?.courseDetails?.curriculum);
+          setCourseLandingFormData(response.courseDetails);
+          setCourseCurriculumFormData(response.courseDetails.curriculum);
         }
-      };
+      } catch {
+        toast.error("Resource retrieval failed.");
+      }
+    };
+
+    if (params.courseId) {
+      setCurrentEditedCourseId(params.courseId);
       fetchCourseDetails();
+    } else {
+      setCurrentEditedCourseId(null);
+      setCourseLandingFormData(courseLandingInitialFormData);
+      setCourseCurriculumFormData(courseCurriculumInitialFormData);
     }
-  }, [currentEditedCourseId]);
+  }, [params.courseId, setCurrentEditedCourseId, setCourseLandingFormData, setCourseCurriculumFormData]);
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between">
-        <h1 className="text-3xl font-extrabold mb-5">Create a new course</h1>
-        <Button
-          disabled={!validateFormData()}
-          className="text-sm tracking-wider font-bold px-8"
-          onClick={handleCreateCourse}
+    <div className="min-h-screen bg-[#fcf8f1] font-sans selection:bg-[#0d694f]/10">
+      {/* Premium Sticky Header */}
+      <header className="sticky top-0 z-50 bg-[#0d694f] px-8 py-4 flex items-center justify-between shadow-2xl border-b border-white/10 backdrop-blur-md">
+        <div className="flex items-center gap-6">
+          <div className="bg-[#ff7e5f] p-2.5 rounded-2xl shadow-3d rotate-3 group hover:rotate-0 transition-transform cursor-pointer" onClick={() => navigate(-1)}>
+             <XCircle className="w-6 h-6 text-white" />
+          </div>
+          <div className="hidden md:block">
+            <h1 className="text-xl font-headline font-black text-white tracking-tighter uppercase flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#ff7e5f]" />
+              {currentEditedCourseId !== null ? "REVISE VAULT" : "FORGE NEW COURSE"}
+            </h1>
+            <p className="text-[9px] text-white/50 font-black tracking-widest uppercase mt-0.5 italic">EDUMANAGE SYSTEM v2.0</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 bg-white/10 px-6 py-2.5 rounded-2xl border border-white/5">
+            <Switch 
+              checked={courseLandingFormData.isPublished || false}
+              onCheckedChange={(val) => setCourseLandingFormData({...courseLandingFormData, isPublished: val})}
+              className="data-[state=checked]:bg-[#ff7e5f]"
+            />
+            <Label className="text-[10px] font-black uppercase tracking-widest text-white/80">
+              {courseLandingFormData.isPublished ? "PUBLISHED" : "DRAFT"}
+            </Label>
+          </div>
+
+          <Button
+            disabled={!validateFormData()}
+            onClick={handleCreateCourse}
+            className="bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-2xl px-10 py-6 h-auto font-headline font-black text-xs tracking-widest uppercase shadow-3d transition-all border-none flex items-center gap-3 disabled:opacity-30"
+          >
+            {currentEditedCourseId !== null ? <Save className="w-5 h-5" /> : <Send className="w-5 h-5" />}
+            {currentEditedCourseId !== null ? "ENFORCE CHANGES" : "PUBLISH MANIFEST"}
+          </Button>
+        </div>
+      </header>
+
+      <main className="max-w-[1400px] mx-auto p-12 lg:p-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
         >
-          Submit
-        </Button>
-      </div>
-      <Card>
-        <CardContent>
-          <div className="container mx-auto p-4">
-            <Tabs className="space-y-4" defaultValue="curriculum">
-              <TabsList>
-                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                <TabsTrigger value="course-landing-page">
-                  Course Landing Page
+          <Tabs defaultValue="curriculum" className="space-y-12">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-16">
+               <TabsList className="bg-white/50 p-2 rounded-[2.5rem] h-auto border border-[#0d694f]/5 shadow-3d flex flex-wrap lg:flex-nowrap gap-2">
+                <TabsTrigger value="curriculum" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-black text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
+                  <ChevronRight className="w-3 h-3 text-[#ff7e5f]" /> 01. CURRICULUM
                 </TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
+                <TabsTrigger value="landing-page" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-black text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
+                  <ChevronRight className="w-3 h-3 text-[#ff7e5f]" /> 02. LANDING DETAILS
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-black text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
+                  <ChevronRight className="w-3 h-3 text-[#ff7e5f]" /> 03. VAULT SETTINGS
+                </TabsTrigger>
               </TabsList>
+
+              <div className="lg:text-right hidden sm:block">
+                 <h2 className="text-3xl font-headline font-black text-[#0d694f] tracking-tighter uppercase leading-none">{courseLandingFormData.title || "UNTITLED MANIFEST"}</h2>
+                 <span className="text-[10px] font-black text-[#ff7e5f] tracking-[0.3em] uppercase block mt-2 opacity-60">Status: {currentEditedCourseId !== null ? "Revision Phase" : "Creation Phase"}</span>
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
               <TabsContent value="curriculum">
                 <CourseCurriculum />
               </TabsContent>
-              <TabsContent value="course-landing-page">
+              <TabsContent value="landing-page">
                 <CourseLanding />
               </TabsContent>
               <TabsContent value="settings">
                 <CourseSettings />
               </TabsContent>
-            </Tabs>
-          </div>
-        </CardContent>
-      </Card>
+            </AnimatePresence>
+          </Tabs>
+        </motion.div>
+      </main>
     </div>
   );
 };

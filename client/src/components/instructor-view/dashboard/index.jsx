@@ -11,7 +11,13 @@ import { Button } from "@/components/ui/button";
 import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 
-const InstructorDashboard = ({ listOfCourses, analytics, auth }) => {
+const InstructorDashboard = ({ 
+  listOfCourses, 
+  analytics, 
+  auth, 
+  onRangeChange, 
+  selectedRange 
+}) => {
   const stats = [
     {
       label: "TOTAL REVENUE",
