@@ -37,25 +37,25 @@ async function seedDenseData() {
     const now = new Date();
     let totalOrders = 0;
 
+    const allOrders = [];
+    const allReviews = [];
+
     // We'll seed data for the last 12 months
     for (let m = 0; m < 12; m++) {
       const monthDate = new Date();
       monthDate.setMonth(now.getMonth() - m);
       
-      // Each month will have 10-20 orders
       const ordersInMonth = Math.floor(Math.random() * 11) + 10; 
 
       for (let i = 0; i < ordersInMonth; i++) {
         const course = courses[Math.floor(Math.random() * courses.length)];
         const student = STUDENTS[Math.floor(Math.random() * STUDENTS.length)];
         
-        // Random day in that month
         const orderDate = new Date(monthDate);
         orderDate.setDate(Math.floor(Math.random() * 28) + 1);
         orderDate.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
 
-        // Create Order
-        const order = new Order({
+        allOrders.push({
           userId: student.id,
           userName: student.name,
           userEmail: student.email,
@@ -71,9 +71,20 @@ async function seedDenseData() {
           createdAt: orderDate,
           updatedAt: orderDate
         });
-        await order.save();
 
-        // Add student to Course.students array
+        // Add to reviews array
+        if (Math.random() > 0.4) {
+          allReviews.push({
+            courseId: course._id,
+            userId: student.id,
+            userName: student.name,
+            rating: Math.floor(Math.random() * 2) + 4,
+            reviewText: "Fantastic course! Highly recommended.",
+            createdAt: orderDate
+          });
+        }
+
+        // Update course students (still need individual updates or a bulk write)
         await Course.findByIdAndUpdate(course._id, {
           $push: {
             students: {
@@ -103,26 +114,21 @@ async function seedDenseData() {
           { upsert: true }
         );
 
-        // Add a review (high probability)
-        if (Math.random() > 0.4) {
-          const review = new Review({
-            courseId: course._id,
-            userId: student.id,
-            userName: student.name,
-            rating: Math.floor(Math.random() * 2) + 4,
-            reviewText: "Fantastic course! Highly recommended.",
-            createdAt: orderDate
-          });
-          await review.save();
-        }
-
         totalOrders++;
       }
-      console.log(`Seeded month ${monthDate.getMonth() + 1}/${monthDate.getFullYear()} with ${ordersInMonth} orders.`);
+      console.log(`Prepared month ${monthDate.getMonth() + 1}/${monthDate.getFullYear()} with ${ordersInMonth} orders.`);
+    }
+
+    // Bulk insert orders and reviews using native collection to bypass Mongoose timestamp generation
+    if (allOrders.length > 0) {
+      await Order.collection.insertMany(allOrders);
+    }
+    if (allReviews.length > 0) {
+      await Review.collection.insertMany(allReviews);
     }
 
     console.log(`Total orders seeded: ${totalOrders}`);
-    console.log("Dense historical seeding completed!");
+    console.log("Dense historical seeding completed with preserved timestamps!");
   } catch (error) {
     console.error("Seeding failed:", error);
   } finally {

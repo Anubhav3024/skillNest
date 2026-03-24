@@ -4,7 +4,8 @@ const {
   getTrajectory,
   getCourseBreakdown,
   getTransactions,
-  exportReport
+  exportReport,
+  getVaultDetailedAnalytics
 } = require("../controllers/analytics-controller");
 const { createCheckoutSession, handleWebhook } = require("../controllers/stripe-controller");
 const { authenticate, checkRole } = require("../../../middlewares/auth-middleware");
@@ -20,6 +21,7 @@ router.post("/webhook", express.raw({ type: "application/json" }), handleWebhook
 router.get("/summary", authenticate, checkRole("instructor"), getSummary);
 router.get("/trajectory", authenticate, checkRole("instructor"), getTrajectory);
 router.get("/course-breakdown", authenticate, checkRole("instructor"), getCourseBreakdown);
+router.get("/vault/:courseId", authenticate, checkRole("instructor"), getVaultDetailedAnalytics);
 router.get("/transactions", authenticate, checkRole("instructor"), getTransactions);
 router.get("/export", authenticate, checkRole("instructor"), exportReport);
 

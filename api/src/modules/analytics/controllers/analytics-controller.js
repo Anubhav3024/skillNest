@@ -203,10 +203,74 @@ const exportReport = async (req, res) => {
   }
 };
 
+const getVaultDetailedAnalytics = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const instructorId = req.user._id;
+
+    const course = await Course.findOne({ _id: courseId, instructorId: String(instructorId) });
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    // 1. Student Progress & List
+    const enrollments = await Order.find({ 
+      courseId: String(courseId), 
+      paymentStatus: "paid" 
+    }).select("userId userName userEmail createdAt coursePricing");
+
+    // 2. Revenue Breakdown (Monthly)
+    const revenueBreakdown = await Order.aggregate([
+      { 
+        $match: { 
+          courseId: String(courseId), 
+          paymentStatus: "paid" 
+        } 
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          revenue: { $sum: { $toDouble: "$coursePricing" } },
+          enrollments: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1 } }
+    ]);
+
+    // 3. Stability Score & Conversion (Mock logic for now as requested)
+    // In a real app, this would use daily engagement logs
+    const totalEnrollments = enrollments.length;
+    const stabilityScore = totalEnrollments > 0 ? 85 + Math.random() * 10 : 100;
+    const conversionRate = totalEnrollments > 0 ? 12.5 + Math.random() * 5 : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        course,
+        stats: {
+          totalStudents: totalEnrollments,
+          totalRevenue: revenueBreakdown.reduce((acc, curr) => acc + curr.revenue, 0),
+          stabilityScore: parseFloat(stabilityScore.toFixed(2)),
+          conversionRate: parseFloat(conversionRate.toFixed(2)),
+        },
+        revenueBreakdown,
+        students: enrollments
+      }
+    });
+  } catch (error) {
+    console.error("Vault Analytics Error:", error);
+    res.status(500).json({ success: false, message: "Error fetching vault analytics" });
+  }
+};
+
 module.exports = {
   getSummary,
   getTrajectory,
   getCourseBreakdown,
   getTransactions,
-  exportReport
+  exportReport,
+  getVaultDetailedAnalytics
 };

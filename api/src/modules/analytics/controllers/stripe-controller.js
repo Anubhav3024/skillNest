@@ -7,7 +7,7 @@ const { emitToInstructor } = require("../../../utils/socket-service");
 // Safety check for Stripe Key
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeKey) {
-  console.error("FATAL: STRIPE_SECRET_KEY is missing in .env. Stripe features will be disabled.");
+  console.warn("WARNING: STRIPE_SECRET_KEY is missing in .env. Stripe features will be disabled.");
 }
 const stripe = stripeKey ? new Stripe(stripeKey) : null;
 

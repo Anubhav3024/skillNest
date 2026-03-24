@@ -129,6 +129,15 @@ export default function InstructorProvider({ children }) {
         deleteCourse,
         activeTab,
         setActiveTab,
+        resetInstructorState: () => {
+          setInstructorCoursesList([]);
+          setAnalytics(null);
+          setSaasAnalytics({
+            summary: null,
+            trajectory: [],
+            transactions: [],
+          });
+        }
       }}
     >
       {children}

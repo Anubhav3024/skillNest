@@ -11,7 +11,7 @@ const { authenticate, checkRole } = require("../../../middlewares/auth-middlewar
 const router = require("express").Router();
 
 router.post("/add", authenticate, checkRole("instructor"), addNewCourse);
-router.get("/get/:instructorId", getAllCourses);
+router.get("/get/:instructorId", authenticate, checkRole("instructor"), getAllCourses);
 router.get("/get/details/:id", getCourseDetailsById);
 router.put(
   "/update/:id",

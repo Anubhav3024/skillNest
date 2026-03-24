@@ -122,6 +122,11 @@ export const fetchSaaSAnalyticsTransactionsService = async () => {
   return res.data;
 };
 
+export const instructorFetchVaultDetailedAnalyticsService = async (courseId) => {
+  const res = await axiosInstance.get(`/api/analytics/vault/${courseId}`);
+  return res.data;
+};
+
 export const createStripeCheckoutService = async (courseId) => {
   const res = await axiosInstance.post("/api/analytics/checkout", { courseId });
   return res.data;

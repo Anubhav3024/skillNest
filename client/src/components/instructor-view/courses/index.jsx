@@ -26,6 +26,11 @@ const InstructorCourses = ({ listOfCourses }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("recententries");
 
+  const capitalize = (str) => {
+    if (!str) return "";
+    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  };
+
   const {
     setCurrentEditedCourseId,
     setCourseLandingFormData,
@@ -83,7 +88,7 @@ const InstructorCourses = ({ listOfCourses }) => {
         className="flex flex-col md:flex-row md:items-center justify-between gap-8"
       >
         <div>
-          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1 uppercase">
+          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1">
             Curriculum Archives
           </h1>
           <p className="text-muted-foreground font-semibold text-sm italic opacity-70">
@@ -93,7 +98,7 @@ const InstructorCourses = ({ listOfCourses }) => {
         
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
-            className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl px-8 py-5 h-auto font-headline font-bold text-[11px] tracking-wider uppercase shadow-3d-orange transition-all border-none group"
+            className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl px-8 py-5 h-auto font-headline font-bold text-[11px]  shadow-3d-orange transition-all border-none group"
             onClick={() => {
               setCurrentEditedCourseId(null);
               setCourseCurriculumFormData(courseCurriculumInitialFormData);
@@ -102,7 +107,7 @@ const InstructorCourses = ({ listOfCourses }) => {
             }}
           >
             <Plus className="mr-2 h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
-            INITIATE NEW VAULT
+            Initiate New Vault
           </Button>
         </motion.div>
       </motion.div>
@@ -128,9 +133,9 @@ const InstructorCourses = ({ listOfCourses }) => {
            </div>
            <Button 
             onClick={handleSearch}
-            className="bg-[#0d694f] hover:bg-[#0d694f]/90 text-white rounded-[1.5rem] px-8 h-[52px] font-bold text-[11px] tracking-wider uppercase shadow-3d-orange border-none shrink-0"
+            className="bg-[#0d694f] hover:bg-[#0d694f]/90 text-white rounded-[1.5rem] px-8 h-[52px] font-bold text-[11px]  shadow-3d-orange border-none shrink-0"
            >
-              SEARCH
+              Search Archive
            </Button>
         </div>
         <div className="flex items-center gap-4 w-full lg:w-auto shrink-0">
@@ -179,16 +184,16 @@ const InstructorCourses = ({ listOfCourses }) => {
                   
                   {/* Status Badge */}
                   <div className="absolute top-4 left-4 flex items-center gap-2">
-                     <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/20 ${course.isPublished ? 'bg-[#0d694f] text-white' : 'bg-[#ff7e5f] text-white'}`}>
-                        {course.isPublished ? "PUBLISHED" : "DRAFT"}
+                     <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold  backdrop-blur-md border border-white/20 ${course.isPublished ? 'bg-[#0d694f] text-white' : 'bg-[#ff7e5f] text-white'}`}>
+                        {course.isPublished ? "Published" : "Draft"}
                      </div>
                   </div>
 
                   {/* Scholars Overlay */}
                   <div className="absolute bottom-3 right-3 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2 border border-white/10 shadow-lg">
                      <Users className="h-3.5 w-3.5 text-white" />
-                     <span className="text-[11px] font-bold text-white uppercase tracking-tight">
-                       {course?.students?.length || 0} ARCHIVED
+                     <span className="text-[11px] font-bold text-white ">
+                       {course?.students?.length || 0} Scholars
                      </span>
                   </div>
                 </div>
@@ -197,8 +202,8 @@ const InstructorCourses = ({ listOfCourses }) => {
               {/* Bottom Section: Main Theme Green */}
               <div className="flex-1 bg-[#0d694f] p-4 space-y-3 relative flex flex-col justify-between"> 
                 <div className="space-y-1.5"> 
-                  <h3 className="text-[15px] font-headline font-bold text-white leading-tight uppercase tracking-tight group-hover:text-[#ff7e5f] transition-all"> 
-                    {course.title || "UNTITLED MANIFEST"}
+                  <h3 className="text-[15px] font-headline font-bold text-white leading-tight tracking-tight group-hover:text-[#ff7e5f] transition-all"> 
+                    {capitalize(course.title) || "Untitled Manifest"}
                   </h3>
                   <div className="relative">
                      <p className="text-[10px] font-semibold text-white/60 italic leading-relaxed line-clamp-2"> 
@@ -211,7 +216,7 @@ const InstructorCourses = ({ listOfCourses }) => {
                   {/* Rating & Pricing Row */}
                   <div className="flex items-center justify-between bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10"> 
                     <div className="flex flex-col gap-0.5"> 
-                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider leading-none">Global Rating</span> 
+                        <span className="text-[9px] font-bold text-white/40  leading-none">Global Rating</span> 
                         <div className="flex items-center gap-0.5"> 
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star key={star} className={`h-2.5 w-2.5 ${star <= 4.5 ? 'fill-white text-white' : 'fill-white/10 text-white/10'}`} /> 
@@ -220,9 +225,9 @@ const InstructorCourses = ({ listOfCourses }) => {
                     </div>
                     <div className="h-8 w-[1px] bg-white/10 mx-2"></div> 
                     <div className="flex flex-col items-end gap-0.5"> 
-                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider leading-none">Price</span> 
+                        <span className="text-[9px] font-bold text-white/40  leading-none">Price</span> 
                         <div className="text-base font-headline font-bold text-white"> 
-                          {course.pricing > 0 ? `₹${course.pricing}` : "GRATIS"}
+                          {course.pricing > 0 ? `₹${course.pricing}` : "Free"}
                         </div>
                     </div>
                   </div>
@@ -231,10 +236,10 @@ const InstructorCourses = ({ listOfCourses }) => {
                   <div className="flex items-center justify-between gap-3"> 
                     <Button
                       onClick={() => navigate(`/instructor/edit-course/${course?._id}`)}
-                      className="flex-1 bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-xl py-3.5 h-auto font-headline font-bold text-[10px] tracking-wider uppercase transition-all shadow-lg shadow-black/20 border-none group/edit relative overflow-hidden" 
+                      className="flex-1 bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-xl py-3.5 h-auto font-headline font-bold text-[10px]  transition-all shadow-lg shadow-black/20 border-none group/edit relative overflow-hidden" 
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                          REVISE VAULT
+                          Revise Vault
                           <BookOpen className="w-3 h-3 opacity-50 group-hover/edit:translate-x-1 transition-transform" /> 
                       </span>
                     </Button>
@@ -263,13 +268,13 @@ const InstructorCourses = ({ listOfCourses }) => {
                 <div className="w-20 h-20 bg-[#fcf8f1] rounded-full flex items-center justify-center mx-auto mb-8 border border-[#0d694f]/10 shadow-inner">
                    <BookOpen className="h-8 w-8 text-[#0d694f]/20" />
                 </div>
-                <h2 className="text-2xl font-headline font-black text-[#0d694f] mb-3 uppercase tracking-tight">Repository Offline</h2>
+                <h2 className="text-2xl font-headline font-black text-[#0d694f] mb-3  tracking-tight">Repository Offline</h2>
                 <p className="text-muted-foreground font-medium mb-10 text-sm italic opacity-70">Your scholarly knowledge is waiting to be manifested. Begin the transmission cycle.</p>
                 <Button
-                   className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl px-10 py-6 h-auto font-headline font-black text-[10px] tracking-widest uppercase shadow-3d-orange transition-all border-none"
+                   className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl px-10 py-6 h-auto font-headline font-black text-[10px]  transition-all border-none"
                    onClick={() => navigate("/instructor/create-new-course")}
                 >
-                   DRAFT FIRST MANIFEST
+                   Draft First Manifest
                 </Button>
              </div>
           </motion.div>

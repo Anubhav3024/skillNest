@@ -7,7 +7,8 @@ import {
   Globe,
   Database,
   Check,
-  Loader2
+  Loader2,
+  UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -200,7 +201,7 @@ const InstructorSettings = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-headline font-black text-[#0d694f] tracking-tighter uppercase mb-2">
+          <h1 className="text-3xl font-headline font-black text-[#0d694f] tracking-tighter  mb-2">
             System Preferences
           </h1>
           <p className="text-muted-foreground font-medium text-xs italic opacity-60">
@@ -224,7 +225,7 @@ const InstructorSettings = () => {
               <img src={auth.user.avatar} alt="Profile" className="w-full h-full object-cover rounded-full" />
             ) : (
               <div className="w-full h-full bg-[#0d694f]/10 flex items-center justify-center rounded-full">
-                <Globe className="h-10 w-10 text-[#0d694f]/40" />
+                <UserCircle className="h-10 w-10 text-[#0d694f]/40" />
               </div>
             )}
             <input type="file" id="profile-image" className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -244,8 +245,8 @@ const InstructorSettings = () => {
         <div className="flex-1 space-y-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ff7e5f] mb-1 block">Certified Educator</span>
-              <h2 className="text-4xl font-headline font-black text-[#0d694f] tracking-tighter uppercase leading-none">
+              <span className="text-[10px] font-black  text-[#ff7e5f] mb-1 block">Certified Educator</span>
+              <h2 className="text-4xl font-headline font-black text-[#0d694f] tracking-tighter  leading-none">
                 {auth?.user?.userName}
               </h2>
               <p className="text-[#0d694f]/60 font-medium text-sm mt-2 flex items-center gap-2">
@@ -269,11 +270,11 @@ const InstructorSettings = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[#0d694f]/5">
             <div className="space-y-1">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#0d694f]/30">Experience Tier</span>
-              <p className="font-bold text-[#0d694f] text-sm uppercase">{auth?.user?.experience || 0} Years in the Vault</p>
+              <span className="text-[10px] font-black  text-[#0d694f]/30">Experience Tier</span>
+              <p className="font-bold text-[#0d694f] text-sm ">{auth?.user?.experience || 0} Years Experience</p>
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#0d694f]/30">Philosophy Manifest</span>
+              <span className="text-[10px] font-black  text-[#0d694f]/30">Philosophy Manifest</span>
               <p className="font-medium text-[#0d694f]/80 text-xs italic leading-relaxed line-clamp-2">
                 &quot;{auth?.user?.philosophy || "No philosophy archived yet."}&quot;
               </p>
@@ -289,7 +290,7 @@ const InstructorSettings = () => {
               key={item.id}
               whileHover={{ x: 5 }}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-4 px-8 py-5 rounded-2xl transition-all font-headline font-black text-[10px] uppercase tracking-widest ${
+              className={`w-full flex items-center gap-4 px-8 py-5 rounded-2xl transition-all font-headline font-black text-[10px]  ${
                 activeTab === item.id 
                   ? 'bg-[#0d694f] text-white shadow-3d-orange' 
                   : 'bg-white text-[#0d694f]/40 hover:bg-[#0d694f]/5 border border-[#0d694f]/10 shadow-3d'
@@ -313,44 +314,44 @@ const InstructorSettings = () => {
               >
                 <div className="flex items-center gap-4 pb-6 border-b border-[#fcf8f1]">
                    <Globe className="h-5 w-5 text-[#0d694f]" />
-                   <h3 className="text-xl font-headline font-black text-[#0d694f] uppercase">Public Identity</h3>
+                   <h3 className="text-xl font-headline font-black text-[#0d694f] ">Public Identity</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Manifest Title (Name)</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Manifest Title (Name)</label>
                       <input name="userName" value={profileData.userName} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Secure Link (Email)</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Secure Link (Email)</label>
                       <input name="userEmail" value={profileData.userEmail} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="md:col-span-2 space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Educator Philosophy (Description)</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Educator Philosophy (Description)</label>
                       <textarea name="philosophy" value={profileData.philosophy} onChange={handleProfileChange} rows="4" className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all resize-none" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Experience Delta (Years)</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Experience Delta (Years)</label>
                       <input name="experience" value={profileData.experience} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">LinkedIn Archive</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">LinkedIn Archive</label>
                       <input name="linkedin" value={profileData.linkedin} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">GitHub Repository</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">GitHub Repository</label>
                       <input name="github" value={profileData.github} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">X / Twitter Frequency</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">X / Twitter Frequency</label>
                       <input name="twitter" value={profileData.twitter} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                 </div>
 
                 <div className="flex justify-end pt-6">
-                  <Button disabled={isSaving} onClick={handleUpdateProfile} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px] tracking-widest uppercase shadow-3d-orange border-none flex items-center gap-3">
+                  <Button disabled={isSaving} onClick={handleUpdateProfile} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px]  shadow-3d-orange border-none flex items-center gap-3">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                    SYNC IDENTITY
+                    Sync Identity
                   </Button>
                 </div>
               </motion.div>
@@ -366,7 +367,7 @@ const InstructorSettings = () => {
               >
                 <div className="flex items-center gap-4 pb-6 border-b border-[#fcf8f1]">
                    <Lock className="h-5 w-5 text-[#0d694f]" />
-                   <h3 className="text-xl font-headline font-black text-[#0d694f] uppercase">Security Layer</h3>
+                   <h3 className="text-xl font-headline font-black text-[#0d694f] ">Security Layer</h3>
                 </div>
 
                 <div className="max-w-md space-y-8">
@@ -379,15 +380,15 @@ const InstructorSettings = () => {
                       <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Confirm New Key</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Confirm New Key</label>
                       <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                 </div>
 
                 <div className="flex justify-end pt-6">
-                  <Button disabled={isSaving} onClick={handleChangePassword} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px] tracking-widest uppercase shadow-3d-orange border-none flex items-center gap-3">
+                  <Button disabled={isSaving} onClick={handleChangePassword} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px]  shadow-3d-orange border-none flex items-center gap-3">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                    ROTATE KEYS
+                    Rotate Keys
                   </Button>
                 </div>
               </motion.div>
@@ -403,32 +404,32 @@ const InstructorSettings = () => {
               >
                 <div className="flex items-center gap-4 pb-6 border-b border-[#fcf8f1]">
                    <CreditCard className="h-5 w-5 text-[#0d694f]" />
-                   <h3 className="text-xl font-headline font-black text-[#0d694f] uppercase">Wealth Flow</h3>
+                   <h3 className="text-xl font-headline font-black text-[#0d694f] ">Wealth Flow</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    <div className="md:col-span-2 space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">UPI Identifier</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">UPI Identifier</label>
                       <input name="upiId" value={payoutData.upiId} onChange={handlePayoutChange} placeholder="example@upi" className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Account Numeric Sequence</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Account Numeric Sequence</label>
                       <input name="accountNumber" value={payoutData.accountNumber} onChange={handlePayoutChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">IFSC Protocol</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">IFSC Protocol</label>
                       <input name="ifsc" value={payoutData.ifsc} onChange={handlePayoutChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="md:col-span-2 space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] opacity-50 ml-2">Banking Institution Designation</label>
+                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Banking Institution Designation</label>
                       <input name="bankName" value={payoutData.bankName} onChange={handlePayoutChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                 </div>
 
                 <div className="flex justify-end pt-6">
-                  <Button disabled={isSaving} onClick={handleUpdatePayouts} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px] tracking-widest uppercase shadow-3d-orange border-none flex items-center gap-3">
+                  <Button disabled={isSaving} onClick={handleUpdatePayouts} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px]  shadow-3d-orange border-none flex items-center gap-3">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                    SYNC VAULT ACCESS
+                    Sync Vault Access
                   </Button>
                 </div>
               </motion.div>
@@ -444,7 +445,7 @@ const InstructorSettings = () => {
               >
                 <div className="flex items-center gap-4 pb-6 border-b border-[#fcf8f1]">
                    <Database className="h-5 w-5 text-[#0d694f]" />
-                   <h3 className="text-xl font-headline font-black text-[#0d694f] uppercase">Platform Protocol</h3>
+                   <h3 className="text-xl font-headline font-black text-[#0d694f] ">Platform Protocol</h3>
                 </div>
 
                 <div className="space-y-8">
@@ -455,7 +456,7 @@ const InstructorSettings = () => {
                     { label: "Vault Indexing", key: "vaultIndexing" },
                   ].map((setting) => (
                     <div key={setting.key} className="flex items-center justify-between p-6 bg-[#fcf8f1]/30 rounded-2xl border border-[#0d694f]/5">
-                       <span className="text-[10px] font-black uppercase tracking-widest text-[#0d694f]">{setting.label}</span>
+                       <span className="text-[10px] font-black  text-[#0d694f]">{setting.label}</span>
                        <Switch 
                          checked={platformSettings[setting.key]} 
                          onCheckedChange={(val) => setPlatformSettings({...platformSettings, [setting.key]: val})}
@@ -466,9 +467,9 @@ const InstructorSettings = () => {
                 </div>
 
                 <div className="flex justify-end pt-6">
-                  <Button disabled={isSaving} onClick={handleSyncPlatformSettings} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px] tracking-widest uppercase shadow-3d-orange border-none flex items-center gap-3">
+                  <Button disabled={isSaving} onClick={handleSyncPlatformSettings} className="bg-[#0d694f] text-white hover:bg-[#ff7e5f] rounded-2xl px-12 py-5 h-auto font-black text-[10px]  shadow-3d-orange border-none flex items-center gap-3">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                    SYNC TERMINAL
+                    Sync Terminal
                   </Button>
                 </div>
               </motion.div>

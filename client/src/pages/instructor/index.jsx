@@ -4,6 +4,7 @@ import InstructorEarnings from "@/components/instructor-view/earnings";
 import InstructorStudents from "@/components/instructor-view/students";
 import InstructorSettings from "@/components/instructor-view/settings";
 import InstructorHelp from "@/components/instructor-view/help";
+import VaultManagement from "@/components/instructor-view/vault-management";
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/context/auth-context";
 import { InstructorContext } from "@/context/instructor-context";
@@ -18,11 +19,14 @@ import {
   PlusCircle,
   HelpCircle,
   Bell,
-  Search
+  Search,
+  BarChart
 } from "lucide-react";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { io } from "socket.io-client";
+import { toast } from "react-toastify";
 
 const InstructorDashboardPage = () => {
   const { 
@@ -42,8 +46,37 @@ const InstructorDashboardPage = () => {
     if (auth?.user?._id) {
        fetchInstructorCourseList(auth?.user?._id);
        fetchInstructorAnalytics(auth?.user?._id);
+       fetchSaaSAnalytics("monthly");
     }
-  }, [fetchInstructorCourseList, fetchInstructorAnalytics, auth?.user?._id]);
+  }, [fetchInstructorCourseList, fetchInstructorAnalytics, fetchSaaSAnalytics, auth?.user?._id]);
+
+  // Real-time Dashboard Updates
+  useEffect(() => {
+    if (!auth?.user?._id) return;
+
+    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    
+    socket.emit("join-instructor", auth.user._id);
+
+    socket.on("dashboard-update", (data) => {
+      console.log("Global Real-time update received:", data);
+      
+      // Refresh all analytics
+      fetchInstructorAnalytics(auth.user._id);
+      fetchSaaSAnalytics("monthly");
+      fetchInstructorCourseList(auth.user._id);
+
+      toast.success(data.message || "New activity on your dashboard! 🥂", {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "colored",
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [auth?.user?._id, fetchInstructorAnalytics, fetchSaaSAnalytics, fetchInstructorCourseList]);
 
   function handleLogout() {
     resetCredentials();
@@ -59,6 +92,18 @@ const InstructorDashboardPage = () => {
         <InstructorDashboard
           listOfCourses={instructorCoursesList}
           analytics={analytics}
+          auth={auth}
+          setActiveTab={setActiveTab}
+        />
+      ),
+    },
+    {
+      icon: BarChart,
+      label: "Vault Explorer",
+      value: "vault-management",
+      component: (
+        <VaultManagement 
+          listOfCourses={instructorCoursesList} 
           auth={auth}
         />
       ),
@@ -111,8 +156,8 @@ const InstructorDashboardPage = () => {
           className="flex items-center gap-3 mb-8 px-4 group cursor-pointer" 
           onClick={() => navigate("/")}
         >
-          <div className="w-9 h-9 bg-[#0d694f] rounded-xl flex items-center justify-center text-white font-headline font-black text-lg shadow-lg shadow-[#0d694f]/20 group-hover:rotate-6 transition-transform">S</div>
-          <span className="text-xl font-headline font-black text-[#0d694f] tracking-tighter">SkillNest</span>
+          <div className="w-9 h-9 bg-[#0d694f] rounded-xl flex items-center justify-center text-white font-headline font-bold text-lg shadow-lg shadow-[#0d694f]/20 group-hover:rotate-6 transition-transform">S</div>
+          <span className="text-xl font-headline font-bold text-[#0d694f] tracking-tighter">SkillNest</span>
         </motion.div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-2">

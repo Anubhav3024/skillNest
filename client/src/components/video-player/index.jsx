@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { Slider } from "../ui/slider";
 import { Button } from "../ui/button";
@@ -12,7 +12,7 @@ import {
   Play,
   RotateCw,
 } from "lucide-react";
-import { progress } from "framer-motion";
+
 
 const VideoPlayer = ({ width = "100%", height = "100%", url, useProgressUpdate,  onProgressUpdate, progressData }) => {
   const [playing, setPlaying] = useState(false);
@@ -144,6 +144,18 @@ const VideoPlayer = ({ width = "100%", height = "100%", url, useProgressUpdate, 
         muted={muted}
         onProgress={handleProgress} //onProgress is called every 0.5 s by default. So, it takes care of updating the state "played" , except in case of seeking. In that case, Slider takes care
       />
+      
+      {!playing && (
+        <div 
+          className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer group/play"
+          onClick={handlePlayAndPause}
+        >
+          <div className="w-20 h-20 rounded-full bg-[#ff7e5f]/90 flex items-center justify-center shadow-3d scale-90 group-hover/play:scale-100 transition-all duration-500">
+            <Play className="w-8 h-8 text-white fill-current ml-1" />
+          </div>
+        </div>
+      )}
+
       {showControls && (
         <div
           className={` absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-4 transition-opacity duration-300 ${

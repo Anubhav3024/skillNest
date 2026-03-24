@@ -8,13 +8,15 @@ cloudinary.config({
 
 const uploadMediaToCloudinary = async (filePath) => {
   try {
-    const res = await cloudinary.uploader.upload(filePath, {
+    const res = await cloudinary.uploader.upload_large(filePath, {
       resource_type: "auto",
+      chunk_size: 6000000, // 6MB chunks
       folder: "lms_uploads",
     });
     return res;
   } catch (error) {
-    throw new Error("Error uploading to cloudinary");
+    console.error("Cloudinary Upload Error:", error);
+    throw new Error("Error uploading to cloudinary: " + (error.message || "Unknown error"));
   }
 };
 

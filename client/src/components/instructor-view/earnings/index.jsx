@@ -1,4 +1,4 @@
-import {
+import{
   TrendingUp,
   Users,
   Star,
@@ -26,7 +26,6 @@ import {
   Cell
 } from "recharts";
 import { useEffect, useState, useMemo } from "react";
-import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import axiosInstance from "@/api/axiosInstance";
 import {
@@ -54,31 +53,7 @@ const InstructorEarnings = ({
   const [breakdownData, setBreakdownData] = useState([]);
   const [loadingBreakdown, setLoadingBreakdown] = useState(false);
 
-  // WebSocket for Real-time Updates
-  useEffect(() => {
-    if (!user?._id) return;
 
-    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
-    
-    socket.emit("join-instructor", user._id);
-
-    socket.on("dashboard-update", (data) => {
-      console.log("Real-time update received:", data);
-      toast.success(data.message || "New enrollment received! 🥂", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      fetchSaaSAnalytics(trajectoryType);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [user?._id, trajectoryType, fetchSaaSAnalytics]);
 
   // Initial Fetch & Trajectory Refresh
   useEffect(() => {
@@ -96,7 +71,7 @@ const InstructorEarnings = ({
 
   const stats = [
     {
-      label: "TOTAL REVENUE",
+      label: "Total Revenue",
       value: `₹${summary?.revenue?.toLocaleString() || 0}`,
       change: "Lifetime Yield",
       icon: TrendingUp,
@@ -104,7 +79,7 @@ const InstructorEarnings = ({
       bg: "bg-[#0d694f]/5"
     },
     {
-      label: "ENROLLMENTS",
+      label: "Enrollments",
       value: summary?.totalStudents || 0,
       change: "Total Scholars",
       icon: Users,
@@ -112,7 +87,7 @@ const InstructorEarnings = ({
       bg: "bg-[#0d694f]/5"
     },
     {
-      label: "AVG. RATING",
+      label: "Avg. Rating",
       value: summary?.avgRating || "0.0",
       change: "Scholarly Feedback",
       icon: Star,
@@ -120,7 +95,7 @@ const InstructorEarnings = ({
       bg: "bg-[#0d694f]/5"
     },
     {
-      label: "STABILITY",
+      label: "Stability",
       value: `${summary?.stability || 100}%`,
       change: "Retention threshold",
       icon: BarChart2,
@@ -230,7 +205,7 @@ const InstructorEarnings = ({
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 rounded-2xl border border-[#0d694f]/10 shadow-3d-orange backdrop-blur-md">
-          <p className="text-[11px] font-bold text-[#0d694f] uppercase tracking-wider mb-2">{payload[0].payload.name}</p>
+          <p className="text-[11px] font-bold text-[#0d694f]  mb-2">{payload[0].payload.name}</p>
           <p className="text-sm font-headline font-bold text-[#ff7e5f]">₹{payload[0].value.toLocaleString()}</p>
           <p className="text-[9px] font-semibold text-muted-foreground mt-1 italic">Click to view course breakdown</p>
         </div>
@@ -254,7 +229,7 @@ const InstructorEarnings = ({
       {/* Header */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1 uppercase">
+          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1 ">
             Financial Analytics
           </h1>
           <p className="text-muted-foreground font-semibold text-sm italic opacity-70">
@@ -267,13 +242,13 @@ const InstructorEarnings = ({
               <button
                 key={type}
                 onClick={() => setTrajectoryType(type)}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold  transition-all ${
                   trajectoryType === type 
                     ? "bg-[#0d694f] text-white shadow-3d" 
                     : "text-muted-foreground/60 hover:text-[#0d694f]"
                 }`}
               >
-                {type}
+                {type.charAt(0).toUpperCase() + type.slice(1)}
               </button>
             ))}
           </div>
@@ -298,12 +273,12 @@ const InstructorEarnings = ({
             className="bg-white p-8 rounded-[2rem] border border-[#0d694f]/5 shadow-3d group cursor-default"
           >
             <div className="flex flex-col gap-6">
-              <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase opacity-60 group-hover:opacity-100 transition-opacity">{stat.label}</span>
+              <span className="text-[10px] font-bold  text-muted-foreground  opacity-60 group-hover:opacity-100 transition-opacity">{stat.label}</span>
               <div className="space-y-1">
                 <div className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter">{stat.value}</div>
-                <div className="text-[10px] font-bold text-[#0d694f]/60 uppercase tracking-wider italic opacity-70">{stat.change}</div>
+                <div className="text-[10px] font-bold text-[#0d694f]/60  italic opacity-70">{stat.change}</div>
               </div>
-              {stat.label === 'STABILITY' && (
+              {stat.label === 'Stability' && (
                 <div className="w-full h-1 bg-[#fcf8f1] rounded-full overflow-hidden">
                    <motion.div 
                     initial={{ width: 0 }}
@@ -322,11 +297,11 @@ const InstructorEarnings = ({
         {/* Financial Trajectory */}
         <motion.div variants={itemVariants} className="lg:col-span-12 bg-white p-8 rounded-2xl border border-[#0d694f]/5 shadow-3d relative overflow-hidden">
           <div className="flex items-center justify-between mb-12 relative z-10">
-            <h3 className="text-lg font-headline font-bold text-[#0d694f] uppercase tracking-tight">Financial Trajectory</h3>
+            <h3 className="text-lg font-headline font-bold text-[#0d694f]  tracking-tight">Financial Trajectory</h3>
             <div className="flex items-center gap-6">
                <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#ff7e5f]"></div>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-60">Revenue Performance</span>
+                  <span className="text-[10px] font-bold text-muted-foreground  opacity-60">Revenue Performance</span>
                </div>
             </div>
           </div>
@@ -379,7 +354,7 @@ const InstructorEarnings = ({
       {/* Transaction Manifest */}
       <motion.div variants={itemVariants} className="bg-white p-8 rounded-2xl border border-[#0d694f]/5 shadow-3d">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-          <h3 className="text-lg font-headline font-bold text-[#0d694f] uppercase tracking-tight">Transaction Manifest</h3>
+          <h3 className="text-lg font-headline font-bold text-[#0d694f]  tracking-tight">Transaction Manifest</h3>
           <div className="relative group">
              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40 group-focus-within:text-[#0d694f] transition-colors" />
              <input 
@@ -396,11 +371,11 @@ const InstructorEarnings = ({
           <table className="w-full text-left">
             <thead>
                 <tr className="border-y border-[#fcf8f1]">
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">EPOCH</th>
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">SCHOLAR</th>
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">ARCHIVE IDENTIFIER</th>
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider text-center">PROTOCOL</th>
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider text-right">VALUATION</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">Epoch</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">Scholar</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">Archive Identifier</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-center">Protocol</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-right">Valuation</th>
                 </tr>
             </thead>
             <tbody className="divide-y divide-[#fcf8f1]">
@@ -415,7 +390,7 @@ const InstructorEarnings = ({
                     transition={{ delay: 0.05 * index }}
                     className="group hover:bg-[#fcf8f1]/50 transition-colors cursor-pointer"
                   >
-                    <td className="py-3.5 px-4 text-[11px] text-muted-foreground/60 font-bold uppercase tracking-wider">
+                    <td className="py-3.5 px-4 text-[11px] text-muted-foreground/60 font-bold ">
                       {new Date(payment.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3.5 px-4">
@@ -423,13 +398,13 @@ const InstructorEarnings = ({
                         <div className="w-9 h-9 rounded-full bg-[#fcf8f1] border border-[#0d694f]/10 flex items-center justify-center text-[10px] font-bold text-[#0d694f] shadow-inner group-hover:rotate-6 transition-transform">
                            {payment.userName?.substring(0, 2).toUpperCase() || '??'}
                         </div>
-                        <span className="text-[13px] font-headline font-bold text-[#0d694f] uppercase tracking-tight group-hover:text-[#ff7e5f] transition-colors">{payment.userName}</span>
+                        <span className="text-[13px] font-headline font-bold text-[#0d694f]  tracking-tight group-hover:text-[#ff7e5f] transition-colors">{payment.userName}</span>
                       </div>
                     </td>
                     <td className="py-3.5 px-4 text-[11px] font-medium text-muted-foreground italic group-hover:text-[#0d694f] transition-colors">{payment.courseTitle}</td>
                     <td className="py-3.5 px-4 text-center">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${payment.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'} group-hover:bg-[#0d694f] group-hover:text-white transition-all`}>
-                        {payment.paymentStatus}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold  border ${payment.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'} group-hover:bg-[#0d694f] group-hover:text-white transition-all`}>
+                        {payment.paymentStatus.charAt(0).toUpperCase() + payment.paymentStatus.slice(1)}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right text-[12px] font-headline font-black text-[#0d694f] tracking-tighter">₹{payment.coursePricing}</td>
@@ -448,9 +423,9 @@ const InstructorEarnings = ({
         </div>
         
         <div className="mt-10 flex items-center justify-between border-t border-[#fcf8f1] pt-10">
-           <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">
-            SHOWING {filteredTransactions.length > 0 ? (currentPage - 1) * ENTRIES_PER_PAGE + 1 : 0}-
-            {Math.min(currentPage * ENTRIES_PER_PAGE, filteredTransactions.length)} OF {filteredTransactions.length} ENTRIES
+           <span className="text-[10px] font-bold text-muted-foreground/40 ">
+            Showing {filteredTransactions.length > 0 ? (currentPage - 1) * ENTRIES_PER_PAGE + 1 : 0}-
+            {Math.min(currentPage * ENTRIES_PER_PAGE, filteredTransactions.length)} of {filteredTransactions.length} entries
            </span>
            <div className="flex items-center gap-3">
               <motion.button 
@@ -458,18 +433,18 @@ const InstructorEarnings = ({
                 whileTap={currentPage > 1 ? { y: 0 } : {}} 
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
-                className={`h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[10px] font-bold uppercase tracking-wider text-[#0d694f] flex items-center gap-2 transition-all shadow-3d ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-[#fcf8f1]'}`}
+                className={`h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[10px] font-bold  text-[#0d694f] flex items-center gap-2 transition-all shadow-3d ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-[#fcf8f1]'}`}
               >
-                <ChevronLeft className="h-3.5 w-3.5" /> PREVIOUS
+                <ChevronLeft className="h-3.5 w-3.5" /> Previous
               </motion.button>
               <motion.button 
                 whileHover={currentPage < totalPages ? { y: -2 } : {}} 
                 whileTap={currentPage < totalPages ? { y: 0 } : {}} 
                 onClick={handleNext}
                 disabled={currentPage === totalPages || totalPages === 0}
-                className={`h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[10px] font-bold uppercase tracking-wider text-[#0d694f] flex items-center gap-2 transition-all shadow-3d ${currentPage === totalPages || totalPages === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-[#fcf8f1]'}`}
+                className={`h-9 px-4 rounded-xl border border-[#0d694f]/5 bg-white text-[10px] font-bold  text-[#0d694f] flex items-center gap-2 transition-all shadow-3d ${currentPage === totalPages || totalPages === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-[#fcf8f1]'}`}
               >
-                NEXT <ChevronRight className="h-3.5 w-3.5" />
+                Next <ChevronRight className="h-3.5 w-3.5" />
               </motion.button>
            </div>
         </div>
@@ -482,7 +457,7 @@ const InstructorEarnings = ({
           
           <DialogHeader className="relative z-10 mb-8">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-headline font-bold text-[#0d694f] uppercase tracking-tighter flex items-center gap-4">
+              <DialogTitle className="text-xl font-headline font-bold text-[#0d694f]  tracking-tighter flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#0d694f] text-white flex items-center justify-center shadow-lg shadow-[#0d694f]/20">
                   <PieChart className="h-6 w-6" />
                 </div>
@@ -519,14 +494,14 @@ const InstructorEarnings = ({
                           <BookOpen className="h-5 w-5" />
                         </div>
                         <div>
-                          <div className="text-[13px] font-headline font-black text-[#0d694f] uppercase tracking-tight group-hover:text-white transition-colors">{course.title}</div>
-                          <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-0.5 group-hover:text-white/60 transition-colors">Manifest ID: {course._id.substring(0, 8)}...</div>
+                          <div className="text-[13px] font-headline font-black text-[#0d694f]  tracking-tight group-hover:text-white transition-colors">{course.title}</div>
+                          <div className="text-[9px] font-black text-muted-foreground  mt-0.5 group-hover:text-white/60 transition-colors">Manifest ID: {course._id.substring(0, 8)}...</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-6 text-right">
                          <div className="space-y-0.5">
                             <div className="text-sm font-headline font-bold text-[#ff7e5f] group-hover:text-white transition-colors">₹{course.revenue.toLocaleString()}</div>
-                            <div className="text-[10px] font-bold text-[#0d694f]/40 uppercase tracking-wider group-hover:text-white/40 transition-colors">Course Yield</div>
+                            <div className="text-[10px] font-bold text-[#0d694f]/40  group-hover:text-white/40 transition-colors">Course Yield</div>
                          </div>
                          <ArrowRight className="h-4.5 w-4.5 text-[#0d694f]/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
                       </div>

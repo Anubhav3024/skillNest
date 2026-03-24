@@ -1,5 +1,5 @@
 import { AuthContext } from "@/context/auth-context/index";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -23,11 +23,11 @@ const AuthPage = () => {
   } = useContext(AuthContext);
 
   // Synchronize initial role
-  useState(() => {
+  useEffect(() => {
     if (signUpFormData.role === "") {
-      setSignUpFormData({ ...signUpFormData, role: "student" });
+      setSignUpFormData((prev) => ({ ...prev, role: "student" }));
     }
-  }, []);
+  }, [signUpFormData.role, setSignUpFormData]);
 
   const checkIfSignInFormValid = () => {
     return (

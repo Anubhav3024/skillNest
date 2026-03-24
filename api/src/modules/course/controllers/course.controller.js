@@ -29,11 +29,21 @@ const getAllCourses = async (req, res) => {
   try {
     const { instructorId } = req.params;
     const { search = "", sort = "" } = req.query;
+    const requesterId = String(req.user?._id || "");
 
     if (!instructorId) {
       return res.status(400).json({
         success: false,
         message: "Instructor ID is required",
+      });
+    }
+
+    // Ownership Check: Strictly enforce data isolation
+    if (String(instructorId) !== requesterId && req.user?.role !== "admin") {
+      console.warn(`Unauthorized course access attempt: ${requesterId} tried to access ${instructorId}`);
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You can only access your own manifests",
       });
     }
 

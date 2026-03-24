@@ -16,7 +16,7 @@ const CourseLanding = () => {
       className="space-y-8"
     >
       <div className="bg-white/50 p-8 rounded-3xl border border-[#0d694f]/5 mb-4">
-        <h3 className="text-xl font-headline font-black text-[#0d694f] tracking-tight uppercase">
+        <h3 className="text-xl font-headline font-bold text-[#0d694f] tracking-tight uppercase">
           Manifest Designation
         </h3>
         <p className="text-muted-foreground font-medium text-[10px] italic opacity-70 uppercase tracking-widest mt-1">

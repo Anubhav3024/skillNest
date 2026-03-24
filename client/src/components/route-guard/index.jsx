@@ -16,7 +16,8 @@ const RouteGuard = ({ authenticated, user, element }) => {
   if (
     authenticated &&
     user?.role === "instructor" &&
-    !location.pathname.includes("/instructor")
+    !location.pathname.includes("/instructor") &&
+    location.pathname !== "/"
   ) {
     return <Navigate to="/instructor" />;
   }

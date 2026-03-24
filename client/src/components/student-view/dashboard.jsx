@@ -27,6 +27,11 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
 
+  const capitalize = (str) => {
+    if (!str) return "";
+    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  };
+
   const handleLogout = () => {
     toast.success("Logged out successfully", { autoClose: 800 });
     resetCredentials();
@@ -35,13 +40,13 @@ const StudentDashboard = () => {
   };
 
   const sidebarLinks = [
-    { id: "dashboard", label: "DASHBOARD", icon: LayoutDashboard },
-    { id: "my-courses", label: "MY COURSES", icon: BookOpen },
-    { id: "browse", label: "BROWSE", icon: SearchIcon },
-    { id: "activity", label: "ACTIVITY", icon: Activity },
-    { id: "profile", label: "PROFILE", icon: User },
-    { id: "settings", label: "SETTINGS", icon: Settings },
-    { id: "help", label: "HELP", icon: HelpCircle },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "my-courses", label: "My Courses", icon: BookOpen },
+    { id: "browse", label: "Browse", icon: SearchIcon },
+    { id: "activity", label: "Activity", icon: Activity },
+    { id: "profile", label: "Profile", icon: User },
+    { id: "settings", label: "Settings", icon: Settings },
+    { id: "help", label: "Help", icon: HelpCircle },
   ];
 
   const recentActivities = [
@@ -128,7 +133,7 @@ const StudentDashboard = () => {
             className="w-full flex items-center gap-4 px-6 py-4 font-headline font-bold text-[10px] tracking-[0.2em] text-muted-foreground hover:text-destructive transition-colors group"
           >
             <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            LOGOUT
+            Logout
           </button>
         </div>
       </aside>
@@ -171,8 +176,8 @@ const StudentDashboard = () => {
           animate={{ opacity: 1, x: 0 }}
           className="mb-10"
         >
-          <h1 className="text-4xl font-headline font-black text-primary mb-2 tracking-tighter uppercase leading-none">
-            Welcome back, {auth?.user?.userName || "Elena"}
+          <h1 className="text-4xl font-headline font-black text-primary mb-2 tracking-tighter leading-none">
+            Welcome back, {capitalize(auth?.user?.userName) || "Elena"}
           </h1>
           <p className="text-muted-foreground font-medium text-sm italic opacity-70">
             Current trajectory: 68% complete. Momentum is high.
@@ -193,11 +198,11 @@ const StudentDashboard = () => {
               className="bg-white rounded-[2.5rem] p-10 shadow-3d relative overflow-hidden group isolate border border-primary/5 min-h-[400px] flex flex-col justify-center"
             >
               <div className="relative z-10 lg:w-3/5 space-y-6">
-                 <div className="inline-flex py-1 px-4 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border border-emerald-100">Active Session</div>
-                 <h2 className="text-3xl font-headline font-black text-primary leading-[1.2] tracking-tight uppercase">Advanced Principles of Architectural Lighting</h2>
+                 <div className="inline-flex py-1 px-4 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black tracking-[0.2em] border border-emerald-100">Active Session</div>
+                 <h2 className="text-3xl font-headline font-black text-primary leading-[1.2] tracking-tight">Advanced Principles of Architectural Lighting</h2>
                  
                  <div className="space-y-3 max-w-sm">
-                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
+                    <div className="flex justify-between items-center text-[10px] font-black tracking-wider">
                       <span className="text-emerald-600">68% Phase Complete</span>
                       <span className="text-muted-foreground opacity-50">12 / 18 Units</span>
                     </div>
@@ -213,7 +218,7 @@ const StudentDashboard = () => {
                  </div>
 
                  <Button className="bg-[#4fb5ca] hover:bg-[#3da4b9] text-white rounded-xl px-8 py-5 font-headline font-black transition-all shadow-lg shadow-[#4fb5ca]/20 active:scale-95 border-none h-auto text-[10px] tracking-widest">
-                   RESUME CURRICULUM
+                   Resume Curriculum
                    <ArrowRight className="ml-2 h-4 w-4" />
                  </Button>
               </div>
@@ -288,9 +293,9 @@ const StudentDashboard = () => {
               className="bg-[#171d1b] rounded-[2rem] p-8 shadow-3d relative overflow-hidden group flex flex-col justify-between items-start min-h-[220px] transition-all"
             >
               <div className="relative z-10 space-y-4">
-                <h3 className="text-xl font-headline font-black text-white leading-tight uppercase tracking-tight">Lumina Plus<br/>Mentorship</h3>
+                <h3 className="text-xl font-headline font-black text-white leading-tight tracking-tight">Lumina Plus<br/>Mentorship</h3>
                 <p className="text-white/40 text-[10px] font-bold leading-relaxed max-w-[140px]">Direct expert consultation protocols active.</p>
-                <button className="flex items-center gap-2 text-[9px] font-black text-white hover:text-emerald-400 transition-all pt-4 uppercase tracking-[0.2em] group/btn">
+                <button className="flex items-center gap-2 text-[9px] font-black text-white hover:text-emerald-400 transition-all pt-4 tracking-[0.2em] group/btn">
                   System Protocol
                   <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
                 </button>
@@ -308,8 +313,8 @@ const StudentDashboard = () => {
           className="mt-16"
         >
           <div className="flex justify-between items-baseline mb-8">
-            <h3 className="text-2xl font-headline font-black text-primary tracking-tighter uppercase">Continuing Curriculum</h3>
-            <button className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:text-emerald-700 transition-colors">Manifest All</button>
+            <h3 className="text-2xl font-headline font-black text-primary tracking-tighter">Continuing Curriculum</h3>
+            <button className="text-[10px] font-black text-emerald-600 tracking-widest hover:text-emerald-700 transition-colors">Manifest All</button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -335,7 +340,7 @@ const StudentDashboard = () => {
 
                 <div className="px-2 space-y-4">
                   <div className="space-y-1">
-                    <h4 className="text-base font-headline font-black text-[#0d694f] leading-tight group-hover:text-[#ff7e5f] transition-colors uppercase tracking-tight line-clamp-2 min-h-[2.5rem]">
+                    <h4 className="text-base font-headline font-black text-[#0d694f] leading-tight group-hover:text-[#ff7e5f] transition-colors tracking-tight line-clamp-2 min-h-[2.5rem]">
                       {course.title}
                     </h4>
                     <p className="text-[9px] font-medium text-slate-400 italic">Phase Accelerator Protocol Active</p>
@@ -394,9 +399,9 @@ const StudentDashboard = () => {
                 <div key={activity.id} className="flex gap-5 items-start group relative">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 ring-4 ring-emerald-500/10 group-hover:ring-8 group-hover:ring-emerald-500/5 transition-all"></div>
                   <div className="space-y-0.5">
-                    <div className="text-[11px] font-headline font-black text-primary uppercase tracking-wider">{activity.title}</div>
+                    <div className="text-[11px] font-headline font-black text-primary tracking-wider">{activity.title}</div>
                     <div className="text-[10px] font-bold text-muted-foreground opacity-50 lowercase">{activity.sub}</div>
-                    <div className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-widest mt-2">{activity.time}</div>
+                    <div className="text-[8px] font-black text-muted-foreground/30 tracking-widest mt-2">{activity.time}</div>
                   </div>
                 </div>
               ))}
@@ -411,24 +416,24 @@ const StudentDashboard = () => {
             className="lg:col-span-8 bg-[#dfede9] rounded-[2.5rem] p-12 shadow-3d relative overflow-hidden isolate border border-primary/10 group"
           >
              <div className="relative z-10 lg:w-3/5 space-y-5">
-                <div className="text-[9px] font-black text-[#ff7e5f] uppercase tracking-widest border border-[#ff7e5f]/20 px-3 py-1 rounded-full inline-block">Adaptive Recommendation</div>
-                <h3 className="text-3xl font-headline font-black text-primary leading-tight tracking-tight uppercase">Sustainable Urban Masterclass</h3>
+                 <div className="text-[9px] font-black text-[#ff7e5f] tracking-widest border border-[#ff7e5f]/20 px-3 py-1 rounded-full inline-block">Adaptive Recommendation</div>
+                <h3 className="text-3xl font-headline font-black text-primary leading-tight tracking-tight">Sustainable Urban Masterclass</h3>
                 <p className="text-muted-foreground font-medium text-xs leading-relaxed max-w-sm italic opacity-80">Phase optimization for urban biodiversity protocols.</p>
                 
                 <div className="flex items-center gap-6 py-4">
                   <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground">
                     <Clock className="h-3.5 w-3.5 text-[#ff7e5f]" />
-                    14 HOURS
+                    14 Hours
                   </div>
                   <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground">
                     <User className="h-3.5 w-3.5 text-[#ff7e5f]" />
-                    DR. ARIS THORNE
+                    Dr. Aris Thorne
                   </div>
                 </div>
 
                 <div className="flex gap-4 pt-2">
-                   <Button variant="ghost" className="text-[10px] font-black text-primary uppercase tracking-widest hover:bg-white/40 border-none px-0 group/link">
-                    ANALYZE MODULE
+                   <Button variant="ghost" className="text-[10px] font-black text-primary tracking-widest hover:bg-white/40 border-none px-0 group/link">
+                    Analyze Module
                     <ArrowRight className="ml-2 h-3 w-3 transition-transform group-hover/link:translate-x-1" />
                    </Button>
                 </div>
@@ -439,7 +444,7 @@ const StudentDashboard = () => {
       </main>
 
       {/* Global Bottom Credit */}
-      <div className="fixed bottom-6 right-10 text-[8px] font-bold text-muted-foreground/20 uppercase tracking-[0.3em] pointer-events-none select-none">© 2024 SkillNest Academy • The Intellectual Sanctuary</div>
+      <div className="fixed bottom-6 right-10 text-[8px] font-bold text-muted-foreground/20 tracking-[0.3em] pointer-events-none select-none">© 2024 SkillNest Academy • The Intellectual Sanctuary</div>
     </div>
   );
 };

@@ -11,13 +11,13 @@ export default {
                 xl: 'calc(var(--radius) + 4px)',
     		},
             fontFamily: {
-                headline: ['Montserrat', 'sans-serif'],
-                body: ['"Open Sans"', 'sans-serif'],
-                content: ['Roboto', 'sans-serif'],
-                subheader: ['Lato', 'sans-serif'],
-                display: ['"Playfair Display"', 'serif'],
-                serif: ['Merriweather', 'serif'],
-                label: ['"Open Sans"', 'sans-serif']
+                headline: ['Outfit', 'sans-serif'],
+                body: ['Outfit', 'sans-serif'],
+                content: ['Outfit', 'sans-serif'],
+                subheader: ['Outfit', 'sans-serif'],
+                display: ['Outfit', 'sans-serif'],
+                serif: ['Outfit', 'sans-serif'],
+                label: ['Outfit', 'sans-serif']
             },
     		colors: {
     			background: 'hsl(var(--background))',

@@ -83,7 +83,7 @@ const CourseSettings = () => {
       className="space-y-8"
     >
       <div className="bg-white/50 p-8 rounded-3xl border border-[#0d694f]/5 mb-4">
-        <h3 className="text-xl font-headline font-black text-[#0d694f] tracking-tight uppercase">
+        <h3 className="text-xl font-headline font-bold text-[#0d694f] tracking-tight uppercase">
           Identity Manifest
         </h3>
         <p className="text-muted-foreground font-medium text-[10px] italic opacity-70 uppercase tracking-widest mt-1">
@@ -116,7 +116,7 @@ const CourseSettings = () => {
               </div>
               <Button 
                 variant="outline"
-                className="bg-white border-[#0d694f]/10 rounded-xl px-10 py-5 h-auto text-[10px] font-black uppercase tracking-widest text-[#0d694f] transition-all hover:bg-[#0d694f] hover:text-white shadow-3d"
+                className="bg-white border-[#0d694f]/10 rounded-xl px-10 py-5 h-auto text-[10px] font-bold uppercase tracking-widest text-[#0d694f] transition-all hover:bg-[#0d694f] hover:text-white shadow-3d"
                 onClick={() => handleReplaceImage()}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
@@ -130,14 +130,14 @@ const CourseSettings = () => {
                   onChange={handleImageChange} 
                   type="file" 
                   accept="image/*" 
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10 h-full w-full"
                 />
                 <div className="absolute inset-0 border-4 border-dashed border-[#0d694f]/10 rounded-3xl flex flex-col items-center justify-center gap-6 bg-[#fcf8f1]/30 group-hover/upload:bg-white group-hover/upload:border-[#0d694f]/30 transition-all">
                   <div className="w-20 h-20 rounded-2xl bg-white shadow-3d flex items-center justify-center">
                     <Upload className="w-8 h-8 text-[#0d694f]" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#0d694f]">UPLOAD SIGNATURE</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#0d694f]">UPLOAD SIGNATURE</p>
                     <p className="text-[9px] font-medium italic opacity-40 mt-2">Recommended: 1280x720 (16:9)</p>
                   </div>
                 </div>

@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const LectureSchema = new mongoose.Schema({
   title: String,
   videoUrl: String,
+  thumbnailUrl: String,
+  duration: Number,
+  size: Number,
   freePreview: Boolean,
   public_id: String,
   resources: [
@@ -40,6 +43,11 @@ const CourseSchema = new mongoose.Schema(
     ],
     curriculum: [LectureSchema],
     isPublished: Boolean,
+    status: {
+      type: String,
+      enum: ["active", "paused", "archived"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );

@@ -5,6 +5,7 @@ const Order = require("../../../models/Order");
 const Course = require("../../../models/course");
 const User = require("../../../models/user");
 const StudentCourses = require("../../../models/student-courses");
+const { emitToInstructor } = require("../../../utils/socket-service");
 
 const createOrder = async (req, res) => {
   try {
@@ -199,12 +200,21 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
               },
             },
           },
-          { session },
+          { session }
         );
       });
     } finally {
       session.endSession();
     }
+
+    // Emit real-time notification to instructor
+    emitToInstructor(String(order.instructorId), "dashboard-update", {
+      orderId: order._id,
+      courseTitle: order.courseTitle,
+      amount: order.coursePricing,
+      userName: order.userName,
+      message: `New enrollment for "${order.courseTitle}" by ${order.userName}! 🥂`
+    });
 
     return res.status(200).json({
       success: true,
@@ -295,7 +305,18 @@ const handleWebhook = async (req, res) => {
           orderStatus: "confirmed",
           razorpayPaymentId: paymentId,
         },
+        { new: true }
       );
+
+      if (updatedOrder) {
+        emitToInstructor(String(updatedOrder.instructorId), "dashboard-update", {
+          orderId: updatedOrder._id,
+          courseTitle: updatedOrder.courseTitle,
+          amount: updatedOrder.coursePricing,
+          userName: updatedOrder.userName,
+          message: `New enrollment for "${updatedOrder.courseTitle}" by ${updatedOrder.userName}! 🥂`
+        });
+      }
     }
 
     return res.status(200).json({ success: true });

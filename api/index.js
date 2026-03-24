@@ -89,6 +89,28 @@ initSocket(server);
 
 connectDB().then(() => {
   server.listen(PORT, () => {
-    console.log(`Server is running at port ${PORT}`);
+    console.log(`
+-----------------------------------------
+🚀 SERVER INITIALIZED
+📍 PORT: ${PORT}
+📦 DATABASE: MongoDB Connected
+🔋 STATUS: Online
+-----------------------------------------
+    `);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`
+❌ CRITICAL ERROR: PORT ${PORT} IS ALREADY IN USE
+-----------------------------------------------
+The backend cannot start because port ${PORT} is being held by another process.
+This often happens when a previous instance didn't shut down correctly.
+
+RECOMMENDED ACTION: Run 'npx kill-port ${PORT}' or restart the terminal.
+-----------------------------------------------
+      `);
+      process.exit(1);
+    } else {
+      console.error("SERVER ERROR:", err);
+    }
   });
 });

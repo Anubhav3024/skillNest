@@ -131,11 +131,11 @@ const AddNewCoursePage = () => {
              <XCircle className="w-6 h-6 text-white" />
           </div>
           <div className="hidden md:block">
-            <h1 className="text-xl font-headline font-black text-white tracking-tighter uppercase flex items-center gap-2">
+            <h1 className="text-xl font-headline font-bold text-white tracking-tighter uppercase flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[#ff7e5f]" />
               {currentEditedCourseId !== null ? "REVISE VAULT" : "FORGE NEW COURSE"}
             </h1>
-            <p className="text-[9px] text-white/50 font-black tracking-widest uppercase mt-0.5 italic">EDUMANAGE SYSTEM v2.0</p>
+            <p className="text-[9px] text-white/50 font-bold tracking-widest uppercase mt-0.5 italic">EDUMANAGE SYSTEM v2.0</p>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ const AddNewCoursePage = () => {
               onCheckedChange={(val) => setCourseLandingFormData({...courseLandingFormData, isPublished: val})}
               className="data-[state=checked]:bg-[#ff7e5f]"
             />
-            <Label className="text-[10px] font-black uppercase tracking-widest text-white/80">
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-white/80">
               {courseLandingFormData.isPublished ? "PUBLISHED" : "DRAFT"}
             </Label>
           </div>
@@ -154,7 +154,7 @@ const AddNewCoursePage = () => {
           <Button
             disabled={!validateFormData()}
             onClick={handleCreateCourse}
-            className="bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-2xl px-10 py-6 h-auto font-headline font-black text-xs tracking-widest uppercase shadow-3d transition-all border-none flex items-center gap-3 disabled:opacity-30"
+            className="bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-2xl px-10 py-5 h-auto font-headline font-bold text-[10px] tracking-widest uppercase shadow-3d transition-all border-none flex items-center gap-3 disabled:opacity-30"
           >
             {currentEditedCourseId !== null ? <Save className="w-5 h-5" /> : <Send className="w-5 h-5" />}
             {currentEditedCourseId !== null ? "ENFORCE CHANGES" : "PUBLISH MANIFEST"}
@@ -171,20 +171,20 @@ const AddNewCoursePage = () => {
           <Tabs defaultValue="curriculum" className="space-y-12">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-16">
                <TabsList className="bg-white/50 p-2 rounded-[2.5rem] h-auto border border-[#0d694f]/5 shadow-3d flex flex-wrap lg:flex-nowrap gap-2">
-                <TabsTrigger value="curriculum" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-black text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
+                <TabsTrigger value="curriculum" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
                   <ChevronRight className="w-3 h-3 text-[#ff7e5f]" /> 01. CURRICULUM
                 </TabsTrigger>
-                <TabsTrigger value="landing-page" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-black text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
+                <TabsTrigger value="landing-page" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
                   <ChevronRight className="w-3 h-3 text-[#ff7e5f]" /> 02. LANDING DETAILS
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-black text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
+                <TabsTrigger value="settings" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">
                   <ChevronRight className="w-3 h-3 text-[#ff7e5f]" /> 03. VAULT SETTINGS
                 </TabsTrigger>
               </TabsList>
 
               <div className="lg:text-right hidden sm:block">
-                 <h2 className="text-3xl font-headline font-black text-[#0d694f] tracking-tighter uppercase leading-none">{courseLandingFormData.title || "UNTITLED MANIFEST"}</h2>
-                 <span className="text-[10px] font-black text-[#ff7e5f] tracking-[0.3em] uppercase block mt-2 opacity-60">Status: {currentEditedCourseId !== null ? "Revision Phase" : "Creation Phase"}</span>
+                 <h2 className="text-3xl font-headline font-bold text-[#0d694f] tracking-tighter uppercase leading-none">{courseLandingFormData.title || "UNTITLED MANIFEST"}</h2>
+                 <span className="text-[10px] font-bold text-[#ff7e5f] tracking-[0.3em] uppercase block mt-2 opacity-60">Status: {currentEditedCourseId !== null ? "Revision Phase" : "Creation Phase"}</span>
               </div>
             </div>
 

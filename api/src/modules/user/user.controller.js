@@ -56,17 +56,27 @@ const updateUserProfile = async (req, res) => {
     if (userName) updateData.userName = userName.toLowerCase();
     if (userEmail) updateData.userEmail = userEmail.toLowerCase();
     if (philosophy !== undefined) updateData.philosophy = philosophy;
-    if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
+    if (socialLinks !== undefined) {
+      // Flatten social links for dot notation update
+      Object.keys(socialLinks).forEach(key => {
+        updateData[`socialLinks.${key}`] = socialLinks[key];
+      });
+    }
     if (avatar !== undefined) updateData.avatar = avatar;
     if (experience !== undefined) updateData.experience = experience;
     if (skills !== undefined) updateData.skills = skills;
     if (upiId !== undefined) updateData.upiId = upiId;
-    if (bankDetails !== undefined) updateData.bankDetails = bankDetails;
+    if (bankDetails !== undefined) {
+      // Flatten bank details for dot notation update
+      Object.keys(bankDetails).forEach(key => {
+        updateData[`bankDetails.${key}`] = bankDetails[key];
+      });
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       targetUserId,
       { $set: updateData },
-      { new: true },
+      { new: true, runValidators: true },
     ).select("-userPassword");
 
     return res.status(200).json({
