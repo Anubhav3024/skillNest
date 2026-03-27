@@ -119,75 +119,92 @@ const InstructorDashboard = ({
       className="space-y-8 font-body"
     >
       {/* Dynamic Welcome Message Header */}
-      <motion.div variants={itemVariants} className="pb-8 border-b border-[#0d694f]/5">
+      <motion.div variants={itemVariants} className="pb-10 border-b border-[#0d694f]/5">
         {!isFirstTime ? (
-          <div className="space-y-2">
-            <h1 className="text-2xl md:text-3xl font-headline font-bold text-[#0d694f] tracking-tight">
-              Welcome back, {capitalize(auth?.user?.userName) || 'Educator'}! 
-            </h1>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <p className="text-muted-foreground font-medium text-sm italic opacity-70">
-                Ready to continue building amazing learning experiences? 
-                {analytics?.totalStudents > 0 && ` Your courses have reached ${analytics.totalStudents} scholars!`}
-              </p>
-              <div className="flex gap-4">
-                 <button 
-                   onClick={() => setActiveTab("courses")}
-                   className="text-[9px] font-black text-[#ff7e5f] hover:text-[#0d694f]  flex items-center gap-1.5"
-                 >
-                    Performance
-                 </button>
-                 <button 
-                   onClick={() => setActiveTab("earnings")}
-                   className="text-[9px] font-black text-[#ff7e5f] hover:text-[#0d694f]  flex items-center gap-1.5"
-                 >
-                    Earnings
-                 </button>
-                 <button 
-                   onClick={() => setActiveTab("students")}
-                   className="text-[9px] font-black text-[#ff7e5f] hover:text-[#0d694f]  flex items-center gap-1.5"
-                 >
-                    Students
-                 </button>
+          <section className="pt-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ff7e5f]/10 text-[#ff7e5f] rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-[#ff7e5f]/10">
+              <TrendingUp size={12} />
+              Educator Command Center
+            </div>
+
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+              <div>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-headline font-extrabold text-[#0d694f] leading-[0.95] tracking-tight">
+                  Welcome back, <br />
+                  <span className="text-[#ff7e5f]">
+                    {capitalize(auth?.user?.userName) || "Educator"}
+                  </span>
+                </h1>
+                <p className="text-slate-500 font-medium text-base lg:text-lg mt-7 max-w-2xl leading-relaxed italic opacity-80">
+                  {analytics?.totalStudents > 0
+                    ? `Your vaults are live with ${analytics.totalStudents} scholars. Keep shipping new lectures and refining your archive.`
+                    : "Your educator workstation is ready. Publish your first vault and start building your scholar community."}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setActiveTab("courses")}
+                  className="px-6 py-3 bg-[#0d694f]/5 rounded-xl text-[10px] font-black text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all tracking-wide"
+                >
+                  Performance
+                </button>
+                <button
+                  onClick={() => setActiveTab("earnings")}
+                  className="px-6 py-3 bg-[#0d694f]/5 rounded-xl text-[10px] font-black text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all tracking-wide"
+                >
+                  Earnings
+                </button>
+                <button
+                  onClick={() => setActiveTab("students")}
+                  className="px-6 py-3 bg-[#0d694f]/5 rounded-xl text-[10px] font-black text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all tracking-wide"
+                >
+                  Students
+                </button>
               </div>
             </div>
-          </div>
+          </section>
         ) : (
-          <div className="space-y-6">
-            <div className="space-y-2">
-               <h1 className="text-2xl md:text-4xl font-headline font-bold text-[#0d694f] tracking-tight">
-                 Welcome to SkillNest, Educator! 🚀
-               </h1>
-               <p className="text-muted-foreground font-medium text-sm max-w-2xl leading-relaxed italic">
-                 Your journey to share knowledge and empower scholars begins here. Let&apos;s initiate your workstation protocols.
-               </p>
-            </div>
+          <div className="space-y-8">
+            <section className="pt-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ff7e5f]/10 text-[#ff7e5f] rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-[#ff7e5f]/10">
+                <Plus size={12} />
+                Onboarding Protocol
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-headline font-extrabold text-[#0d694f] leading-[0.95] tracking-tight">
+                Welcome to SkillNest, <br />
+                <span className="text-[#ff7e5f]">Educator</span>
+              </h1>
+              <p className="text-slate-500 font-medium text-base lg:text-lg mt-7 max-w-2xl leading-relaxed italic opacity-80">
+                Your journey to share knowledge and empower scholars begins here. Let&apos;s initiate your workstation protocols.
+              </p>
+            </section>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-               <OnboardingCard 
-                  step="01"
-                  title="Protocol Manifest"
-                  desc="Set up your professional educator profile to build trust with scholars."
-                  buttonLabel="Update Profile"
-                  icon={UserCircle}
-                  onClick={() => setActiveTab("settings")}
-               />
-               <OnboardingCard 
-                  step="02"
-                  title="Initiate Vault"
-                  desc="Upload your first knowledge manifestation and start your teaching career."
-                  buttonLabel="Add Course"
-                  icon={Database}
-                  onClick={() => navigate("/instructor/create-new-course")}
-               />
-               <OnboardingCard 
-                  step="03"
-                  title="Orchestrate"
-                  desc="Explore your vault explorer to audit and manage future courses."
-                  buttonLabel="Vault Explorer"
-                  icon={ArrowRight}
-                  onClick={() => setActiveTab("vault-management")}
-               />
+              <OnboardingCard 
+                step="01"
+                title="Protocol Manifest"
+                desc="Set up your professional educator profile to build trust with scholars."
+                buttonLabel="Update Profile"
+                icon={UserCircle}
+                onClick={() => setActiveTab("settings")}
+              />
+              <OnboardingCard 
+                step="02"
+                title="Initiate Vault"
+                desc="Upload your first knowledge manifestation and start your teaching career."
+                buttonLabel="Add Course"
+                icon={Database}
+                onClick={() => navigate("/instructor/create-new-course")}
+              />
+              <OnboardingCard 
+                step="03"
+                title="Orchestrate"
+                desc="Explore your vault explorer to audit and manage future courses."
+                buttonLabel="Vault Explorer"
+                icon={ArrowRight}
+                onClick={() => setActiveTab("vault-management")}
+              />
             </div>
           </div>
         )}
