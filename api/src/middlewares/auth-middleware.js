@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { normalizeRole } = require("../utils/role");
 
 const authenticate = async (req, res, next) => {
   let token;
@@ -14,7 +15,10 @@ const authenticate = async (req, res, next) => {
     token = authHeader.split(" ")[1];
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload;
+    req.user = {
+      ...payload,
+      role: normalizeRole(payload?.role),
+    };
 
     next();
   } catch (error) {
@@ -37,7 +41,8 @@ const authenticate = async (req, res, next) => {
 
 const checkRole = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    const normalizedRole = normalizeRole(req.user?.role);
+    if (!req.user || !roles.includes(normalizedRole)) {
       return res.status(403).json({
         success: false,
         message: "Access denied: insufficient permissions",

@@ -7,10 +7,11 @@ import {
 } from "@/services";
 import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { ClipLoader } from "react-spinners";
+import Loader from "../../components/common/loader";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { normalizeUser } from "@/utils/role";
 
 export const AuthContext = createContext(null);
 
@@ -48,7 +49,7 @@ export default function AuthProvider({ children }) {
       const data = await registerService(signUpFormData);
 
       if (data.success) {
-        const user = data.user || data.newUser;
+        const user = normalizeUser(data.user || data.newUser);
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("user", JSON.stringify(user));
 
@@ -56,7 +57,7 @@ export default function AuthProvider({ children }) {
 
         setAuth({
           authenticated: true,
-          user: user,
+          user,
         });
       } else {
         toast.error(data.message || "Registration failed");
@@ -94,7 +95,7 @@ export default function AuthProvider({ children }) {
     try {
       const data = await loginService(signInFormData);
       if (data.success) {
-        const user = data.user || data.newUser;
+        const user = normalizeUser(data.user || data.newUser);
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("user", JSON.stringify(user));
 
@@ -102,7 +103,7 @@ export default function AuthProvider({ children }) {
 
         setAuth({
           authenticated: true,
-          user: user,
+          user,
         });
       } else {
         toast.error(data.message || "Login failed");
@@ -127,9 +128,10 @@ export default function AuthProvider({ children }) {
     try {
       const data = await checkAuthService();
       if (data.success) {
+        const user = normalizeUser(data.user);
         setAuth({
           authenticated: true,
-          user: data.user,
+          user,
         });
         setLoading(false);
       } else {
@@ -167,10 +169,11 @@ export default function AuthProvider({ children }) {
   };
 
   const updateAuthUser = (nextUser) => {
-    localStorage.setItem("user", JSON.stringify(nextUser));
+    const user = normalizeUser(nextUser);
+    localStorage.setItem("user", JSON.stringify(user));
     setAuth((prev) => ({
       ...prev,
-      user: nextUser,
+      user,
     }));
   };
 
@@ -204,7 +207,7 @@ export default function AuthProvider({ children }) {
     >
       {loading ? (
         <div className=" fixed inset-0 spinner-container flex flex-col items-center justify-center  ">
-          <ClipLoader color="#36D7B7" size={70} />
+          <Loader />
         </div>
       ) : (
         children

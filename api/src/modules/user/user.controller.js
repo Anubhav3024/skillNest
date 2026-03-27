@@ -17,7 +17,8 @@ const updateUserProfile = async (req, res) => {
       experience, 
       skills,
       upiId,
-      bankDetails
+      bankDetails,
+      fieldOfStudy
     } = req.body;
     const requesterId = String(req.user?._id || "");
     const targetUserId = userId ? String(userId) : requesterId;
@@ -72,6 +73,7 @@ const updateUserProfile = async (req, res) => {
         updateData[`bankDetails.${key}`] = bankDetails[key];
       });
     }
+    if (fieldOfStudy !== undefined) updateData.fieldOfStudy = fieldOfStudy;
 
     const updatedUser = await User.findByIdAndUpdate(
       targetUserId,

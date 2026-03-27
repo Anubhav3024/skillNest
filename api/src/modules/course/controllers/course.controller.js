@@ -1,6 +1,123 @@
 const mongoose = require("mongoose");
 const Course = require("../../../models/course");
 const { deleteMediaFromCloudinary } = require("../../../utils/cloudinary");
+const { createBulkNotifications } = require("../../../utils/notification-service");
+
+const hasMeaningfulValue = (value) =>
+  value !== undefined && value !== null && !(typeof value === "string" && value.trim() === "");
+
+const formatReadableDate = (value) => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const buildCourseChangeNotifications = ({ previousCourse, updatedCourse, sender }) => {
+  const recipients = (previousCourse.students || [])
+    .map((student) => student.studentId)
+    .filter(Boolean);
+
+  if (recipients.length === 0) {
+    return [];
+  }
+
+  const notificationTemplates = [];
+  const previousLectures = previousCourse.curriculum || [];
+  const nextLectures = updatedCourse.curriculum || [];
+  const curriculumChanged =
+    JSON.stringify(previousLectures) !== JSON.stringify(nextLectures);
+  const newLectures = nextLectures.filter(
+    (lecture) =>
+      !previousLectures.some(
+        (oldLecture) =>
+          String(oldLecture._id) === String(lecture._id) ||
+          (oldLecture.videoUrl && oldLecture.videoUrl === lecture.videoUrl),
+      ),
+  );
+
+  if (newLectures.length > 0) {
+    const firstNewLecture = newLectures[0];
+    notificationTemplates.push({
+      title: "New lecture added",
+      message:
+        newLectures.length === 1
+          ? `${sender.senderName} added "${firstNewLecture.title || "a new lecture"}" to "${updatedCourse.title}".`
+          : `${sender.senderName} added ${newLectures.length} new lectures to "${updatedCourse.title}".`,
+      type: "NEW_LECTURE",
+      link: `/course/details/${updatedCourse._id}`,
+      metadata: {
+        courseTitle: updatedCourse.title,
+        lectureTitles: newLectures.map((lecture) => lecture.title).filter(Boolean),
+      },
+    });
+  }
+
+  const previousDate = formatReadableDate(previousCourse.date);
+  const nextDate = formatReadableDate(updatedCourse.date);
+  if (previousDate !== nextDate && nextDate) {
+    notificationTemplates.push({
+      title: "Course schedule updated",
+      message: `${sender.senderName} scheduled a new session date for "${updatedCourse.title}" on ${nextDate}.`,
+      type: "COURSE_SCHEDULE",
+      link: `/course/details/${updatedCourse._id}`,
+      metadata: {
+        courseTitle: updatedCourse.title,
+        scheduledFor: nextDate,
+      },
+    });
+  }
+
+  const updatedFields = [];
+  if (hasMeaningfulValue(updatedCourse.subtitle) && previousCourse.subtitle !== updatedCourse.subtitle) {
+    updatedFields.push("course summary");
+  }
+  if (hasMeaningfulValue(updatedCourse.welcomeMessage) && previousCourse.welcomeMessage !== updatedCourse.welcomeMessage) {
+    updatedFields.push("welcome note");
+  }
+  if (hasMeaningfulValue(updatedCourse.description) && previousCourse.description !== updatedCourse.description) {
+    updatedFields.push("course details");
+  }
+  if (hasMeaningfulValue(updatedCourse.objectives) && previousCourse.objectives !== updatedCourse.objectives) {
+    updatedFields.push("learning goals");
+  }
+  if (curriculumChanged && newLectures.length === 0) {
+    updatedFields.push("course materials");
+  }
+  if (previousCourse.status !== updatedCourse.status && hasMeaningfulValue(updatedCourse.status)) {
+    updatedFields.push("availability status");
+  }
+
+  if (updatedFields.length > 0) {
+    notificationTemplates.push({
+      title: "Course details refreshed",
+      message: `${sender.senderName} updated ${updatedFields.join(", ")} for "${updatedCourse.title}".`,
+      type: "COURSE_UPDATE",
+      link: `/course/details/${updatedCourse._id}`,
+      metadata: {
+        courseTitle: updatedCourse.title,
+        updatedFields,
+      },
+    });
+  }
+
+  return notificationTemplates.flatMap((template) =>
+    recipients.map((recipientId) => ({
+      recipientId,
+      recipientRole: "student",
+      senderId: sender.senderId,
+      senderName: sender.senderName,
+      courseId: updatedCourse._id,
+      entityType: "course",
+      entityId: String(updatedCourse._id),
+      ...template,
+    })),
+  );
+};
 
 const addNewCourse = async (req, res) => {
 // ... existing code ...
@@ -158,9 +275,24 @@ const updateCourseById = async (req, res) => {
       });
     }
 
+    const previousCourseSnapshot = course.toObject();
+
     const updatedCourse = await Course.findByIdAndUpdate(id, update, {
       new: true,
     });
+
+    const notifications = buildCourseChangeNotifications({
+      previousCourse: previousCourseSnapshot,
+      updatedCourse,
+      sender: {
+        senderId: requesterId,
+        senderName: req.user?.userName || course.instructorName,
+      },
+    });
+
+    if (notifications.length > 0) {
+      await createBulkNotifications(notifications);
+    }
 
     return res.status(200).json({
       success: true,

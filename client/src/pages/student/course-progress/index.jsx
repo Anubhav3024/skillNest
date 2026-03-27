@@ -222,7 +222,7 @@ const StudentCourseProgress = () => {
       <div className="flex items-center justify-between p-4 bg-[#1c1d1f] border-b border-r-gray-700">
         <div className="flex items-center space-x-4">
           <Button
-            onClick={() => navigate("/student-courses")}
+            onClick={() => navigate("/home?tab=my-courses")}
             className="text-black bg-white"
             variant="ghost"
             size="sm"
@@ -344,7 +344,7 @@ const StudentCourseProgress = () => {
               <div>
                 <Button
                   className="mr-5"
-                  onClick={() => navigate("/student-courses")}
+                  onClick={() => navigate("/home?tab=my-courses")}
                 >
                   My Courses Page
                 </Button>

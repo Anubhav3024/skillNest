@@ -2,6 +2,9 @@ const Course = require("../../../models/course");
 const StudentCourses = require("../../../models/student-courses");
 const User = require("../../../models/user");
 
+const escapeRegex = (input = "") =>
+  input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const getAllStudentViewCourses = async (req, res) => {
   try {
     const {
@@ -9,9 +12,12 @@ const getAllStudentViewCourses = async (req, res) => {
       level = [],
       primaryLanguage = [],
       sortBy = "price-lowtohigh",
+      page = 1,
+      limit = 12,
+      search = "",
     } = req.query;
 
-    let filters = {};
+    let filters = { isPublished: true };
 
     if (category.length) {
       filters.category = { $in: category.split(",") };
@@ -23,6 +29,16 @@ const getAllStudentViewCourses = async (req, res) => {
 
     if (primaryLanguage.length) {
       filters.primaryLanguage = { $in: primaryLanguage.split(",") };
+    }
+
+    if (search && search.trim()) {
+      const safeQuery = escapeRegex(search.trim());
+      filters.$or = [
+        { title: { $regex: safeQuery, $options: "i" } },
+        { subtitle: { $regex: safeQuery, $options: "i" } },
+        { category: { $regex: safeQuery, $options: "i" } },
+        { instructorName: { $regex: safeQuery, $options: "i" } },
+      ];
     }
 
     let sortParam = {};
@@ -49,14 +65,25 @@ const getAllStudentViewCourses = async (req, res) => {
         break;
     }
 
-    const courseList = await Course.find(filters).sort(sortParam);
+    const skip = (page - 1) * limit;
+    const totalCourses = await Course.countDocuments(filters);
+    const totalPages = Math.ceil(totalCourses / limit);
+
+    const courseList = await Course.find(filters)
+      .sort(sortParam)
+      .skip(skip)
+      .limit(limit);
 
     return res.status(200).json({
       success: true,
       message: "Courses fetched successfully",
       courseList,
+      totalPages,
+      totalCourses,
+      currentPage: Number(page),
     });
   } catch (error) {
+    console.error("Error in getAllStudentViewCourses:", error);
     return res.status(500).json({
       success: false,
       message: "Error fetching all courses of student",

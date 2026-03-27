@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { InstructorContext } from "@/context/instructor-context";
 import { mediaDeleteService, mediaUploadService } from "@/services";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { motion } from "framer-motion";
@@ -20,6 +20,7 @@ const CourseSettings = () => {
     mediaUploadProgressPercentage,
     setMediaUploadProgressPercentage,
   } = useContext(InstructorContext);
+  const fileInputRef = useRef(null);
 
   const handleImageChange = async (event) => {
     const selectedImage = event.target.files[0];
@@ -52,11 +53,28 @@ const CourseSettings = () => {
     }
   };
 
+  const openFilePicker = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const handleReplaceImage = async () => {
     const imagePublicId = courseLandingFormData.imagePublicId;
+    const currentImage = courseLandingFormData.image;
 
     if (!imagePublicId) {
-      toast.warning("Knowledge anchor missing: imagePublicId not found.");
+      if (currentImage) {
+        setCourseLandingFormData({
+          ...courseLandingFormData,
+          image: "",
+          imagePublicId: "",
+        });
+        toast.info("Signature cleared. Upload a new image.");
+        openFilePicker();
+      } else {
+        toast.info("No signature found to replace.");
+      }
       return;
     }
 
@@ -70,6 +88,7 @@ const CourseSettings = () => {
           imagePublicId: "",
         });
         toast.info("Vault identity reset.");
+        openFilePicker();
       }
     } catch {
       toast.error("Reset protocol failed.");
@@ -92,6 +111,13 @@ const CourseSettings = () => {
       </div>
 
       <Card className="bg-white rounded-[2rem] border border-[#0d694f]/5 shadow-3d overflow-hidden">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="hidden"
+        />
         <div className="p-8">
           {mediaUploadProgress && (
             <MediaProgressbar
@@ -126,13 +152,10 @@ const CourseSettings = () => {
           ) : (
             <div className="w-full max-w-md">
               <div className="relative group/upload h-64 cursor-pointer">
-                <Input 
-                  onChange={handleImageChange} 
-                  type="file" 
-                  accept="image/*" 
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10 h-full w-full"
-                />
-                <div className="absolute inset-0 border-4 border-dashed border-[#0d694f]/10 rounded-3xl flex flex-col items-center justify-center gap-6 bg-[#fcf8f1]/30 group-hover/upload:bg-white group-hover/upload:border-[#0d694f]/30 transition-all">
+                <div
+                  onClick={openFilePicker}
+                  className="absolute inset-0 border-4 border-dashed border-[#0d694f]/10 rounded-3xl flex flex-col items-center justify-center gap-6 bg-[#fcf8f1]/30 group-hover/upload:bg-white group-hover/upload:border-[#0d694f]/30 transition-all"
+                >
                   <div className="w-20 h-20 rounded-2xl bg-white shadow-3d flex items-center justify-center">
                     <Upload className="w-8 h-8 text-[#0d694f]" />
                   </div>

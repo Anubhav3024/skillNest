@@ -11,10 +11,34 @@ import {
   mediaDeleteService,
   mediaUploadService,
 } from "@/services";
-import { Upload, Trash2, Plus, RefreshCw, Layers, FileText, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Upload, 
+  Trash2, 
+  Plus, 
+  RefreshCw, 
+  Layers, 
+  FileText, 
+  X, 
+  Clock, 
+  HardDrive
+} from "lucide-react";
 import { useContext, useRef } from "react";
 import { toast } from "react-toastify";
-import { motion, AnimatePresence } from "framer-motion";
+
+// Helper for formatting duration (s -> mm:ss)
+const formatDuration = (seconds) => {
+  if (!seconds) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
+// Helper for formatting size (bytes -> MB)
+const formatSize = (bytes) => {
+  if (!bytes) return "0 MB";
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
 
 const CourseCurriculum = () => {
   const {
@@ -80,14 +104,22 @@ const CourseCurriculum = () => {
             videoUrl: uploadedUrl,
             public_id: res?.result?.public_id || res?.public_id,
             videoFileName: selectedFile.name,
+            thumbnailUrl: res?.result?.thumbnailUrl,
+            duration: res?.result?.duration,
+            size: res?.result?.size,
           };
           setCourseCurriculumFormData(copyCourseCurriculumFormData);
           toast.success("Lecture transmission successful.");
         } else {
           toast.error("Upload failed: " + (res?.message || "Unknown error"));
         }
-      } catch {
-        toast.error("Shields down: Video transmission failed.");
+      } catch (err) {
+        console.error("Single upload Error:", err);
+        if (err?.response?.data?.debug) {
+          console.error("Upload debug:", err.response.data.debug);
+        }
+        const errorMessage = err?.response?.data?.message || err?.message || "Transmission Interrupted: Upload failed.";
+        toast.error(`Shields down: ${errorMessage}`);
       } finally {
         setMediaUploadProgress(false);
       }
@@ -115,15 +147,22 @@ const CourseCurriculum = () => {
           
           lecture.resources.push({
             title: selectedFile.name,
-            fileUrl: res?.result?.secure_url,
+            fileUrl: res?.result?.url || res?.result?.secure_url || res?.url,
             public_id: res?.result?.public_id,
           });
 
           setCourseCurriculumFormData(copyCourseCurriculumFormData);
           toast.success("Scholarly resource archived.");
+        } else {
+          toast.error("Resource upload failed: " + (res?.message || "Unknown error"));
         }
-      } catch {
-        toast.error("Resource transmission failed.");
+      } catch (err) {
+        console.error("Resource upload Error:", err);
+        if (err?.response?.data?.debug) {
+          console.error("Upload debug:", err.response.data.debug);
+        }
+        const errorMessage = err?.response?.data?.message || err?.message || "Transmission Interrupted: Upload failed.";
+        toast.error(`Archive Interrupted: ${errorMessage}`);
       } finally {
         setMediaUploadProgress(false);
       }
@@ -203,9 +242,12 @@ const CourseCurriculum = () => {
         copyCourseCurriculumFormData = [
           ...copyCourseCurriculumFormData,
           ...(response?.result || []).map((item, i) => ({
-            videoUrl: item?.secure_url || item?.url,
+            videoUrl: item?.url,
             public_id: item?.public_id,
             videoFileName: item?.original_filename ? `${item.original_filename}.${item.format}` : `video_${i + 1}.mp4`,
+            thumbnailUrl: item?.thumbnailUrl,
+            duration: item?.duration,
+            size: item?.size,
             title: `Lecture ${copyCourseCurriculumFormData.length + i + 1}`,
             freePreview: false,
             resources: [],
@@ -369,18 +411,56 @@ const CourseCurriculum = () => {
                    <Label className="text-[10px] font-bold uppercase tracking-widest text-[#0d694f] mb-4 block opacity-60">TRANSMISSION SOURCE</Label>
                    {curriculumItem.videoUrl ? (
                     <div className="space-y-4">
-                      <div className="rounded-2xl border border-[#0d694f]/10 shadow-3d bg-black aspect-video">
-                        <VideoPlayer url={curriculumItem.videoUrl} width="100%" height="100%" useProgressUpdate={false} />
+                      <div className="relative aspect-video rounded-2xl border border-[#0d694f]/10 shadow-3d overflow-hidden group/player">
+                        {curriculumItem.thumbnailUrl ? (
+                          <div className="absolute inset-0 z-0">
+                            <img src={curriculumItem.thumbnailUrl} alt="Video Preview" className="w-full h-full object-cover blur-sm opacity-50" />
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 bg-black z-0"></div>
+                        )}
+                        <div className="relative z-10 w-full h-full">
+                           <VideoPlayer url={curriculumItem.videoUrl} width="100%" height="100%" useProgressUpdate={false} />
+                        </div>
+                        
+                        {/* Metadata HUD Overlay */}
+                        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-20 pointer-events-none transition-all group-hover/player:translate-y-0 translate-y-2 opacity-0 group-hover/player:opacity-100">
+                           <div className="flex gap-2">
+                              {curriculumItem.duration > 0 && (
+                                <div className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1.5">
+                                   <Clock className="w-2.5 h-2.5 text-white/50" />
+                                   <span className="text-[8px] font-black text-white">{formatDuration(curriculumItem.duration)}</span>
+                                </div>
+                              )}
+                              {curriculumItem.size > 0 && (
+                                <div className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1.5">
+                                   <HardDrive className="w-2.5 h-2.5 text-white/50" />
+                                   <span className="text-[8px] font-black text-white">{formatSize(curriculumItem.size)}</span>
+                                </div>
+                              )}
+                           </div>
+                        </div>
                       </div>
-                      {/* Filename tag like Scholarly Archives */}
+
                       <div className="flex items-center justify-between bg-white/80 p-3 rounded-xl border border-[#0d694f]/5 shadow-sm">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="w-8 h-8 rounded-lg bg-[#fcf8f1] flex items-center justify-center shrink-0">
-                            <Upload className="w-4 h-4 text-[#0d694f]/40" />
+                             {curriculumItem.thumbnailUrl ? (
+                               <img src={curriculumItem.thumbnailUrl} alt="Thumb" className="w-full h-full object-cover rounded-lg" />
+                             ) : (
+                               <Upload className="w-4 h-4 text-[#0d694f]/40" />
+                             )}
                           </div>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#0d694f] truncate">
-                            {curriculumItem.videoFileName || "Lecture Video"}
-                          </span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-[#0d694f] truncate">
+                              {curriculumItem.videoFileName || "Lecture Video"}
+                            </span>
+                            {curriculumItem.size > 0 && (
+                              <span className="text-[7px] font-bold text-muted-foreground opacity-60 uppercase tracking-widest">
+                                {formatSize(curriculumItem.size)} • SECURE ARCHIVE
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <Button 
@@ -395,10 +475,23 @@ const CourseCurriculum = () => {
                     <div className="space-y-4">
                       <div className="relative group/upload h-32">
                         <Input type="file" accept="video/*" onChange={(e) => handleSingleLectureUpload(e, index)} className="absolute inset-0 opacity-0 cursor-pointer z-10 h-full w-full" />
-                        <div className="absolute inset-0 border-2 border-dashed border-[#0d694f]/10 rounded-2xl flex flex-col items-center justify-center gap-3 bg-white/50 group-hover/upload:bg-white group-hover/upload:border-[#0d694f]/30 transition-all">
-                          <Upload className="w-5 h-5 text-[#0d694f]/30 group-hover/upload:text-[#ff7e5f] transition-colors" />
-                          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#0d694f]/40 text-center px-4">TRANSMIT MODULE VIDEO</span>
-                        </div>
+                        <motion.div 
+                          whileHover={{ scale: 1.01, borderColor: "#ff7e5f" }}
+                          className="absolute inset-0 border-2 border-dashed border-[#0d694f]/10 rounded-2xl flex flex-col items-center justify-center gap-3 bg-white/50 group-hover/upload:bg-white transition-all overflow-hidden"
+                        >
+                          <div className="absolute inset-x-0 bottom-0 h-1 bg-[#0d694f]/5 overflow-hidden">
+                             <motion.div 
+                               initial={{ width: 0 }}
+                               animate={{ width: mediaUploadProgress ? `${mediaUploadProgressPercentage}%` : 0 }}
+                               className="h-full bg-[#ff7e5f]"
+                             />
+                          </div>
+                          <Upload className="w-6 h-6 text-[#0d694f]/30 group-hover/upload:text-[#ff7e5f] transition-all" />
+                          <div className="text-center">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#0d694f]/60 block">TRANSMIT MODULE VIDEO</span>
+                            <span className="text-[7px] font-bold text-[#0d694f]/30 uppercase mt-1 block tracking-widest leading-none">MAX 200MB • MP4/WEBM</span>
+                          </div>
+                        </motion.div>
                       </div>
                       
                       <div className="relative">

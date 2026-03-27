@@ -20,6 +20,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { motion } from "framer-motion";
+import StudentShell from "@/components/student-view/student-shell";
 
 const createSearchParamsHelper = (filterParams) => {
   const queryParams = [];
@@ -57,8 +58,15 @@ const StudentViewCoursesPage = () => {
 
   useEffect(() => {
     const buildQueryStringForFilters = createSearchParamsHelper(filters);
-    setSearchParams(new URLSearchParams(buildQueryStringForFilters));
-  }, [filters, setSearchParams]);
+    const nextParams = new URLSearchParams(buildQueryStringForFilters);
+    const existingSearch = searchParams.get("search");
+    if (existingSearch) nextParams.set("search", existingSearch);
+
+    const nextQueryString = nextParams.toString();
+    if (nextQueryString !== searchParams.toString()) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [filters, searchParams, setSearchParams]);
 
   useEffect(() => {
     setSort("price-lowtohigh");
@@ -103,8 +111,8 @@ const StudentViewCoursesPage = () => {
     sessionStorage.setItem("filters", JSON.stringify(copyFilters));
   };
 
-  return (
-    <div className="min-h-screen bg-[#fcf8f1] pt-24 pb-20 px-6 lg:px-12">
+  const content = (
+    <div className={`min-h-screen bg-[#fcf8f1] pb-20 px-6 lg:px-12 ${auth?.authenticated ? "pt-0" : "pt-24"}`}>
       <div className="max-w-7xl mx-auto">
         <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4">
@@ -284,6 +292,12 @@ const StudentViewCoursesPage = () => {
       </div>
     </div>
   );
+
+  if (auth?.authenticated) {
+    return <StudentShell>{content}</StudentShell>;
+  }
+
+  return content;
 };
 
 export default StudentViewCoursesPage;

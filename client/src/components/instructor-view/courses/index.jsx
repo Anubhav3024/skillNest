@@ -37,8 +37,17 @@ const InstructorCourses = ({ listOfCourses }) => {
     setCourseCurriculumFormData,
     deleteCourse,
     fetchInstructorCourseList,
+    globalSearchTerm,
+    setGlobalSearchTerm,
   } = useContext(InstructorContext);
   const { auth } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (globalSearchTerm !== searchTerm) {
+      setSearchTerm(globalSearchTerm || "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalSearchTerm]);
 
   useEffect(() => {
     if (auth?.user?._id) {
@@ -50,6 +59,7 @@ const InstructorCourses = ({ listOfCourses }) => {
   const handleSearch = () => {
     if (auth?.user?._id) {
        fetchInstructorCourseList(auth.user._id, searchTerm, sortOption);
+       setGlobalSearchTerm(searchTerm);
     }
   };
 
@@ -125,7 +135,10 @@ const InstructorCourses = ({ listOfCourses }) => {
               <input 
                type="text" 
                value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
+               onChange={(e) => {
+                 setSearchTerm(e.target.value);
+                 setGlobalSearchTerm(e.target.value);
+               }}
                onKeyPress={handleKeyPress}
                placeholder="Query curriculum archives..." 
                className="w-full bg-white border border-[#0d694f]/5 rounded-[1.5rem] pl-16 pr-6 py-4 text-xs font-medium focus:ring-4 focus:ring-[#0d694f]/5 focus:border-[#0d694f]/20 outline-none transition-all shadow-3d"

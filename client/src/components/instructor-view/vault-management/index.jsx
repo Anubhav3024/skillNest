@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, 
@@ -11,15 +11,19 @@ import {
 } from "lucide-react";
 import VaultDetailedView from "./detailed-view";
 import PropTypes from "prop-types";
+import { InstructorContext } from "@/context/instructor-context";
 
-const VaultManagement = ({ listOfCourses, auth }) => {
+const VaultManagement = ({ listOfCourses }) => {
+  const { globalSearchTerm, setGlobalSearchTerm } = useContext(InstructorContext);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const searchTerm = globalSearchTerm || "";
 
   const filteredCourses = listOfCourses?.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || course.status === filterStatus;
+    const title = course?.title || "";
+    const status = (course?.status || "active").toLowerCase();
+    const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === "all" || status === filterStatus;
     return matchesSearch && matchesStatus;
   }) || [];
 
@@ -41,7 +45,6 @@ const VaultManagement = ({ listOfCourses, auth }) => {
       <VaultDetailedView 
         courseId={selectedCourseId} 
         onBack={() => setSelectedCourseId(null)} 
-        auth={auth}
       />
     );
   }
@@ -70,7 +73,7 @@ const VaultManagement = ({ listOfCourses, auth }) => {
               type="text" 
               placeholder="Search vaults..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setGlobalSearchTerm(e.target.value)}
               className="w-full bg-white/50 backdrop-blur-sm border border-[#0d694f]/5 rounded-2xl pl-11 pr-4 py-3 text-xs font-bold outline-none focus:ring-4 focus:ring-[#0d694f]/5 focus:border-[#0d694f]/20 transition-all shadow-sm"
             />
           </div>
@@ -99,20 +102,23 @@ const VaultManagement = ({ listOfCourses, auth }) => {
       >
         <AnimatePresence mode="popLayout">
           {filteredCourses.length > 0 ? (
-            filteredCourses.map((course) => (
-              <motion.div 
-                key={course._id}
-                layout
-                variants={itemVariants}
-                whileHover={{ y: -5 }}
-                onClick={() => setSelectedCourseId(course._id)}
-                className="group relative bg-white border border-[#0d694f]/5 rounded-[2rem] overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl hover:shadow-[#0d694f]/5 transition-all duration-500 flex flex-col h-full"
-              >
+            filteredCourses.map((course) => {
+              const status = (course?.status || "active").toLowerCase();
+
+              return (
+                <motion.div 
+                  key={course._id}
+                  layout
+                  variants={itemVariants}
+                  whileHover={{ y: -5 }}
+                  onClick={() => setSelectedCourseId(course._id)}
+                  className="group relative bg-white border border-[#0d694f]/5 rounded-[2rem] overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl hover:shadow-[#0d694f]/5 transition-all duration-500 flex flex-col h-full"
+                >
                 {/* Thumbnail Area */}
                 <div className="relative aspect-[16/10] overflow-hidden m-2 rounded-[1.5rem] border border-[#0d694f]/5">
                   <img 
                     src={course.image || "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800"} 
-                    alt={course.title}
+                    alt={course.title || "Vault thumbnail"}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-90 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#011c14]/60 via-transparent to-transparent"></div>
@@ -120,11 +126,11 @@ const VaultManagement = ({ listOfCourses, auth }) => {
                   {/* Status Overlay */}
                   <div className="absolute top-4 left-4">
                      <div className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase backdrop-blur-md border border-white/20 shadow-lg ${
-                       course.status === 'paused' ? 'bg-amber-500 text-white' : 
-                       course.status === 'archived' ? 'bg-zinc-500 text-white' : 
+                       status === 'paused' ? 'bg-amber-500 text-white' : 
+                       status === 'archived' ? 'bg-zinc-500 text-white' : 
                        'bg-[#0d694f] text-white'
                      }`}>
-                        {course.status || 'ACTIVE'}
+                        {status.toUpperCase()}
                      </div>
                   </div>
 
@@ -139,7 +145,7 @@ const VaultManagement = ({ listOfCourses, auth }) => {
                 <div className="p-6 pt-2 flex-col flex justify-between flex-1 space-y-4">
                   <div className="space-y-2">
                     <h3 className="text-lg font-headline font-bold text-[#0d694f] tracking-tight line-clamp-2 uppercase">
-                      {course.title}
+                      {course.title || "Untitled Vault"}
                     </h3>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1.5">
@@ -163,12 +169,13 @@ const VaultManagement = ({ listOfCourses, auth }) => {
                 
                 {/* Status-specific decorative line */}
                 <div className={`absolute bottom-0 left-0 h-1 transition-all duration-500 group-hover:w-full w-12 ${
-                  course.status === 'paused' ? 'bg-amber-500' : 
-                  course.status === 'archived' ? 'bg-zinc-500' : 
+                  status === 'paused' ? 'bg-amber-500' : 
+                  status === 'archived' ? 'bg-zinc-500' : 
                   'bg-[#ff7e5f]'
                 }`}></div>
               </motion.div>
-            ))
+              );
+            })
           ) : (
             <motion.div 
               initial={{ opacity: 0 }}
@@ -192,7 +199,6 @@ const VaultManagement = ({ listOfCourses, auth }) => {
 
 VaultManagement.propTypes = {
   listOfCourses: PropTypes.array.isRequired,
-  auth: PropTypes.object.isRequired
 };
 
 export default VaultManagement;

@@ -58,7 +58,7 @@ const StudentHomePage = () => {
             
             <div className="flex flex-wrap items-center gap-6">
               <Button 
-                onClick={() => navigate("/courses")}
+                onClick={() => navigate("/home?tab=browse")}
                 className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-10 py-7 font-headline font-black text-lg shadow-xl shadow-[#0d694f]/20 transition-all active:scale-95 border-none"
               >
                 Get Started
@@ -129,7 +129,7 @@ const StudentHomePage = () => {
           {categories.map((cat, idx) => (
             <div 
               key={idx}
-              onClick={() => navigate(`/courses?category=${cat.title.toLowerCase().replace(' ', '-')}`)}
+              onClick={() => navigate(`/home?tab=browse&category=${encodeURIComponent(cat.title.toLowerCase().replace(' ', '-'))}`)}
               className={`${cat.color} p-10 rounded-[2.5rem] border border-transparent hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden`}
             >
               <div className={`w-16 h-16 rounded-2xl ${cat.active ? 'bg-white/10' : 'bg-white'} flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform`}>
@@ -199,7 +199,7 @@ const StudentHomePage = () => {
             </div>
             
             <Button 
-              onClick={() => navigate("/courses")}
+              onClick={() => navigate("/home?tab=browse")}
               className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-10 py-7 font-headline font-black transition-all group border-none shadow-xl shadow-[#0d694f]/20"
             >
               Learn More
@@ -218,7 +218,7 @@ const StudentHomePage = () => {
            </div>
            <div className="flex gap-4">
               <Button 
-                onClick={() => navigate("/courses")}
+                onClick={() => navigate("/home?tab=browse")}
                 className="bg-[#ff7e5f] hover:bg-[#ff6b4a] text-white rounded-xl px-10 py-7 font-headline font-black shadow-2xl shadow-orange-950/20 border-none"
               >
                 Explore Courses

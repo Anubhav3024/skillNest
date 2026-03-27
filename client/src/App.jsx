@@ -1,11 +1,12 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { useContext, lazy, Suspense } from "react";
-import { AuthContext } from "./context/auth-context";
+import { AuthContext } from "@/context/auth-context";
 import RouteGuard from "./components/route-guard";
 import StudentViewCommonLayout from "./components/student-view/common-layout";
 import NotFoundPage from "./pages/not-found";
 
-import { ClipLoader } from "react-spinners";
+
+import Loader from "./components/common/loader";
 import StudentHomePage from "./pages/student/home";
 import { ToastContainer } from "react-toastify";
 
@@ -30,13 +31,14 @@ const StudentCourseProgress = lazy(() =>
 const StudentProfilePage = lazy(() => import("./pages/student/profile"));
 
 function App() {
-  const { auth } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const auth = authContext?.auth;
 
   return (
     <Suspense
       fallback={
-        <div className=" fixed inset-0 spinner-container flex items-center justify-center  ">
-          <ClipLoader color="#36D7B7" size={70} />
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader />
         </div>
       }
     >
@@ -93,10 +95,10 @@ function App() {
           }
         >
           <Route index element={<StudentHomePage />} />
-          <Route path="/courses" element={<StudentViewCoursesPage />} />
+          <Route path="/courses" element={<Navigate to="/home?tab=browse" replace />} />
           <Route path="home" element={<StudentHomePage />} />
           <Route path="/payment-return" element={<PaypalPaymentReturnPage />} />
-          <Route path="/student-courses" element={<StudentCoursesPage />} />
+          <Route path="/student-courses" element={<Navigate to="/home?tab=my-courses" replace />} />
           <Route
             path="/course-progress/:id"
             element={<StudentCourseProgress />}
@@ -114,3 +116,4 @@ function App() {
 }
 
 export default App;
+

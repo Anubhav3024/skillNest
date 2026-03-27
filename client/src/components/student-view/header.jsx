@@ -1,20 +1,19 @@
-import { Search, User, LogOut, BookOpen, GraduationCap, Users } from "lucide-react";
+import { Search, User, LogOut } from "lucide-react";
 import { useContext, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { AuthContext } from "@/context/auth-context";
 import { toast } from "react-toastify";
 
 const StudentViewCommonHeader = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { resetCredentials, auth } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (e) => {
     if (e.key === "Enter" && searchQuery.trim() !== "") {
-      navigate(`/courses?search=${encodeURIComponent(searchQuery)}`);
+      navigate(`/home?tab=browse&search=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -23,13 +22,6 @@ const StudentViewCommonHeader = () => {
     resetCredentials();
     sessionStorage.clear();
   };
-
-  const navLinks = [
-    { label: "Browse", path: "/courses", icon: Search },
-    { label: "Learning", path: "/student-courses", icon: BookOpen },
-    { label: "Teaching", path: "/instructor", icon: GraduationCap },
-    { label: "Community", path: "/community", icon: Users },
-  ];
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#fcf8f1]/80 backdrop-blur-xl border-b border-[#0d694f]/5 transition-all duration-300">
@@ -43,22 +35,6 @@ const StudentViewCommonHeader = () => {
                SkillNest
              </span>
           </Link>
-          
-          <div className="hidden lg:flex items-center gap-8 font-headline text-sm font-semibold tracking-tight">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`transition-all pb-1 border-b-2 ${
-                  location.pathname === link.path 
-                    ? "text-primary border-primary" 
-                    : "text-muted-foreground border-transparent hover:text-primary"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -66,7 +42,7 @@ const StudentViewCommonHeader = () => {
             <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search concepts..."
+              placeholder="Search courses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
@@ -81,8 +57,8 @@ const StudentViewCommonHeader = () => {
                   to="/profile"
                   className="w-10 h-10 rounded-full bg-muted overflow-hidden ring-2 ring-transparent hover:ring-primary transition-all cursor-pointer flex items-center justify-center"
                 >
-                  {auth?.user?.photoURL ? (
-                    <img src={auth?.user?.photoURL} alt="User profile" className="w-full h-full object-cover" />
+                  {auth?.user?.avatar ? (
+                    <img src={auth?.user?.avatar} alt="User profile" className="w-full h-full object-cover" />
                   ) : (
                     <User className="h-5 w-5 text-muted-foreground" />
                   )}

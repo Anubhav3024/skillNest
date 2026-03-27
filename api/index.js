@@ -1,7 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
+const passport = require("passport");
 const connectDB = require("./src/config/db");
+require("./src/config/passport");
 const authRoutes = require("./src/modules/auth/routes/index");
 const mediaRoutes = require("./src/modules/course/routes/media-routes/index");
 const instructorCourseRoutes = require("./src/modules/course/routes/course-routes");
@@ -16,6 +19,9 @@ const userRoutes = require("./src/modules/user/routes/index");
 const adminUserRoutes = require("./src/modules/admin/routes/user-routes");
 const analyticsRoutes = require("./src/modules/analytics/routes/index");
 const instructorRoutes = require("./src/modules/instructor/routes/instructor-routes");
+const studentDashboardRoutes = require("./src/modules/student/routes/student-dashboard-routes");
+const studentActivityRoutes = require("./src/modules/student/routes/student-activity-routes");
+const notificationRoutes = require("./src/modules/notification/routes/notification-routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,7 +53,23 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Update express.json to capture raw body for Stripe Webhook verification
+const sessionSecret = process.env.SESSION_SECRET || process.env.JWT_SECRET || "dev_session_secret";
+app.use(
+  session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
+  }),
+);
+
+app.use(passport.initialize());
+
+// Capture raw body for webhook signature verification
 app.use(
   express.json({
     verify: (req, res, buf) => {
@@ -76,6 +98,9 @@ app.use("/student/discovery", studentDiscoveryRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminUserRoutes);
 app.use("/instructor", instructorRoutes);
+app.use("/student/dashboard", studentDashboardRoutes);
+app.use("/student/activity", studentActivityRoutes);
+app.use("/notifications", notificationRoutes);
 
 app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: err.message || "Something went wrong" });

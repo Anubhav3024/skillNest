@@ -1,9 +1,11 @@
 import { Fragment } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+import { normalizeRole } from "@/utils/role";
 
 const RouteGuard = ({ authenticated, user, element }) => {
   const location = useLocation();
+  const role = normalizeRole(user?.role);
 
   if (
     !authenticated &&
@@ -13,18 +15,13 @@ const RouteGuard = ({ authenticated, user, element }) => {
     return <Navigate to="/auth" />;
   }
 
-  if (
-    authenticated &&
-    user?.role === "instructor" &&
-    !location.pathname.includes("/instructor") &&
-    location.pathname !== "/"
-  ) {
+  if (authenticated && role === "instructor" && !location.pathname.includes("/instructor")) {
     return <Navigate to="/instructor" />;
   }
 
   if (
     authenticated &&
-    user?.role === "student" &&
+    role === "student" &&
     (location.pathname.includes("/instructor") ||
       location.pathname.includes("/auth"))
   ) {

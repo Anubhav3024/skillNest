@@ -1,6 +1,7 @@
 const User = require("../../../models/user.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { normalizeRole, isValidRole } = require("../../../utils/role");
 
 // const registerUser = async (req, res) => {
 //   const { userName, userEmail, userPassword, role } = req.body;
@@ -65,8 +66,8 @@ const registerUser = async (req, res) => {
     userEmail = userEmail.toLowerCase();
     userName = userName.toLowerCase();
 
-    const allowedRoles = ["student", "instructor"];
-    if (!allowedRoles.includes(role)) {
+    role = normalizeRole(role);
+    if (!isValidRole(role)) {
       return res.status(400).json({
         success: false,
         message: "Invalid role",
@@ -115,7 +116,7 @@ const registerUser = async (req, res) => {
         _id: newUser._id,
         userName: newUser.userName,
         userEmail: newUser.userEmail,
-        role: newUser.role,
+        role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" },
@@ -124,7 +125,7 @@ const registerUser = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
-      user: userResponse,
+      user: { ...userResponse, role },
       accessToken,
     });
   } catch (error) {
@@ -178,23 +179,32 @@ const loginUser = async (req, res) => {
       });
     }
 
+    const normalizedRole = normalizeRole(user.role);
+    if (normalizedRole && normalizedRole !== user.role) {
+      user.role = normalizedRole;
+      await user.save();
+    }
+
     const accessToken = jwt.sign(
       {
         _id: user._id,
         userName: user.userName,
         userEmail: user.userEmail,
-        role: user.role,
+        role: normalizedRole || user.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" },
     );
 
     user.userPassword = undefined;
+    const safeUser = user.toObject();
+    delete safeUser.userPassword;
+    safeUser.role = normalizedRole || user.role;
 
     return res.status(200).json({
       success: true,
       message: "User logged in successfully",
-      user,
+      user: safeUser,
       accessToken,
     });
   } catch (error) {
@@ -217,12 +227,13 @@ const refreshToken = (req, res) => {
   try {
     const user = req.user;
 
+    const normalizedRole = normalizeRole(user.role);
     const newToken = jwt.sign(
       {
         _id: user._id,
         userName: user.userName,
         userEmail: user.userEmail,
-        role: user.role,
+        role: normalizedRole || user.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" },

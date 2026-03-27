@@ -18,15 +18,15 @@ import {
   UserCircle,
   PlusCircle,
   HelpCircle,
-  Bell,
   Search,
   BarChart
 } from "lucide-react";
 import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import NotificationDropdown from "@/components/common/notification-dropdown";
 
 const InstructorDashboardPage = () => {
   const { 
@@ -37,10 +37,14 @@ const InstructorDashboardPage = () => {
     saasAnalytics,
     fetchSaaSAnalytics,
     activeTab,
-    setActiveTab
+    setActiveTab,
+    globalSearchTerm,
+    setGlobalSearchTerm
   } = useContext(InstructorContext);
   const { auth, resetCredentials } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
 
   useEffect(() => {
     if (auth?.user?._id) {
@@ -49,6 +53,12 @@ const InstructorDashboardPage = () => {
        fetchSaaSAnalytics("monthly");
     }
   }, [fetchInstructorCourseList, fetchInstructorAnalytics, fetchSaaSAnalytics, auth?.user?._id]);
+
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [setActiveTab, tabFromUrl]);
 
   // Real-time Dashboard Updates
   useEffect(() => {
@@ -83,6 +93,25 @@ const InstructorDashboardPage = () => {
     sessionStorage.clear();
   }
 
+  const handleGlobalSearchKeyDown = (event) => {
+    if (event.key !== "Enter") return;
+
+    const query = globalSearchTerm.trim();
+
+    if (!auth?.user?._id) return;
+
+    if (activeTab === "courses") {
+      fetchInstructorCourseList(auth.user._id, query);
+      return;
+    }
+
+    if (activeTab === "vault-management") {
+      return;
+    }
+
+    setActiveTab("vault-management");
+  };
+
   const menuItems = [
     {
       icon: LayoutDashboard,
@@ -104,7 +133,6 @@ const InstructorDashboardPage = () => {
       component: (
         <VaultManagement 
           listOfCourses={instructorCoursesList} 
-          auth={auth}
         />
       ),
     },
@@ -217,15 +245,15 @@ const InstructorDashboardPage = () => {
             <input
               type="text"
               placeholder="Search manifests..."
+              value={globalSearchTerm}
+              onChange={(e) => setGlobalSearchTerm(e.target.value)}
+              onKeyDown={handleGlobalSearchKeyDown}
               className="w-full pl-14 pr-8 py-3.5 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md text-white placeholder:text-white/40 focus:bg-white/15 transition-all outline-none text-sm font-medium focus:ring-1 focus:ring-white/20"
             />
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="w-11 h-11 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all relative group hover:bg-white/20">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-3 right-3 w-2 h-2 bg-[#ff7e5f] rounded-full border-2 border-[#0d694f] animate-pulse"></span>
-            </button>
+            <NotificationDropdown userId={auth?.user?._id} role="instructor" />
             
             <div 
               onClick={() => setActiveTab("settings")}

@@ -1,6 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, 
   LayoutDashboard, 
@@ -16,45 +17,221 @@ import {
   TrendingUp,
   Activity,
   Plus,
-  Trash2
+  Trash2,
+  Clock
 } from "lucide-react";
-import { InstructorContext } from "@/context/instructor-context";
-import { instructorFetchVaultDetailedAnalyticsService } from "@/services";
+import { 
+  instructorFetchVaultDetailedAnalyticsService,
+  mediaUploadService,
+  mediaDeleteService,
+  updateCourseByIdService
+} from "@/services";
+import { toast } from "react-toastify";
+import axiosInstance from "@/api/axiosInstance";
+
+// Helpers for industrial-grade metadata
+const formatDuration = (seconds) => {
+  if (!seconds) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
+const formatSize = (bytes) => {
+  if (!bytes) return "0 MB";
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
 
 const VaultDetailedView = ({ courseId, onBack }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [vaultData, setVaultData] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  const { updateCourse } = useContext(InstructorContext);
+  const [error, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const navigate = useNavigate();
+
+  const course = vaultData?.course || null;
+  const stats = vaultData?.stats || {};
+  const revenueBreakdown = vaultData?.revenueBreakdown || [];
+  const students = vaultData?.students || [];
+  const curriculum = Array.isArray(course?.curriculum) ? course.curriculum : [];
 
   useEffect(() => {
-    async function fetchVaultDetails() {
+    let isMounted = true;
+
+    const fetchVaultDetails = async () => {
       setLoading(true);
-      const data = await instructorFetchVaultDetailedAnalyticsService(courseId);
-      if (data?.success) {
-        setVaultData(data.data);
+      setError(null);
+      try {
+        const data = await instructorFetchVaultDetailedAnalyticsService(courseId);
+        if (!isMounted) return;
+        if (data?.success) {
+          setVaultData(data.data);
+        } else {
+          setError(data?.message || "Vault data could not be loaded.");
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        const message = err?.response?.data?.message || err?.message || "Vault data fetch failed.";
+        setError(message);
+      } finally {
+        if (isMounted) setLoading(false);
       }
+    };
+
+    if (courseId) {
+      fetchVaultDetails();
+    } else {
+      setError("Invalid vault identifier.");
       setLoading(false);
     }
-    fetchVaultDetails();
-  }, [courseId]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [courseId, refreshKey]);
 
   const handleStatusChange = async (newStatus) => {
     if (window.confirm(`Are you certain you wish to ${newStatus} this manifestation?`)) {
-      const response = await updateCourse(courseId, { status: newStatus });
-      if (response?.success) {
-        setVaultData(prev => ({
-          ...prev,
-          course: { ...prev.course, status: newStatus }
-        }));
+      try {
+        const response = await updateCourseByIdService(courseId, { status: newStatus });
+        if (response?.success) {
+          setVaultData(prev => (
+            prev
+              ? {
+                ...prev,
+                course: { ...prev.course, status: newStatus }
+              }
+              : prev
+          ));
+          toast.success(`Vault status updated to ${newStatus}.`);
+        } else {
+          toast.error(response?.message || "Failed to update vault status.");
+        }
+      } catch (err) {
+        const message = err?.response?.data?.message || err?.message || "Status update failed.";
+        toast.error(message);
       }
     }
   };
 
-  const handleDownloadReport = () => {
-    // Reference the backend export endpoint
-    window.open(`${import.meta.env.VITE_API_URL}/api/analytics/export?courseId=${courseId}`, '_blank');
+  const handleDownloadReport = async () => {
+    try {
+      const response = await axiosInstance.post("/api/analytics/export-link", {
+        courseId,
+      });
+      if (response.data?.success && response.data?.url) {
+        window.open(response.data.url, "_blank", "noopener,noreferrer");
+      } else {
+        toast.error("Failed to generate export link.");
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || "Export failed.";
+      toast.error(message);
+    }
+  };
+
+  const handleReviseVault = () => {
+    if (!courseId) {
+      toast.error("Invalid vault identifier.");
+      return;
+    }
+    navigate(`/instructor/edit-course/${courseId}?tab=settings`);
+  };
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleAddLecture = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!courseId) {
+      toast.error("Invalid vault identifier.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setIsUploading(true);
+      const res = await mediaUploadService(formData, setUploadProgress);
+      
+      if (res?.success) {
+        const uploadedUrl = res?.result?.url || res?.result?.secure_url || res?.url;
+        if (!uploadedUrl) {
+          toast.error("Transmission error: No URL received from server.");
+          return;
+        }
+        const newLecture = {
+          title: `New Module: ${file.name.replace(/\.[^/.]+$/, "")}`,
+          videoUrl: uploadedUrl,
+          public_id: res?.result?.public_id,
+          thumbnailUrl: res?.result?.thumbnailUrl,
+          duration: res?.result?.duration,
+          size: res?.result?.size,
+          freePreview: false,
+          resources: []
+        };
+
+        const updatedCurriculum = [...curriculum, newLecture];
+        const response = await updateCourseByIdService(courseId, { curriculum: updatedCurriculum });
+        
+        if (response?.success) {
+          setVaultData(prev => ({
+            ...prev,
+            course: { ...prev.course, curriculum: updatedCurriculum }
+          }));
+        } else {
+          toast.error("Manifestation failed: " + (res?.message || "Unknown error"));
+        }
+      } else {
+        toast.error("Transmission failed: " + (res?.message || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Vault upload Error:", err);
+      if (err?.response?.data?.debug) {
+        console.error("Upload debug:", err.response.data.debug);
+      }
+      const errorMessage = err?.response?.data?.message || err?.message || "Transmission Interrupted: Upload failed.";
+      toast.error(`Vault Error: ${errorMessage}`);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleDeleteLecture = async (lectureIndex) => {
+    if (!window.confirm("Purge this module from the manifestation?")) return;
+    if (!courseId) {
+      toast.error("Invalid vault identifier.");
+      return;
+    }
+
+    const lecture = curriculum[lectureIndex];
+    if (!lecture) return;
+
+    try {
+      if (lecture.public_id) {
+        await mediaDeleteService(lecture.public_id);
+      }
+
+      const updatedCurriculum = curriculum.filter((_, i) => i !== lectureIndex);
+      const response = await updateCourseByIdService(courseId, { curriculum: updatedCurriculum });
+      
+      if (response?.success) {
+        setVaultData(prev => ({
+          ...prev,
+          course: { ...prev.course, curriculum: updatedCurriculum }
+        }));
+        toast.info("Module dissolved from current manifold.");
+      } else {
+        toast.error(response?.message || "Failed to update curriculum.");
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || "Delete failed.";
+      toast.error(message);
+    }
   };
 
   if (loading) {
@@ -66,7 +243,33 @@ const VaultDetailedView = ({ courseId, onBack }) => {
     );
   }
 
-  const { course, stats, revenueBreakdown, students } = vaultData;
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-[#fcf8f1] flex items-center justify-center text-[#0d694f] font-black">!</div>
+        <div className="space-y-1">
+          <p className="text-sm font-bold text-[#0d694f]">Vault synchronization failed</p>
+          <p className="text-[11px] text-muted-foreground">{error}</p>
+        </div>
+        <button
+          onClick={() => {
+            setRefreshKey((prev) => prev + 1);
+          }}
+          className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#0d694f] text-white"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4 text-center">
+        <p className="text-sm font-bold text-[#0d694f]">Vault data unavailable.</p>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -91,7 +294,7 @@ const VaultDetailedView = ({ courseId, onBack }) => {
           </motion.button>
           <div className="space-y-1">
             <h1 className="text-2xl font-headline font-black text-[#0d694f] uppercase tracking-tighter leading-none">
-              {course.title}
+              {course.title || "Untitled Vault"}
             </h1>
             <div className="flex items-center gap-3">
                <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Vault ID: {courseId.slice(-8)}</span>
@@ -166,10 +369,10 @@ const VaultDetailedView = ({ courseId, onBack }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Stats Grid */}
               <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <StatCard label="TOTAL SCHOLARS" value={stats.totalStudents} icon={Users} color="emerald" trend="+12% this month" />
-                <StatCard label="STABILITY SCORE" value={`${stats.stabilityScore}%`} icon={Activity} color="indigo" desc="Engagement Consistency" />
-                <StatCard label="CONVERSION RATE" value={`${stats.conversionRate}%`} icon={TrendingUp} color="orange" desc="Views to Enrollments" />
-                <StatCard label="CUMULATIVE REVENUE" value={`₹${stats.totalRevenue}`} icon={IndianRupee} color="emerald" trend="Lifetime Manifestations" />
+                <StatCard label="TOTAL SCHOLARS" value={stats.totalStudents || 0} icon={Users} color="emerald" trend="+12% this month" />
+                <StatCard label="STABILITY SCORE" value={`${stats.stabilityScore || 0}%`} icon={Activity} color="indigo" desc="Engagement Consistency" />
+                <StatCard label="CONVERSION RATE" value={`${stats.conversionRate || 0}%`} icon={TrendingUp} color="orange" desc="Views to Enrollments" />
+                <StatCard label="CUMULATIVE REVENUE" value={`₹${stats.totalRevenue || 0}`} icon={IndianRupee} color="emerald" trend="Lifetime Manifestations" />
                 
                 {/* Visual Chart Placeholder */}
                 <div className="col-span-full bg-white rounded-[2.5rem] border border-[#0d694f]/5 p-8 h-[300px] flex flex-col justify-center items-center relative overflow-hidden group">
@@ -198,7 +401,7 @@ const VaultDetailedView = ({ courseId, onBack }) => {
                     </div>
                     <div className="space-y-4 relative z-10">
                        <p className="text-xs font-medium text-white/60 leading-relaxed italic">
-                         Your {course.level} level curriculum is currently resonating with {stats.totalStudents} scholars worldwide.
+                         Your {course.level || "N/A"} level curriculum is currently resonating with {stats.totalStudents || 0} scholars worldwide.
                        </p>
                        <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                           <span className="text-[10px] font-bold text-white/40 uppercase">Global Resonance</span>
@@ -312,22 +515,47 @@ const VaultDetailedView = ({ courseId, onBack }) => {
             <div className="space-y-6">
                <div className="flex items-center justify-between">
                   <h3 className="text-xl font-headline font-bold text-[#0d694f] uppercase tracking-tight italic">Manifest Structure</h3>
-                  <button className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-                    <Plus className="h-3 w-3" /> ADD LECTURE
-                  </button>
+                  <div className="relative">
+                     <input 
+                       type="file" 
+                       accept="video/*" 
+                       onChange={handleAddLecture}
+                       className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                       disabled={isUploading}
+                     />
+                     <button className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 disabled:bg-opacity-50">
+                       <Plus className="h-3 w-3" /> {isUploading ? `UPLOADING ${uploadProgress}%` : "APPEND MODULE"}
+                     </button>
+                  </div>
                </div>
                
                <div className="space-y-4">
-                  {course.curriculum.map((lecture, i) => (
-                    <div key={i} className="bg-white rounded-2xl p-5 border border-[#0d694f]/5 flex items-center justify-between group hover:border-[#0d694f]/20 transition-all shadow-sm">
+                  {curriculum.map((lecture, i) => (
+                    <div key={i} className="bg-white rounded-3xl p-6 border border-[#0d694f]/5 flex items-center justify-between group hover:border-[#0d694f]/20 transition-all shadow-sm hover:shadow-xl">
                        <div className="flex items-center gap-6">
-                          <div className="w-10 h-10 rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 flex items-center justify-center font-black text-[11px] text-[#0d694f]/30">
-                             {String(i + 1).padStart(2, '0')}
+                          <div className="relative w-16 h-10 rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 overflow-hidden flex items-center justify-center">
+                             {lecture.thumbnailUrl ? (
+                               <img src={lecture.thumbnailUrl} alt="Thumb" className="w-full h-full object-cover" />
+                             ) : (
+                               <div className="text-[10px] font-black text-[#0d694f]/20">M{String(i + 1).padStart(2, '0')}</div>
+                             )}
+                             {lecture.duration > 0 && (
+                               <div className="absolute bottom-1 right-1 px-1 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[6px] font-black text-white">
+                                 {formatDuration(lecture.duration)}
+                               </div>
+                             )}
                           </div>
                           <div className="space-y-1">
-                             <h4 className="text-sm font-bold text-[#0d694f] uppercase tracking-tight">{lecture.title}</h4>
+                             <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-bold text-[#0d694f] uppercase tracking-tight">{lecture.title}</h4>
+                                {lecture.size > 0 && (
+                                  <span className="text-[8px] font-black text-muted-foreground/30 uppercase">{formatSize(lecture.size)}</span>
+                                )}
+                             </div>
                              <div className="flex items-center gap-3">
-                                <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest">Video Archive</span>
+                                <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest flex items-center gap-1.5">
+                                   <Clock className="w-2.5 h-2.5" /> ARCHIVED VIDEO
+                                </span>
                                 <div className="h-1 w-1 rounded-full bg-muted-foreground/20"></div>
                                 <span className="text-[9px] font-bold text-[#ff7e5f] italic">{lecture.freePreview ? 'Public Access' : 'Private Manifest'}</span>
                              </div>
@@ -335,7 +563,7 @@ const VaultDetailedView = ({ courseId, onBack }) => {
                        </div>
                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button className="p-2.5 rounded-xl hover:bg-[#fcf8f1] text-[#0d694f] transition-all"><Settings className="h-3.5 w-3.5" /></button>
-                          <button className="p-2.5 rounded-xl hover:bg-red-50 text-red-500 transition-all"><Trash2 className="h-3.5 w-3.5" /></button>
+                          <button onClick={() => handleDeleteLecture(i)} className="p-2.5 rounded-xl hover:bg-red-50 text-red-500 transition-all"><Trash2 className="h-3.5 w-3.5" /></button>
                        </div>
                     </div>
                   ))}
@@ -372,9 +600,12 @@ const VaultDetailedView = ({ courseId, onBack }) => {
                           <h4 className="text-sm font-bold text-[#0d694f] uppercase">Vault Investment (Price)</h4>
                           <p className="text-[10px] font-medium text-muted-foreground italic">Pricing strategy for this specific manifestation.</p>
                        </div>
-                       <div className="text-xl font-headline font-bold text-[#0d694f]">₹{course.pricing}</div>
+                       <div className="text-xl font-headline font-bold text-[#0d694f]">₹{course.pricing ?? 0}</div>
                     </div>
-                    <button className="w-full bg-[#fcf8f1] hover:bg-[#0d694f] hover:text-white text-[#0d694f] py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-[#0d694f]/5 shadow-sm">
+                    <button
+                      onClick={handleReviseVault}
+                      className="w-full bg-[#fcf8f1] hover:bg-[#0d694f] hover:text-white text-[#0d694f] py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-[#0d694f]/5 shadow-sm"
+                    >
                       REVISE PRICING ARCHIVE
                     </button>
                   </div>
@@ -472,7 +703,6 @@ SettingsOption.propTypes = {
 VaultDetailedView.propTypes = {
   courseId: PropTypes.string.isRequired,
   onBack: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired
 };
 
 export default VaultDetailedView;

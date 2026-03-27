@@ -6,6 +6,8 @@ import {
   CreditCard,
   Globe,
   Database,
+  Github,
+  Twitter,
   Check,
   Loader2,
   UserCircle
@@ -29,7 +31,6 @@ const InstructorSettings = () => {
     userEmail: auth?.user?.userEmail || "",
     philosophy: auth?.user?.philosophy || "",
     experience: auth?.user?.experience || "",
-    linkedin: auth?.user?.socialLinks?.linkedin || "",
     github: auth?.user?.socialLinks?.github || "",
     twitter: auth?.user?.socialLinks?.twitter || "",
   });
@@ -80,7 +81,6 @@ const InstructorSettings = () => {
         philosophy: profileData.philosophy,
         experience: profileData.experience,
         socialLinks: {
-          linkedin: profileData.linkedin,
           github: profileData.github,
           twitter: profileData.twitter,
         }
@@ -255,9 +255,9 @@ const InstructorSettings = () => {
             </div>
             <div className="flex gap-3">
               {[
-                { icon: Globe, link: auth?.user?.socialLinks?.linkedin },
-                { icon: Database, link: auth?.user?.socialLinks?.github },
-                { icon: Lock, link: auth?.user?.socialLinks?.twitter }
+                { icon: Globe, link: auth?.user?.socialLinks?.external },
+                { icon: Github, link: auth?.user?.socialLinks?.github },
+                { icon: Twitter, link: auth?.user?.socialLinks?.twitter }
               ].map((social, idx) => (
                 social.link && (
                   <a key={idx} href={social.link} target="_blank" rel="noreferrer" className="p-3 rounded-2xl bg-[#0d694f]/5 text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all shadow-3d border border-transparent">
@@ -333,10 +333,6 @@ const InstructorSettings = () => {
                    <div className="space-y-2">
                       <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">Experience Delta (Years)</label>
                       <input name="experience" value={profileData.experience} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">LinkedIn Archive</label>
-                      <input name="linkedin" value={profileData.linkedin} onChange={handleProfileChange} className="w-full bg-[#fcf8f1]/50 border-none rounded-2xl px-6 py-4 text-xs font-bold text-[#0d694f] focus:ring-2 focus:ring-[#0d694f]/10 transition-all" />
                    </div>
                    <div className="space-y-2">
                       <label className="text-[10px] font-black  text-[#0d694f] opacity-50 ml-2">GitHub Repository</label>

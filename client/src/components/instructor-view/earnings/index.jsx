@@ -79,6 +79,22 @@ const InstructorEarnings = ({
       bg: "bg-[#0d694f]/5"
     },
     {
+      label: "Platform Fees",
+      value: `₹${summary?.platformFee?.toLocaleString() || 0}`,
+      change: "Service Charge",
+      icon: BarChart2,
+      color: "text-[#ff7e5f]",
+      bg: "bg-[#ff7e5f]/5"
+    },
+    {
+      label: "Gross Sales",
+      value: `₹${summary?.totalSales?.toLocaleString() || 0}`,
+      change: "Total Revenue",
+      icon: TrendingUp,
+      color: "text-blue-600",
+      bg: "bg-blue-50"
+    },
+    {
       label: "Enrollments",
       value: summary?.totalStudents || 0,
       change: "Total Scholars",
@@ -103,6 +119,27 @@ const InstructorEarnings = ({
       bg: "bg-[#0d694f]/5"
     }
   ];
+
+  const payoutInfo = (
+    <div className="bg-[#fcf8f1] p-6 rounded-[2rem] border border-[#0d694f]/5 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-[11px] font-black text-[#0d694f] uppercase tracking-widest">Payout Registry</h4>
+        <div className="px-3 py-1 bg-[#0d694f]/10 rounded-full text-[9px] font-black text-[#0d694f] uppercase tracking-wider">Active</div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-1">
+          <p className="text-[10px] font-bold text-muted-foreground/60 uppercase">UPI Identifier</p>
+          <p className="text-sm font-headline font-bold text-[#0d694f]">{user?.upiId || "Not Configured"}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-bold text-muted-foreground/60 uppercase">Bank Account</p>
+          <p className="text-sm font-headline font-bold text-[#0d694f]">
+            {user?.bankDetails?.accountNumber ? `${user.bankDetails.bankName} (${user.bankDetails.accountNumber.slice(-4)})` : "Not Configured"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 
   const filteredTransactions = useMemo(() => {
     const list = transactions || [];
@@ -263,6 +300,11 @@ const InstructorEarnings = ({
         </div>
       </motion.div>
 
+      {/* Payout Info Section */}
+      <motion.div variants={itemVariants}>
+        {payoutInfo}
+      </motion.div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
@@ -374,8 +416,8 @@ const InstructorEarnings = ({
                   <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">Epoch</th>
                   <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">Scholar</th>
                   <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">Archive Identifier</th>
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-center">Protocol</th>
-                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-right">Valuation</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-center">Payout Status</th>
+                  <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-right">Yield (Net)</th>
                 </tr>
             </thead>
             <tbody className="divide-y divide-[#fcf8f1]">
@@ -403,11 +445,11 @@ const InstructorEarnings = ({
                     </td>
                     <td className="py-3.5 px-4 text-[11px] font-medium text-muted-foreground italic group-hover:text-[#0d694f] transition-colors">{payment.courseTitle}</td>
                     <td className="py-3.5 px-4 text-center">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold  border ${payment.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'} group-hover:bg-[#0d694f] group-hover:text-white transition-all`}>
-                        {payment.paymentStatus.charAt(0).toUpperCase() + payment.paymentStatus.slice(1)}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${payment.payoutStatus === 'processed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-orange-600 border-orange-100'} group-hover:bg-[#0d694f] group-hover:text-white transition-all`}>
+                        {payment.payoutStatus?.toUpperCase() || 'PENDING'}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-right text-[12px] font-headline font-black text-[#0d694f] tracking-tighter">₹{payment.coursePricing}</td>
+                    <td className="py-3.5 px-4 text-right text-[12px] font-headline font-black text-[#0d694f] tracking-tighter">₹{payment.instructorShare}</td>
                   </motion.tr>
                 ))}
               </AnimatePresence>

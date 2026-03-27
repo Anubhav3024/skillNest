@@ -1,10 +1,13 @@
-import { AuthContext } from "@/context/auth-context/index";
+import { AuthContext } from "@/context/auth-context";
 import { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { Github } from "lucide-react";
+import { toast } from "react-toastify";
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleNavigate = () => {
     navigate("/");
@@ -21,6 +24,38 @@ const AuthPage = () => {
     handleRegisterUser,
     handleloginUser,
   } = useContext(AuthContext);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const oauth = params.get("oauth");
+    const token = params.get("token");
+    const error = params.get("error");
+
+    if (oauth && error) {
+      const provider =
+        oauth === "google" ? "Google" : oauth === "github" ? "GitHub" : "OAuth";
+      toast.error(`${provider} login failed. Please try again.`);
+      return;
+    }
+
+    if (oauth && token) {
+      localStorage.setItem("accessToken", token);
+      localStorage.removeItem("user");
+      window.location.replace("/");
+    }
+  }, [location.search]);
+
+  const handleGithubLogin = () => {
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const role = activeRole || "student";
+    window.location.href = `${baseUrl}/auth/github?role=${encodeURIComponent(role)}`;
+  };
+
+  const handleGoogleLogin = () => {
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const role = activeRole || "student";
+    window.location.href = `${baseUrl}/auth/google?role=${encodeURIComponent(role)}`;
+  };
 
   // Synchronize initial role
   useEffect(() => {
@@ -205,13 +240,19 @@ const AuthPage = () => {
 
                 {/* Social Logins */}
                 <div className="grid grid-cols-2 gap-4">
-                  <button className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-muted text-foreground font-headline font-semibold text-sm hover:bg-muted/80 transition-colors">
+                  <button
+                    onClick={handleGoogleLogin}
+                    className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-muted text-foreground font-headline font-semibold text-sm hover:bg-muted/80 transition-colors"
+                  >
                     <span className="material-symbols-outlined text-xl">google</span>
                     Google
                   </button>
-                  <button className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-muted text-foreground font-headline font-semibold text-sm hover:bg-muted/80 transition-colors">
-                    <span className="material-symbols-outlined text-xl">brand_awareness</span>
-                    Apple
+                  <button
+                    onClick={handleGithubLogin}
+                    className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-muted text-foreground font-headline font-semibold text-sm hover:bg-muted/80 transition-colors"
+                  >
+                    <Github className="h-5 w-5" />
+                    GitHub
                   </button>
                 </div>
 
@@ -246,3 +287,5 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
+
+

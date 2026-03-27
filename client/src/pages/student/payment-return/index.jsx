@@ -26,7 +26,7 @@ const PaypalPaymentReturnPage = () => {
 
         if (response?.success) {
           sessionStorage.removeItem("currentOrderId");
-          window.location.href = "/student-courses";
+          window.location.href = "/home?tab=my-courses";
         }
       } else {
         toast.error("Order information not found. Please contact support.");

@@ -8,7 +8,8 @@ import {
 import { TrendingUp, Award, PlayCircle, Search, Star, ChevronRight, Clock } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
+import Loader from "../../../components/common/loader";
+import StudentShell from "@/components/student-view/student-shell";
 
 const StudentCoursesPage = () => {
   const { studentBoughtCoursesList, setStudentBoughtCoursesList } = useContext(StudentContext);
@@ -37,18 +38,20 @@ const StudentCoursesPage = () => {
     fetchStudentBoughtCourses();
   }, [auth?.user?._id, setStudentBoughtCoursesList]);
 
+  const loadingContent = (
+    <div className="min-h-screen bg-[#fcf8f1] flex items-center justify-center">
+      <Loader />
+    </div>
+  );
+
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#fcf8f1] flex items-center justify-center">
-        <ClipLoader color="#0d694f" size={50} />
-      </div>
-    );
+    return auth?.authenticated ? <StudentShell>{loadingContent}</StudentShell> : loadingContent;
   }
 
   const featuredCourse = studentBoughtCoursesList?.[0];
 
-  return (
-    <div className="min-h-screen bg-[#fcf8f1] pt-24 pb-20 px-8 lg:px-12">
+  const content = (
+    <div className={`min-h-screen bg-[#fcf8f1] pb-20 px-8 lg:px-12 ${auth?.authenticated ? "pt-0" : "pt-24"}`}>
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16">
         <div className="space-y-3">
@@ -113,7 +116,7 @@ const StudentCoursesPage = () => {
                <PlayCircle className="h-10 w-10 text-[#0d694f]/20" />
              </div>
              <h3 className="text-2xl font-headline font-black text-[#0d694f]">No active courses</h3>
-             <Button onClick={() => navigate("/courses")} className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-8 py-6 mt-6 font-headline font-black shadow-lg shadow-[#0d694f]/20 border-none">Browse the Sanctuary</Button>
+             <Button onClick={() => navigate("/home?tab=browse")} className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-8 py-6 mt-6 font-headline font-black shadow-lg shadow-[#0d694f]/20 border-none">Browse the Sanctuary</Button>
           </div>
         )}
 
@@ -180,7 +183,7 @@ const StudentCoursesPage = () => {
           </div>
           <Button 
              variant="outline" 
-             onClick={() => navigate("/courses")}
+             onClick={() => navigate("/home?tab=browse")}
              className="hidden md:flex rounded-2xl font-headline font-black text-xs px-8 py-6 border-[#0d694f]/20 text-[#0d694f] hover:bg-white hover:border-[#0d694f] transition-all bg-white"
           >
             EXPLORE NEW PATHS
@@ -237,7 +240,7 @@ const StudentCoursesPage = () => {
                </div>
                <h3 className="text-3xl font-headline font-black text-[#0d694f] mb-6 tracking-tight">Vault Empty</h3>
                <p className="text-muted-foreground font-medium mb-10 leading-relaxed">Begin your intellectual journey today by browsing our curated collection.</p>
-               <Button onClick={() => navigate("/courses")} className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-2xl px-12 py-7 font-headline font-black shadow-2xl shadow-[#0d694f]/20 border-none">
+               <Button onClick={() => navigate("/home?tab=browse")} className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-2xl px-12 py-7 font-headline font-black shadow-2xl shadow-[#0d694f]/20 border-none">
                  Browse Catalog
                </Button>
              </div>
@@ -246,6 +249,12 @@ const StudentCoursesPage = () => {
       </section>
     </div>
   );
+
+  if (auth?.authenticated) {
+    return <StudentShell>{content}</StudentShell>;
+  }
+
+  return content;
 };
 
 export default StudentCoursesPage;

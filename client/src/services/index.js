@@ -127,11 +127,6 @@ export const instructorFetchVaultDetailedAnalyticsService = async (courseId) => 
   return res.data;
 };
 
-export const createStripeCheckoutService = async (courseId) => {
-  const res = await axiosInstance.post("/api/analytics/checkout", { courseId });
-  return res.data;
-};
-
 export const mediaBulkUploadService = async (formData, onProgressCallBack) => {
   const res = await axiosInstance.post("/media/bulk-upload", formData, {
     onUploadProgress: (progressEvent) => {
@@ -225,7 +220,12 @@ export const resetCourseProgressService = async (userId, courseId) => {
 
 // New Services
 export const updateUserProfileService = async (formData) => {
-  const res = await axiosInstance.put("/user/update-profile", formData);
+  const res = await axiosInstance.put("/user/update", formData);
+  return res.data;
+};
+
+export const updateUserSettingsService = async (formData) => {
+  const res = await axiosInstance.put("/user/settings/update", formData);
   return res.data;
 };
 
@@ -290,5 +290,35 @@ export const getAllUsersService = async () => {
 
 export const deleteUserService = async (userId) => {
   const res = await axiosInstance.delete(`/admin/users/delete/${userId}`);
+  return res.data;
+};
+
+export const fetchStudentDashboardService = async (userId) => {
+  const res = await axiosInstance.get(`/student/dashboard/${userId}`);
+  return res.data;
+};
+
+export const fetchStudentTransactionsService = async (userId) => {
+  const res = await axiosInstance.get(`/student/order/transactions/${userId}`);
+  return res.data;
+};
+
+export const fetchStudentActivityService = async (userId) => {
+  const res = await axiosInstance.get(`/student/activity/activity-overview/${userId}`);
+  return res.data;
+};
+
+export const getNotificationsService = async (limit = 12) => {
+  const res = await axiosInstance.get(`/notifications?limit=${limit}`);
+  return res.data;
+};
+
+export const markNotificationReadService = async (notificationId) => {
+  const res = await axiosInstance.patch(`/notifications/${notificationId}/read`);
+  return res.data;
+};
+
+export const markAllNotificationsReadService = async () => {
+  const res = await axiosInstance.patch("/notifications/read-all");
   return res.data;
 };

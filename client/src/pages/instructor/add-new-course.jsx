@@ -9,7 +9,7 @@ import {
   courseCurriculumInitialFormData,
   courseLandingInitialFormData,
 } from "@/config";
-import { ClipLoader } from "react-spinners";
+import Loader from "../../components/common/loader";
 import { InstructorContext } from "@/context/instructor-context";
 import { AuthContext } from "@/context/auth-context";
 import {
@@ -18,7 +18,7 @@ import {
   updateCourseByIdService,
 } from "@/services";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { ChevronRight, Save, XCircle, Sparkles, Send } from "lucide-react";
@@ -38,7 +38,14 @@ const AddNewCoursePage = () => {
 
   const navigate = useNavigate();
   const params = useParams();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+
+  const searchParams = new URLSearchParams(location.search);
+  const requestedTab = searchParams.get("tab");
+  const initialTab = ["curriculum", "landing-page", "settings"].includes(requestedTab)
+    ? requestedTab
+    : "curriculum";
 
   const validateFormData = () => {
     return true; // Allow saving at any time to prevent blocking the user
@@ -117,7 +124,7 @@ const AddNewCoursePage = () => {
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-[#fcf8f1] flex items-center justify-center z-[100]">
-        <ClipLoader color="#0d694f" size={70} />
+        <Loader />
       </div>
     );
   }
@@ -168,7 +175,7 @@ const AddNewCoursePage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative"
         >
-          <Tabs defaultValue="curriculum" className="space-y-12">
+          <Tabs defaultValue={initialTab} className="space-y-12">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-16">
                <TabsList className="bg-white/50 p-2 rounded-[2.5rem] h-auto border border-[#0d694f]/5 shadow-3d flex flex-wrap lg:flex-nowrap gap-2">
                 <TabsTrigger value="curriculum" className="rounded-[2rem] px-8 py-4 data-[state=active]:bg-[#0d694f] data-[state=active]:text-white font-headline font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2">

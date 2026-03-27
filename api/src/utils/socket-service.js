@@ -53,4 +53,10 @@ const emitToInstructor = (instructorId, event, data) => {
   }
 };
 
-module.exports = { initSocket, getIO, emitToInstructor };
+const emitToUser = (userId, event, data) => {
+  if (io) {
+    io.to(userId).emit(event, data);
+  }
+};
+
+module.exports = { initSocket, getIO, emitToInstructor, emitToUser };

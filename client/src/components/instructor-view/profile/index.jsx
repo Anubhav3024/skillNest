@@ -5,7 +5,6 @@ import {
   Save,
   Globe,
   Twitter,
-  Linkedin,
   Github,
   Award,
   ExternalLink,
@@ -29,7 +28,6 @@ const InstructorProfile = ({ auth }) => {
   const [skills, setSkills] = useState(auth?.user?.skills?.join(", ") || "");
   const [socialLinks, setSocialLinks] = useState({
     twitter: auth?.user?.socialLinks?.twitter || "",
-    linkedin: auth?.user?.socialLinks?.linkedin || "",
     github: auth?.user?.socialLinks?.github || "",
     external: auth?.user?.socialLinks?.external || "",
   });
@@ -172,7 +170,6 @@ const InstructorProfile = ({ auth }) => {
                  
                  <div className="flex items-center justify-center gap-3 border-t border-[#fcf8f1] pt-8">
                     <motion.button whileHover={{ y: -3 }} className="w-9 h-9 rounded-xl bg-[#fcf8f1] text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all flex items-center justify-center shadow-sm"><Twitter className="h-3.5 w-3.5" /></motion.button>
-                    <motion.button whileHover={{ y: -3 }} className="w-9 h-9 rounded-xl bg-[#fcf8f1] text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all flex items-center justify-center shadow-sm"><Linkedin className="h-3.5 w-3.5" /></motion.button>
                     <motion.button whileHover={{ y: -3 }} className="w-9 h-9 rounded-xl bg-[#fcf8f1] text-[#0d694f] hover:bg-[#0d694f] hover:text-white transition-all flex items-center justify-center shadow-sm"><Github className="h-3.5 w-3.5" /></motion.button>
                  </div>
               </div>
@@ -310,19 +307,6 @@ const InstructorProfile = ({ auth }) => {
                          value={socialLinks.twitter}
                          onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
                          placeholder="@architect"
-                         className="w-full bg-white border border-[#0d694f]/5 rounded-xl pl-11 pr-6 py-3.5 text-[13px] font-medium focus:ring-4 focus:ring-[#0d694f]/5 outline-none transition-all shadow-sm"
-                        />
-                     </div>
-                  </div>
-                  <div className="space-y-3">
-                     <label className="text-[9px] font-black text-[#0d694f]/40 uppercase tracking-[0.2em] ml-1">LINKEDIN PROFILE</label>
-                     <div className="relative group">
-                        <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-[#0d694f] transition-colors" />
-                        <input 
-                         type="text" 
-                         value={socialLinks.linkedin}
-                         onChange={(e) => setSocialLinks({ ...socialLinks, linkedin: e.target.value })}
-                         placeholder="in/expert"
                          className="w-full bg-white border border-[#0d694f]/5 rounded-xl pl-11 pr-6 py-3.5 text-[13px] font-medium focus:ring-4 focus:ring-[#0d694f]/5 outline-none transition-all shadow-sm"
                         />
                      </div>

@@ -1,6 +1,4 @@
-const Notification = require("../../../models/Notification");
-const User = require("../../../models/user");
-const { getIO } = require("../../../utils/socket-service");
+const { createBulkNotifications } = require("../../../utils/notification-service");
 
 const broadcastMessage = async (req, res) => {
   try {
@@ -21,26 +19,18 @@ const broadcastMessage = async (req, res) => {
       });
     }
 
-    // Create notifications for each student
     const notifications = studentIds.map((studentId) => ({
       recipientId: studentId,
       senderId: instructorId,
-      message: message,
+      senderName: req.user?.userName,
+      recipientRole: "student",
+      title: "New educator announcement",
+      message,
       type: "BROADCAST",
+      link: "/home?tab=my-courses",
     }));
 
-    await Notification.insertMany(notifications);
-
-    // Real-time notification via Socket.io
-    const io = getIO();
-    studentIds.forEach((studentId) => {
-      io.to(String(studentId)).emit("new-notification", {
-        message: message,
-        senderName: req.user.userName,
-        type: "BROADCAST",
-        createdAt: new Date(),
-      });
-    });
+    await createBulkNotifications(notifications);
 
     return res.status(200).json({
       success: true,

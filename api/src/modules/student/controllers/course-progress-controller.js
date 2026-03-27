@@ -1,6 +1,7 @@
 const CourseProgress = require("../../../models/course-Progress");
 const Course = require("../../../models/course");
 const StudentCourses = require("../../../models/student-courses");
+const Activity = require("../../../models/Activity");
 
 //mark current lecture as viewed
 
@@ -56,8 +57,31 @@ const markCurrentLectureAsViewed = async (req, res) => {
         progress.lecturesProgress.every((item) => item.viewed);
 
       if (allLecturesViewed) {
-        (progress.completed = true), (progress.completionDate = new Date());
+        progress.completed = true;
+        progress.completionDate = new Date();
         await progress.save();
+
+        // 🏆 Log Course Completion Activity
+        await Activity.create({
+          userId,
+          type: "COURSE_COMPLETE",
+          courseId,
+          courseTitle: course.title,
+          metadata: { completionDate: progress.completionDate }
+        });
+      } else {
+        // Only log lecture view if it's NOT a full course completion
+        // (Completion is more significant for the activity feed)
+        const lecture = course.curriculum.find(l => String(l._id) === String(lectureId));
+        await Activity.create({
+          userId,
+          type: "LECTURE_VIEW",
+          courseId,
+          courseTitle: course.title,
+          lectureId,
+          lectureTitle: lecture?.title || "Unknown Lecture",
+          metadata: { progressPercent: Math.round((progress.lecturesProgress.length / course.curriculum.length) * 100) }
+        });
       }
 
       return res
@@ -65,6 +89,7 @@ const markCurrentLectureAsViewed = async (req, res) => {
         .json({ success: true, message: "Lecture marked as viewed", progress });
     }
   } catch (error) {
+    console.error("Error in markCurrentLectureAsViewed:", error);
     return res.status(500).json({
       success: false,
       message: "Error marking current lecture as viewed",

@@ -28,6 +28,14 @@ const UserSchema = new mongoose.Schema(
       enum: ["student", "instructor"],
       required: true,
     },
+    githubId: {
+      type: String,
+      default: "",
+    },
+    googleId: {
+      type: String,
+      default: "",
+    },
     avatar: {
       type: String,
       default: "",
@@ -38,7 +46,6 @@ const UserSchema = new mongoose.Schema(
     },
     socialLinks: {
       twitter: { type: String, default: "" },
-      linkedin: { type: String, default: "" },
       github: { type: String, default: "" },
       external: { type: String, default: "" },
     },
@@ -49,6 +56,11 @@ const UserSchema = new mongoose.Schema(
       communityInsights: { type: Boolean, default: false },
       vaultIndexing: { type: Boolean, default: true },
       analyticsSharing: { type: Boolean, default: false },
+      // Student specific
+      courseUpdates: { type: Boolean, default: true },
+      promotionalEmails: { type: Boolean, default: false },
+      progressReminders: { type: Boolean, default: true },
+      publicProfile: { type: Boolean, default: true },
     },
     experience: {
       type: String,
@@ -66,6 +78,10 @@ const UserSchema = new mongoose.Schema(
       accountNumber: { type: String, default: "" },
       ifsc: { type: String, default: "" },
       bankName: { type: String, default: "" },
+    },
+    fieldOfStudy: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true },

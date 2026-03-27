@@ -36,6 +36,7 @@ export default function InstructorProvider({ children }) {
     transactions: [],
   });
 
+  const [globalSearchTerm, setGlobalSearchTerm] = useState("");
   const [currentEditedCourseId, setCurrentEditedCourseId] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -121,6 +122,8 @@ export default function InstructorProvider({ children }) {
         setAnalytics,
         saasAnalytics,
         setSaasAnalytics,
+        globalSearchTerm,
+        setGlobalSearchTerm,
         currentEditedCourseId,
         setCurrentEditedCourseId,
         fetchInstructorCourseList,
@@ -137,6 +140,7 @@ export default function InstructorProvider({ children }) {
             trajectory: [],
             transactions: [],
           });
+          setGlobalSearchTerm("");
         }
       }}
     >
