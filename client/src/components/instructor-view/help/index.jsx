@@ -181,7 +181,7 @@ const InstructorHelp = () => {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="text-center space-y-4">
-        <h1 className="text-4xl font-headline font-black text-[#0d694f] uppercase tracking-tighter">
+        <h1 className="text-4xl font-headline font-black text-[#0d694f] tracking-tighter">
           Educator Knowledge Base
         </h1>
         <p className="text-muted-foreground font-medium text-sm italic opacity-70 max-w-lg mx-auto">
@@ -206,7 +206,7 @@ const InstructorHelp = () => {
                   <section.icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-headline font-black text-[#0d694f] uppercase tracking-tight">
+                  <h3 className="text-base font-headline font-black text-[#0d694f] tracking-tight">
                     {section.title}
                   </h3>
                   <p className="text-[10px] font-medium text-muted-foreground/60 italic leading-relaxed">
@@ -234,7 +234,7 @@ const InstructorHelp = () => {
                         e.stopPropagation();
                         setSelectedProtocol(section);
                       }}
-                      className="mt-6 flex items-center gap-2 text-[9px] font-black text-[#0d694f] hover:text-[#ff7e5f] uppercase tracking-[0.2em] transition-colors group/btn"
+                      className="mt-6 flex items-center gap-2 text-[9px] font-black text-[#0d694f] hover:text-[#ff7e5f] tracking-[0.2em] transition-colors group/btn"
                     >
                       Read Detailed Protocol <ArrowRight className="h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
@@ -250,18 +250,18 @@ const InstructorHelp = () => {
       <motion.div variants={itemVariants} className="bg-[#0d694f] rounded-[3rem] p-10 relative overflow-hidden shadow-2xl shadow-[#0d694f]/30">
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
           <div className="space-y-2">
-            <h2 className="text-2xl font-headline font-black text-white uppercase tracking-tight">Still Need Support?</h2>
+            <h2 className="text-2xl font-headline font-black text-white tracking-tight">Still Need Support?</h2>
             <p className="text-white/60 text-xs font-medium italic">Our creators are ready to assist with your educational mission.</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
              <a href="mailto:support@skillnest.edu" className="w-full sm:w-auto">
-               <Button className="w-full bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-2xl px-8 py-5 h-auto font-black text-[10px] tracking-widest uppercase shadow-lg border-none flex items-center gap-2 group transition-all">
+               <Button className="w-full bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-2xl px-8 py-5 h-auto font-black text-[10px] tracking-widest shadow-lg border-none flex items-center gap-2 group transition-all">
                   <Mail className="h-4 w-4" />
                   Contact Creator
                </Button>
              </a>
              <a href="https://youtube.com/c/skillnest" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
-               <Button variant="outline" className="w-full bg-white/10 hover:bg-white/20 text-white border-white/10 rounded-2xl px-8 py-5 h-auto font-black text-[10px] tracking-widest uppercase flex items-center gap-2 transition-all">
+               <Button variant="outline" className="w-full bg-white/10 hover:bg-white/20 text-white border-white/10 rounded-2xl px-8 py-5 h-auto font-black text-[10px] tracking-widest flex items-center gap-2 transition-all">
                   <Youtube className="h-4 w-4" />
                   Tutorial Vault
                </Button>
@@ -304,7 +304,7 @@ const InstructorHelp = () => {
                     <selectedProtocol.icon className="h-8 w-8" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-headline font-black text-[#0d694f] uppercase tracking-tighter">
+                    <h2 className="text-3xl font-headline font-black text-[#0d694f] tracking-tighter">
                       {selectedProtocol.title}
                     </h2>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-40">Section ID: {selectedProtocol.id}</p>
@@ -351,7 +351,7 @@ const InstructorHelp = () => {
 
                 <Button 
                    onClick={() => setSelectedProtocol(null)}
-                   className="w-full bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-2xl py-5 h-auto font-black text-[10px] tracking-[0.2em] uppercase shadow-3d border-none transition-all"
+                   className="w-full bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-2xl py-5 h-auto font-black text-[10px] tracking-[0.2em] shadow-3d border-none transition-all"
                 >
                    Close Manifest
                 </Button>

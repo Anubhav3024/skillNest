@@ -155,7 +155,7 @@ const InstructorStudents = ({ listOfCourses }) => {
       {/* Header */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1 uppercase">
+          <h1 className="text-2xl font-headline font-bold text-[#0d694f] tracking-tighter mb-1">
             Scholar Registry
           </h1>
           <p className="text-muted-foreground font-semibold text-sm italic opacity-70">
@@ -164,20 +164,20 @@ const InstructorStudents = ({ listOfCourses }) => {
         </div>
         <div className="flex items-center gap-4">
            <div className="bg-white border border-[#0d694f]/10 rounded-xl px-5 py-3 flex flex-col shadow-3d cursor-default group">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider leading-none mb-1 opacity-60 group-hover:opacity-100 transition-opacity">TOTAL ENROLLMENTS</span>
-              <span className="text-xl font-headline font-bold text-[#0d694f] leading-none tracking-tight">{filteredEnrollments.length}</span>
-           </div>
-           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-             <Button 
-                onClick={() => setIsBroadcastModalOpen(true)}
-                disabled={filteredEnrollments.length === 0}
-                className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-xl px-7 py-5 h-auto font-headline font-bold text-[11px] tracking-wider uppercase shadow-3d-orange border-none disabled:opacity-50"
-              >
-                BROADCAST MESSAGE
-             </Button>
-           </motion.div>
-        </div>
-      </motion.div>
+               <span className="text-[10px] font-bold text-muted-foreground tracking-wider leading-none mb-1 opacity-60 group-hover:opacity-100 transition-opacity">Total Enrollments</span>
+               <span className="text-xl font-headline font-bold text-[#0d694f] leading-none tracking-tight">{filteredEnrollments.length}</span>
+            </div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button 
+                 onClick={() => setIsBroadcastModalOpen(true)}
+                 disabled={filteredEnrollments.length === 0}
+                 className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-xl px-7 py-5 h-auto font-headline font-bold text-[11px] tracking-wider shadow-3d-orange border-none disabled:opacity-50"
+               >
+                 Broadcast Message
+              </Button>
+            </motion.div>
+         </div>
+       </motion.div>
 
       {/* Search & Filters */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-center gap-4">
@@ -193,47 +193,47 @@ const InstructorStudents = ({ listOfCourses }) => {
         </div>
         
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="bg-white border border-[#0d694f]/5 rounded-[1.5rem] px-8 py-4 h-auto text-[11px] font-bold uppercase tracking-wider text-[#0d694f] hover:bg-[#fcf8f1] shadow-3d flex items-center gap-2">
-              <Filter className="h-3.5 w-3.5" />
-              REFINE REGISTRY
-              <ChevronDown className="h-3 w-3 opacity-50" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 bg-white rounded-2xl shadow-2xl border border-[#0d694f]/5 p-2" align="end">
-            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-3">Filter by Course</DropdownMenuLabel>
-            <DropdownMenuItem 
-              onClick={() => setSelectedCourse("all")}
-              className={`text-[10px] font-bold uppercase rounded-xl mb-1 cursor-pointer ${selectedCourse === "all" ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
-            >
-              All Courses
-            </DropdownMenuItem>
-            {uniqueCourses.map(course => (
-              <DropdownMenuItem 
-                key={course}
-                onClick={() => setSelectedCourse(course)}
-                className={`text-[10px] font-bold uppercase rounded-xl mb-1 cursor-pointer ${selectedCourse === course ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
-              >
-                {course}
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator className="bg-[#0d694f]/5 my-2" />
-            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-3">Filter by Status</DropdownMenuLabel>
-            <DropdownMenuItem 
-              onClick={() => setSelectedStatus("all")}
-              className={`text-[10px] font-bold uppercase rounded-xl mb-1 cursor-pointer ${selectedStatus === "all" ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
-            >
-              All Statuses
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setSelectedStatus("ACTIVE")}
-              className={`text-[10px] font-bold uppercase rounded-xl mb-1 cursor-pointer ${selectedStatus === "ACTIVE" ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
-            >
-              Active
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </motion.div>
+           <DropdownMenuTrigger asChild>
+             <Button variant="ghost" className="bg-white border border-[#0d694f]/5 rounded-[1.5rem] px-8 py-4 h-auto text-[11px] font-bold tracking-wider text-[#0d694f] hover:bg-[#fcf8f1] shadow-3d flex items-center gap-2">
+               <Filter className="h-3.5 w-3.5" />
+               Refine Registry
+               <ChevronDown className="h-3 w-3 opacity-50" />
+             </Button>
+           </DropdownMenuTrigger>
+           <DropdownMenuContent className="w-56 bg-white rounded-2xl shadow-2xl border border-[#0d694f]/5 p-2" align="end">
+             <DropdownMenuLabel className="text-[10px] font-black tracking-widest text-muted-foreground/60 px-2 py-3">Filter by Course</DropdownMenuLabel>
+             <DropdownMenuItem 
+               onClick={() => setSelectedCourse("all")}
+               className={`text-[10px] font-bold rounded-xl mb-1 cursor-pointer ${selectedCourse === "all" ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
+             >
+               All Courses
+             </DropdownMenuItem>
+             {uniqueCourses.map(course => (
+               <DropdownMenuItem 
+                 key={course}
+                 onClick={() => setSelectedCourse(course)}
+                 className={`text-[10px] font-bold rounded-xl mb-1 cursor-pointer ${selectedCourse === course ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
+               >
+                 {course}
+               </DropdownMenuItem>
+             ))}
+             <DropdownMenuSeparator className="bg-[#0d694f]/5 my-2" />
+             <DropdownMenuLabel className="text-[10px] font-black tracking-widest text-muted-foreground/60 px-2 py-3">Filter by Status</DropdownMenuLabel>
+             <DropdownMenuItem 
+               onClick={() => setSelectedStatus("all")}
+               className={`text-[10px] font-bold rounded-xl mb-1 cursor-pointer ${selectedStatus === "all" ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
+             >
+               All Statuses
+             </DropdownMenuItem>
+             <DropdownMenuItem 
+               onClick={() => setSelectedStatus("ACTIVE")}
+               className={`text-[10px] font-bold rounded-xl mb-1 cursor-pointer ${selectedStatus === "ACTIVE" ? "bg-[#0d694f]/5 text-[#0d694f]" : ""}`}
+             >
+               Active
+             </DropdownMenuItem>
+           </DropdownMenuContent>
+         </DropdownMenu>
+       </motion.div>
 
       {/* Students Table */}
       <div className="space-y-6">
@@ -242,10 +242,10 @@ const InstructorStudents = ({ listOfCourses }) => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#fcf8f1]">
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">SCHOLAR IDENTITY</th>
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">ACCESS PERMISSIONS</th>
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider">ENGAGEMENT MATRIX</th>
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider text-center">PROTOCOL</th>
+                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Scholar Identity</th>
+                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Access Permissions</th>
+                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Engagement Matrix</th>
+                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider text-center">Protocol</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#fcf8f1]">
@@ -265,7 +265,7 @@ const InstructorStudents = ({ listOfCourses }) => {
                               <User className="h-5 w-5" />
                             </div>
                             <div>
-                               <div className="font-headline font-bold text-[#0d694f] text-[14px] uppercase tracking-tight group-hover:text-[#ff7e5f] transition-colors">{enrollment.studentName}</div>
+                               <div className="font-headline font-bold text-[#0d694f] text-[14px] tracking-tight group-hover:text-[#ff7e5f] transition-colors">{enrollment.studentName}</div>
                               <div className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1.5 mt-0.5 italic opacity-60">
                                   <Mail className="h-3 w-3" />
                                   {enrollment.studentEmail}
@@ -278,35 +278,35 @@ const InstructorStudents = ({ listOfCourses }) => {
                             <div className="w-8 h-8 rounded-lg bg-[#0d694f]/5 flex items-center justify-center text-[#0d694f]">
                               <BookOpen className="h-4 w-4" />
                             </div>
-                            <span className="bg-white border border-[#0d694f]/5 text-[#0d694f] px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider truncate max-w-[200px] shadow-sm group-hover:bg-[#0d694f] group-hover:text-white transition-all">
+                            <span className="bg-white border border-[#0d694f]/5 text-[#0d694f] px-3 py-1.5 rounded-xl text-[10px] font-bold tracking-wider truncate max-w-[200px] shadow-sm group-hover:bg-[#0d694f] group-hover:text-white transition-all">
                                 {enrollment.courseTitle}
                             </span>
-                        </div>
-                      </td>
+                         </div>
+                       </td>
                       <td className="py-3.5 px-5">
                         <div className="space-y-1">
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0d694f]/80 uppercase tracking-wider italic">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0d694f]/80 tracking-wider italic">
                               <Calendar className="h-3.5 w-3.5" />
                               {enrollment.joinDate}
                             </div>
-                            <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground font-bold uppercase tracking-wider opacity-30">
+                            <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground font-bold tracking-wider opacity-30">
                               <Clock className="h-3 w-3" />
-                              MAPPED TO PROTOCOL
+                              Mapped to Protocol
                             </div>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-5 text-center">
-                        <span className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-100/50 group-hover:bg-[#0d694f] group-hover:text-white transition-all">
-                            {enrollment.status || "ACTIVE"}
+                         </div>
+                       </td>
+                       <td className="py-3.5 px-5 text-center">
+                        <span className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider border border-emerald-100/50 group-hover:bg-[#0d694f] group-hover:text-white transition-all">
+                            {enrollment.status ? enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1).toLowerCase() : "Active"}
                         </span>
                       </td>
                     </motion.tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="py-32 text-center text-muted-foreground font-black uppercase tracking-[0.3em] text-[10px] opacity-20">
+                    <td colSpan={4} className="py-32 text-center text-muted-foreground font-black tracking-[0.3em] text-[10px] opacity-20">
                       <Users className="h-10 w-10 mx-auto mb-4 opacity-50" />
-                      REGISTRY EMPTY
+                      Registry Empty
                     </td>
                   </tr>
                 )}
@@ -319,28 +319,28 @@ const InstructorStudents = ({ listOfCourses }) => {
         {filteredEnrollments.length > 0 && (
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-between gap-6 px-4">
             <div className="bg-white border border-[#0d694f]/10 rounded-2xl px-6 py-4 shadow-3d-small">
-              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                SHOWING <span className="text-[#0d694f]">{Math.min(filteredEnrollments.length, (currentPage - 1) * ENTRIES_PER_PAGE + 1)}-{Math.min(filteredEnrollments.length, currentPage * ENTRIES_PER_PAGE)}</span> OF {filteredEnrollments.length} SCHOLARS
+              <span className="text-[11px] font-bold text-muted-foreground tracking-wider">
+                Showing <span className="text-[#0d694f]">{Math.min(filteredEnrollments.length, (currentPage - 1) * ENTRIES_PER_PAGE + 1)}-{Math.min(filteredEnrollments.length, currentPage * ENTRIES_PER_PAGE)}</span> of {filteredEnrollments.length} scholars
               </span>
             </div>
-            
+             
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
-                className="bg-white border-[#0d694f]/10 rounded-xl px-6 h-12 text-[11px] font-bold uppercase tracking-wider text-[#0d694f] hover:bg-[#0d694f] hover:text-white shadow-3d disabled:opacity-30 transition-all flex items-center gap-2"
+                className="bg-white border-[#0d694f]/10 rounded-xl px-6 h-12 text-[11px] font-bold tracking-wider text-[#0d694f] hover:bg-[#0d694f] hover:text-white shadow-3d disabled:opacity-30 transition-all flex items-center gap-2"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
-                PREVIOUS
+                Previous
               </Button>
               <Button
                 variant="outline"
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className="bg-white border-[#0d694f]/10 rounded-xl px-6 h-12 text-[11px] font-bold uppercase tracking-wider text-[#0d694f] hover:bg-[#0d694f] hover:text-white shadow-3d disabled:opacity-30 transition-all flex items-center gap-2"
+                className="bg-white border-[#0d694f]/10 rounded-xl px-6 h-12 text-[11px] font-bold tracking-wider text-[#0d694f] hover:bg-[#0d694f] hover:text-white shadow-3d disabled:opacity-30 transition-all flex items-center gap-2"
               >
-                NEXT
+                Next
                 <ChevronRight className="h-3.5 w-3.5" />
               </Button>
             </div>
@@ -354,7 +354,7 @@ const InstructorStudents = ({ listOfCourses }) => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#0d694f]/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
           
           <DialogHeader className="relative z-10 mb-6">
-            <DialogTitle className="text-xl font-headline font-bold text-[#0d694f] uppercase tracking-tighter flex items-center gap-3">
+            <DialogTitle className="text-xl font-headline font-bold text-[#0d694f] tracking-tighter flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#0d694f] text-white flex items-center justify-center shadow-lg shadow-[#0d694f]/20">
                 <MessageSquare className="h-5 w-5" />
               </div>
@@ -378,36 +378,36 @@ const InstructorStudents = ({ listOfCourses }) => {
             
             <div className="flex items-center gap-2 px-4 py-3 bg-[#0d694f]/5 rounded-xl border border-[#0d694f]/5">
               <Users className="h-3.5 w-3.5 text-[#0d694f]/60" />
-              <span className="text-[10px] font-bold text-[#0d694f]/80 uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-[#0d694f]/80 tracking-widest">
                 Targeted: {Array.from(new Set(filteredEnrollments.map(e => e.studentId))).length} Unique Scholars
               </span>
             </div>
-          </div>
+           </div>
 
-          <DialogFooter className="relative z-10 mt-8 sm:justify-between gap-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => setIsBroadcastModalOpen(false)}
-              className="flex-1 rounded-xl h-14 text-[10px] font-bold uppercase tracking-wider text-[#0d694f]/40 hover:text-[#ff7e5f] hover:bg-transparent"
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleBroadcast}
-              disabled={isSending || !broadcastMessage.trim()}
-              className="flex-2 min-w-[160px] bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl h-14 text-[11px] font-bold uppercase tracking-wider shadow-3d-orange border-none flex items-center gap-3 transition-all disabled:opacity-50"
-            >
-              {isSending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-              {isSending ? "SEQUESTERING..." : "DEPLOY BROADCAST"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </motion.div>
+           <DialogFooter className="relative z-10 mt-8 sm:justify-between gap-4">
+             <Button 
+               variant="ghost" 
+               onClick={() => setIsBroadcastModalOpen(false)}
+              className="flex-1 rounded-xl h-14 text-[10px] font-bold tracking-wider text-[#0d694f]/40 hover:text-[#ff7e5f] hover:bg-transparent"
+             >
+               Cancel
+             </Button>
+             <Button 
+               onClick={handleBroadcast}
+               disabled={isSending || !broadcastMessage.trim()}
+              className="flex-2 min-w-[160px] bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-2xl h-14 text-[11px] font-bold tracking-wider shadow-3d-orange border-none flex items-center gap-3 transition-all disabled:opacity-50"
+             >
+               {isSending ? (
+                 <Loader2 className="h-4 w-4 animate-spin" />
+               ) : (
+                 <Send className="h-4 w-4" />
+               )}
+              {isSending ? "Sequestering..." : "Deploy Broadcast"}
+             </Button>
+           </DialogFooter>
+         </DialogContent>
+       </Dialog>
+     </motion.div>
   );
 };
 

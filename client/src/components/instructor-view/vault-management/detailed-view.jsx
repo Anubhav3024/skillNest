@@ -293,7 +293,7 @@ const VaultDetailedView = ({ courseId, onBack }) => {
             <ArrowLeft className="h-5 w-5" />
           </motion.button>
           <div className="space-y-1">
-            <h1 className="text-2xl font-headline font-black text-[#0d694f] uppercase tracking-tighter leading-none">
+            <h1 className="text-2xl font-headline font-black text-[#0d694f] tracking-tighter leading-none">
               {course.title || "Untitled Vault"}
             </h1>
             <div className="flex items-center gap-3">
@@ -313,25 +313,25 @@ const VaultDetailedView = ({ courseId, onBack }) => {
           {course.status === 'active' ? (
             <button 
               onClick={() => handleStatusChange('paused')}
-              className="px-6 py-3 rounded-2xl bg-white border border-amber-500/20 text-amber-600 font-headline font-bold text-[10px] uppercase tracking-widest hover:bg-amber-50 transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl bg-white border border-amber-500/20 text-amber-600 font-headline font-bold text-[10px] tracking-widest hover:bg-amber-50 transition-all flex items-center gap-2"
             >
-              <Pause className="h-3 w-3" /> PAUSE
+              <Pause className="h-3 w-3" /> Pause
             </button>
           ) : course.status === 'paused' ? (
             <button 
               onClick={() => handleStatusChange('active')}
-              className="px-6 py-3 rounded-2xl bg-[#0d694f] text-white font-headline font-bold text-[10px] uppercase tracking-widest hover:bg-[#0d694f]/90 transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl bg-[#0d694f] text-white font-headline font-bold text-[10px] tracking-widest hover:bg-[#0d694f]/90 transition-all flex items-center gap-2"
             >
-              <Play className="h-3 w-3" /> RESUME
+              <Play className="h-3 w-3" /> Resume
             </button>
           ) : null}
           
           {course.status !== 'archived' && (
             <button 
               onClick={() => handleStatusChange('archived')}
-              className="px-6 py-3 rounded-2xl bg-white border border-red-500/20 text-red-600 font-headline font-bold text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl bg-white border border-red-500/20 text-red-600 font-headline font-bold text-[10px] tracking-widest hover:bg-red-50 transition-all flex items-center gap-2"
             >
-              <Archive className="h-3 w-3" /> ARCHIVE
+              <Archive className="h-3 w-3" /> Archive
             </button>
           )}
         </div>
@@ -350,7 +350,7 @@ const VaultDetailedView = ({ courseId, onBack }) => {
             }`}
           >
             <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'opacity-100' : 'opacity-40'}`} />
-            <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
+            <span className="text-[10px] font-black tracking-widest">{tab.label}</span>
           </button>
         ))}
       </div>

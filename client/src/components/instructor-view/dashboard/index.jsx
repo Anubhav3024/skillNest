@@ -1,5 +1,4 @@
 import {
-  IndianRupee,
   Globe,
   Database,
   UserCircle,
@@ -352,48 +351,69 @@ const InstructorDashboard = ({
                 <motion.div 
                   key={course._id}
                   whileHover={{ y: -10, scale: 1.02 }}
-                  className="min-w-[340px] bg-gradient-to-br from-white to-[#fcf8f1] rounded-[2.5rem] p-5 border border-[#0d694f]/10 shadow-xl snap-start group relative transition-all duration-500 hover:border-[#0d694f]/30"
+                  className="min-w-[340px] snap-start group relative bg-white border border-[#0d694f]/20 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col h-full"
                 >
-                  <div className="relative aspect-video rounded-[2.2rem] overflow-hidden mb-6 shadow-2xl border border-white/50 bg-[#f3efe5]">
-                    <img 
-                      src={course.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"} 
-                      alt="" 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
-                    <div className={`absolute top-4 right-4 px-4 py-1.5 rounded-full backdrop-blur-md text-[9px] font-black  border border-white/20 shadow-lg ${course.isPublished ? 'bg-emerald-500/90 text-white' : 'bg-[#ff7e5f]/90 text-white'}`}>
-                      {course.isPublished ? 'Active' : 'Draft'}
+                  <div className="relative p-1.5 bg-white/40 backdrop-blur-xl">
+                    <div className="relative aspect-video overflow-hidden rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 shadow-inner">
+                      <img 
+                        src={course.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"} 
+                        alt={course.title || "Vault thumbnail"}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#011c14]/60 via-transparent to-transparent opacity-80"></div>
+
+                      <div className="absolute top-4 left-4 flex items-center gap-2">
+                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold backdrop-blur-md border border-white/20 shadow-lg ${course.isPublished ? 'bg-[#0d694f] text-white' : 'bg-[#ff7e5f] text-white'}`}>
+                          {course.isPublished ? "Published" : "Draft"}
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-3 right-3 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2 border border-white/10 shadow-lg">
+                        <Users className="h-3.5 w-3.5 text-white" />
+                        <span className="text-[11px] font-bold text-white ">
+                          {course.students?.length || 0} Scholars
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="px-2 space-y-6">
-                    <div className="space-y-2">
-                       <h3 className="text-base font-headline font-black text-[#0d694f] tracking-tight line-clamp-1 group-hover:text-[#ff7e5f] transition-colors">
+                  <div className="flex-1 bg-[#0d694f] p-4 space-y-3 relative flex flex-col justify-between"> 
+                    <div className="space-y-1.5"> 
+                      <h3 className="text-[15px] font-headline font-bold text-white leading-tight tracking-tight group-hover:text-[#ff7e5f] transition-all line-clamp-1"> 
                         {capitalize(course.title) || "Untitled Manifest"}
                       </h3>
-                      <div className="flex items-center justify-between">
-                         <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-xl bg-[#0d694f]/5 flex items-center justify-center border border-[#0d694f]/5">
-                               <Users className="h-3.5 w-3.5 text-[#0d694f]/60" />
-                            </div>
-                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">{course.students?.length || 0} Scholars</span>
-                         </div>
-                         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fcf8f1] rounded-xl border border-[#0d694f]/5">
-                            <IndianRupee className="h-3 w-3 text-[#ff7e5f]" />
-                            <span className="text-sm font-headline font-black text-[#0d694f]">{course.pricing || 'FREE'}</span>
-                         </div>
-                      </div>
+                      <p className="text-[10px] font-semibold text-white/60 italic leading-relaxed line-clamp-2"> 
+                        {course.objectives || course.subtitle || "No strategic objectives declared for this vault."}
+                      </p>
                     </div>
 
-                    <div className="flex gap-4 pt-2">
+                    <div className="space-y-3"> 
+                      <div className="flex items-center justify-between bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10"> 
+                        <div className="flex flex-col gap-0.5"> 
+                          <span className="text-[9px] font-bold text-white/40  leading-none">Lectures</span> 
+                          <div className="text-base font-headline font-bold text-white"> 
+                            {course.curriculum?.length || 0}
+                          </div>
+                        </div>
+                        <div className="h-8 w-[1px] bg-white/10 mx-2"></div> 
+                        <div className="flex flex-col items-end gap-0.5"> 
+                          <span className="text-[9px] font-bold text-white/40  leading-none">Price</span> 
+                          <div className="text-base font-headline font-bold text-white"> 
+                            {course.pricing > 0 ? `₹${course.pricing}` : "Free"}
+                          </div>
+                        </div>
+                      </div>
+
                       <Button 
                         onClick={() => navigate(`/instructor/edit-course/${course?._id}`)}
-                        className="flex-1 rounded-2xl bg-[#0d694f] hover:bg-[#ff7e5f] text-white shadow-3d-orange border-none text-[11px] font-bold  h-auto py-4.5 transition-all group/btn"
+                        className="w-full bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-xl py-3.5 h-auto font-headline font-bold text-[10px]  transition-all shadow-lg shadow-black/20 border-none group/btn"
                       >
-                        Revise
-                        <ArrowRight className="h-3.5 w-3.5 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                        Revise Vault
+                        <ArrowRight className="h-3.5 w-3.5 ml-2 opacity-60 group-hover/btn:translate-x-1 transition-transform" />
                       </Button>
                     </div>
+                    
+                    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                   </div>
                 </motion.div>
               ))}

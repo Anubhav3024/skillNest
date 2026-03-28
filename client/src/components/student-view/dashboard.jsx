@@ -225,39 +225,81 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
                 transition={{ delay: 0.7 + (idx * 0.1) }}
                 whileHover={{ y: -12 }}
                 onClick={() => navigate(`/course/details/${course._id}`)}
-                className="group bg-white rounded-[3rem] border border-[#0d694f]/5 shadow-3d overflow-hidden cursor-pointer transition-all hover:shadow-2xl"
+                className="group relative bg-white border border-[#0d694f]/20 rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl flex flex-col h-full"
               >
-                <div className="aspect-[16/11] bg-[#fcf8f1] overflow-hidden relative">
-                  {course.image ? (
-                    <img
-                      src={course.image}
-                      alt={course.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#0d694f]/5">
-                      <BookOpen className="w-12 h-12 text-[#0d694f]/10" />
+                <div className="relative p-1.5 bg-white/40 backdrop-blur-xl">
+                  <div className="relative aspect-video overflow-hidden rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 shadow-inner">
+                    {course.image ? (
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-[#0d694f]/5">
+                        <BookOpen className="w-12 h-12 text-[#0d694f]/10" />
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#011c14]/60 via-transparent to-transparent opacity-80"></div>
+
+                    <div className="absolute top-4 left-4 flex items-center gap-2">
+                      <div className="px-4 py-1.5 rounded-full text-[10px] font-bold backdrop-blur-md border border-white/20 bg-[#0d694f] text-white shadow-lg">
+                        {course.category}
+                      </div>
                     </div>
-                  )}
-                  <div className="absolute top-6 left-6">
-                    <div className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-2xl text-[9px] font-black text-[#ff7e5f] tracking-widest uppercase shadow-xl">
-                       {course.category}
+
+                    <div className="absolute bottom-3 right-3 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-2 border border-white/10 shadow-lg">
+                      <Users className="h-3.5 w-3.5 text-white" />
+                      <span className="text-[11px] font-bold text-white ">
+                        {course.totalStudents ?? course.students?.length ?? 0} Scholars
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div className="p-10 space-y-6">
-                  <h4 className="text-xl font-headline font-black text-[#0d694f] leading-tight line-clamp-2 h-14">
-                    {capitalize(course.title)}
-                  </h4>
-                  <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[#fcf8f1] rounded-xl text-slate-400">
-                      <Play size={14} className="text-[#ff7e5f]" />
-                      <span className="text-[10px] font-black tracking-tight">{course.totalLectures} units</span>
-                    </div>
-                    <div className="text-2xl font-headline font-black text-[#ff7e5f] tracking-tighter">
-                      ₹{course.pricing || "Free"}
-                    </div>
+
+                <div className="flex-1 bg-[#0d694f] p-4 space-y-3 relative flex flex-col justify-between"> 
+                  <div className="space-y-1.5"> 
+                    <h4 className="text-[15px] font-headline font-bold text-white leading-tight tracking-tight group-hover:text-[#ff7e5f] transition-all line-clamp-2 uppercase"> 
+                      {capitalize(course.title)}
+                    </h4>
+                    <p className="text-[10px] font-semibold text-white/60 italic leading-relaxed line-clamp-2"> 
+                      {course.instructorName ? `by ${capitalize(course.instructorName)} · ` : ""}
+                      {course.level ? `${course.level} · ` : ""}
+                      {course.totalLectures || 0} units
+                    </p>
                   </div>
+
+                  <div className="space-y-3"> 
+                    <div className="flex items-center justify-between bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10"> 
+                      <div className="flex flex-col gap-0.5"> 
+                        <span className="text-[9px] font-bold text-white/40  leading-none">Units</span> 
+                        <div className="text-base font-headline font-bold text-white"> 
+                          {course.totalLectures || 0}
+                        </div>
+                      </div>
+                      <div className="h-8 w-[1px] bg-white/10 mx-2"></div> 
+                      <div className="flex flex-col items-end gap-0.5"> 
+                        <span className="text-[9px] font-bold text-white/40  leading-none">Price</span> 
+                        <div className="text-base font-headline font-bold text-white"> 
+                          {course.pricing > 0 ? `₹${course.pricing}` : "Free"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        navigate(`/course/details/${course._id}`);
+                      }}
+                      className="w-full bg-[#ff7e5f] hover:bg-[#ff7e5f]/90 text-white rounded-xl py-3.5 h-auto text-[10px] font-headline font-bold border-none transition-all shadow-lg shadow-black/20 group/btn"
+                    >
+                      View Vault
+                      <ArrowRight className="ml-2 h-3.5 w-3.5 opacity-60 group-hover/btn:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
+
+                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                 </div>
               </motion.div>
             ))}

@@ -106,7 +106,7 @@ const InstructorProfile = ({ auth }) => {
       {/* Header */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-headline font-black text-[#0d694f] tracking-tighter mb-1 uppercase">
+          <h1 className="text-2xl font-headline font-black text-[#0d694f] tracking-tighter mb-1">
             Educator Dossier
           </h1>
           <p className="text-muted-foreground font-medium text-sm italic opacity-70">
@@ -117,14 +117,14 @@ const InstructorProfile = ({ auth }) => {
           <Button 
             onClick={handleCommitChanges}
             disabled={isSaving}
-            className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-xl px-10 py-5 h-auto font-headline font-black text-[9px] tracking-widest uppercase shadow-3d-orange border-none group"
+            className="bg-[#0d694f] hover:bg-[#ff7e5f] text-white rounded-xl px-10 py-5 h-auto font-headline font-black text-[9px] tracking-widest shadow-3d-orange border-none group"
           >
             {isSaving ? (
               <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
             ) : (
               <Save className="h-3.5 w-3.5 mr-2 transition-transform group-hover:scale-110" />
             )}
-            COMMIT CHANGES
+            Commit Changes
           </Button>
         </motion.div>
       </motion.div>
