@@ -1,50 +1,37 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { captureAndFinalizePaymentService } from "@/services";
-import React, { useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PaypalPaymentReturnPage = () => {
+  const navigate = useNavigate();
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-
-  const paymentId = params.get("paymentId");
-  const payerId = params.get("PayerID");
-
-
 
   useEffect(() => {
-  if (payerId && paymentId) {
-    const capturePayment = async () => {
-      const currentOrderId = sessionStorage.getItem("currentOrderId");
+    // Legacy route kept for older payment provider redirects.
+    // Razorpay uses an in-app handler flow (no redirect required).
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error");
+    const reason = params.get("reason");
 
-      if (currentOrderId) {
-        const response = await captureAndFinalizePaymentService({
-          paymentId,
-          payerId,
-          orderId: currentOrderId,
-        });
+    if (error || reason) {
+      toast.error(reason || "Payment failed. Please try again.");
+    } else {
+      toast.info("Redirecting to your courses...");
+    }
 
-        if (response?.success) {
-          sessionStorage.removeItem("currentOrderId");
-          window.location.href = "/home?tab=my-courses";
-        }
-      } else {
-        toast.error("Order information not found. Please contact support.");
-        return;
-      }
-    };
-    capturePayment();
-  } else {
-    toast.error("Payment details missing. Please contact support.");
-    return;
-  }
-}, [payerId, paymentId]);
+    const timeout = setTimeout(() => {
+      navigate("/home?tab=my-courses", { replace: true });
+    }, 1200);
+
+    return () => clearTimeout(timeout);
+  }, [location.search, navigate]);
 
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Processing payemnt... Please wait</CardTitle>
+        <CardTitle>Finalizing payment... Please wait</CardTitle>
       </CardHeader>
     </Card>
   );

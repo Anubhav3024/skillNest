@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { easeInOut, motion } from "framer-motion";
 
 const MediaProgressbar = ({ isMediaUploading, progress }) => {

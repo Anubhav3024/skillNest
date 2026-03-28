@@ -180,9 +180,11 @@ const loginUser = async (req, res) => {
     }
 
     const normalizedRole = normalizeRole(user.role);
-    if (normalizedRole && normalizedRole !== user.role) {
-      user.role = normalizedRole;
-      await user.save();
+    if (!normalizedRole || !isValidRole(normalizedRole)) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid account role. Please contact support.",
+      });
     }
 
     const accessToken = jwt.sign(
@@ -190,7 +192,7 @@ const loginUser = async (req, res) => {
         _id: user._id,
         userName: user.userName,
         userEmail: user.userEmail,
-        role: normalizedRole || user.role,
+        role: normalizedRole,
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" },
@@ -199,7 +201,7 @@ const loginUser = async (req, res) => {
     user.userPassword = undefined;
     const safeUser = user.toObject();
     delete safeUser.userPassword;
-    safeUser.role = normalizedRole || user.role;
+    safeUser.role = normalizedRole;
 
     return res.status(200).json({
       success: true,

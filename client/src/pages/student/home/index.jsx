@@ -41,38 +41,43 @@ const StudentHomePage = () => {
       <section className="relative overflow-hidden">
         <div className="flex flex-col lg:flex-row min-h-[600px] lg:min-h-[750px]">
           {/* Left Side: Cream */}
-          <div className="lg:w-[60%] flex flex-col justify-start px-8 lg:px-24 pt-16 pb-20 relative z-10">
+          <div className="lg:w-[60%] flex flex-col justify-center px-6 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-20 lg:py-24 relative z-10">
             <div className="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm mb-8 animate-in fade-in slide-in-from-left-4 duration-700">
                <Star className="h-4 w-4 text-[#ff7e5f] fill-current" />
                <span className="text-xs font-headline font-black text-foreground uppercase tracking-widest">30 Days free trial</span>
             </div>
             
-            <h1 className="text-5xl lg:text-[5.5rem] font-headline font-black text-[#0d694f] leading-[1.05] tracking-tight mb-8">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-headline font-black text-[#0d694f] leading-[1.05] tracking-tight mb-7 sm:mb-8">
               Build Your Skills <br />
-              on the <span className="text-[#ff7e5f] relative">Best <div className="absolute -bottom-2 left-0 w-full h-3 bg-[#ff7e5f]/20 -z-10 rounded-full"></div></span> Platform
+              on the{" "}
+              <span className="text-[#ff7e5f] relative inline-block">
+                Best
+                <span className="absolute -bottom-2 left-0 w-full h-3 bg-[#ff7e5f]/20 -z-10 rounded-full"></span>
+              </span>{" "}
+              Platform
             </h1>
             
-            <p className="max-w-md text-muted-foreground font-medium text-lg leading-relaxed mb-10">
+            <p className="max-w-xl text-[#0d694f]/70 font-medium text-base sm:text-lg leading-relaxed mb-10">
               Find unlimited courses that match your niche to hasten the process of developing your skills.
             </p>
             
             <div className="flex flex-wrap items-center gap-6">
               <Button 
                 onClick={() => navigate("/home?tab=browse")}
-                className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-10 py-7 font-headline font-black text-lg shadow-xl shadow-[#0d694f]/20 transition-all active:scale-95 border-none"
+                className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-9 sm:px-10 py-6 font-headline font-black text-base sm:text-lg shadow-xl shadow-[#0d694f]/20 transition-all active:scale-95 border-none"
               >
                 Get Started
               </Button>
-              <button className="flex items-center gap-3 font-headline font-bold text-[#0d694f] hover:text-[#ff7e5f] transition-all group">
-                <div className="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-[#ff7e5f] group-hover:scale-110 transition-transform">
-                  <PlayCircle className="h-7 w-7 fill-current" />
+              <button className="flex items-center gap-3 font-headline font-bold text-sm sm:text-base text-[#0d694f] hover:text-[#ff7e5f] transition-all group">
+                <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[#ff7e5f] group-hover:scale-110 transition-transform">
+                  <PlayCircle className="h-6 w-6 fill-current" />
                 </div>
-                Video Play
+                Watch demo
               </button>
             </div>
             
             {/* Social Proof */}
-            <div className="mt-16 flex items-center gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-2xl w-fit border border-white/50">
+            <div className="mt-12 sm:mt-16 flex items-center gap-4 bg-white/60 backdrop-blur-sm p-4 rounded-2xl w-fit border border-white/60">
                <div className="flex -space-x-3">
                  {[1,2,3,4].map(i => (
                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[#fcf8f1] bg-muted overflow-hidden">
@@ -95,7 +100,7 @@ const StudentHomePage = () => {
             </div>
             
             {/* Person Image Overlay */}
-            <div className="relative w-full h-full lg:-left-24 flex items-center justify-center lg:justify-start pt-12 lg:pt-0 pb-10 lg:pb-0">
+            <div className="relative w-full h-full lg:-left-16 xl:-left-20 flex items-center justify-center lg:justify-start py-12 lg:py-0">
                <div className="relative w-[85%] aspect-square max-w-lg">
                   <div className="absolute inset-0 bg-[#ff7e5f] rounded-3xl rotate-6 animate-pulse"></div>
                   <div className="absolute inset-0 bg-white rounded-3xl transition-transform duration-700 hover:rotate-2 overflow-hidden border-8 border-white shadow-2xl">
@@ -112,31 +117,31 @@ const StudentHomePage = () => {
       </section>
 
       {/* Course Categories Section */}
-      <section className="py-24 px-8 lg:px-24 bg-white">
-        <div className="max-w-7xl mx-auto text-center mb-16">
+      <section className="py-20 sm:py-24 px-6 sm:px-8 lg:px-24 bg-white">
+        <div className="max-w-7xl mx-auto text-center mb-14 sm:mb-16">
           <div className="inline-flex items-center gap-2 text-[#ff7e5f] font-headline font-black text-xs uppercase tracking-[0.3em] mb-4">
             <span className="w-8 h-px bg-[#ff7e5f]/30"></span>
             Course Categories
             <span className="w-8 h-px bg-[#ff7e5f]/30"></span>
           </div>
-          <h2 className="text-5xl font-headline font-black text-foreground mb-6">Explore our Course Categories</h2>
-          <p className="text-muted-foreground font-medium max-w-xl mx-auto">
+          <h2 className="text-4xl sm:text-5xl font-headline font-black text-[#0d694f] tracking-tight mb-5 sm:mb-6">Explore our Course Categories</h2>
+          <p className="text-[#0d694f]/70 font-medium max-w-xl mx-auto">
             For everyone of you, we offer a variety of distinctive benefits. Empowering voices in the classroom and beyond.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {categories.map((cat, idx) => (
             <div 
               key={idx}
               onClick={() => navigate(`/home?tab=browse&category=${encodeURIComponent(cat.title.toLowerCase().replace(' ', '-'))}`)}
-              className={`${cat.color} p-10 rounded-[2.5rem] border border-transparent hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden`}
+              className={`${cat.color} p-8 rounded-[2.25rem] border border-[#0d694f]/10 hover:border-[#0d694f]/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group cursor-pointer relative overflow-hidden`}
             >
-              <div className={`w-16 h-16 rounded-2xl ${cat.active ? 'bg-white/10' : 'bg-white'} flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform`}>
-                <span className={`material-symbols-outlined text-3xl ${cat.active ? 'text-white' : 'text-[#0d694f]'}`}>{cat.icon}</span>
+              <div className={`w-14 h-14 rounded-2xl ${cat.active ? 'bg-white/10' : 'bg-white'} flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform`}>
+                <span className={`material-symbols-outlined text-[28px] ${cat.active ? 'text-white' : 'text-[#0d694f]'}`}>{cat.icon}</span>
               </div>
-              <h3 className="text-2xl font-headline font-black mb-4">{cat.title}</h3>
-              <p className={`text-sm font-medium leading-relaxed opacity-70 mb-8`}>
+              <h3 className="text-xl font-headline font-black mb-3">{cat.title}</h3>
+              <p className={`text-sm font-medium leading-relaxed mb-7 ${cat.active ? 'text-white/75' : 'text-[#0d694f]/70'}`}>
                 {cat.desc}
               </p>
               <div className={`inline-flex h-2 w-12 rounded-full ${cat.active ? 'bg-white/20' : 'bg-[#0d694f]/10'}`}></div>
@@ -146,7 +151,7 @@ const StudentHomePage = () => {
       </section>
 
       {/* About Section */}
-      <section className="py-24 px-8 lg:px-24 max-w-7xl mx-auto bg-[#fcf8f1]">
+      <section className="py-20 sm:py-24 px-6 sm:px-8 lg:px-24 max-w-7xl mx-auto bg-[#fcf8f1]">
         <div className="flex flex-col lg:flex-row items-center gap-20">
           <div className="lg:w-1/2 relative">
              <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#0d694f]/5 rounded-full blur-3xl"></div>
@@ -174,11 +179,11 @@ const StudentHomePage = () => {
               About Us
               <span className="w-8 h-px bg-[#ff7e5f]/30"></span>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-headline font-black text-[#0d694f] leading-tight mb-8">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-headline font-black text-[#0d694f] leading-tight tracking-tight mb-6 sm:mb-8">
               Educate The populace <br />
               to advance the nation
             </h2>
-            <p className="text-muted-foreground font-medium text-lg leading-relaxed mb-10">
+            <p className="text-[#0d694f]/70 font-medium text-base sm:text-lg leading-relaxed mb-10">
               This can be accomplished by highlighting any awards or recognitions that the company has received, as well as any partnerships or collaborations that it has formed with other industry leaders.
             </p>
             
@@ -200,7 +205,7 @@ const StudentHomePage = () => {
             
             <Button 
               onClick={() => navigate("/home?tab=browse")}
-              className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-10 py-7 font-headline font-black transition-all group border-none shadow-xl shadow-[#0d694f]/20"
+              className="bg-[#0d694f] hover:bg-[#0b5c45] text-white rounded-xl px-9 sm:px-10 py-6 font-headline font-black text-base transition-all group border-none shadow-xl shadow-[#0d694f]/20"
             >
               Learn More
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -210,7 +215,7 @@ const StudentHomePage = () => {
       </section>
 
       {/* Global Footer CTA */}
-      <section className="bg-[#0d694f] py-24 px-8 lg:px-24">
+      <section className="bg-[#0d694f] py-20 sm:py-24 px-6 sm:px-8 lg:px-24">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
            <div className="text-white max-w-xl text-center md:text-left">
               <h3 className="text-4xl lg:text-5xl font-headline font-black mb-4">Ready to embark on <br />your learning quest?</h3>

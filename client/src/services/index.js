@@ -32,6 +32,11 @@ export const checkAuthService = async () => {
   return res.data;
 };
 
+export const exchangeOAuthTicketService = async (ticket) => {
+  const res = await axiosInstance.post("/auth/oauth/exchange", { ticket });
+  return res.data;
+};
+
 export const mediaUploadService = async (formData, onProgressCallBack) => {
   const res = await axiosInstance.post("/media/upload", formData, {
     onUploadProgress: (progressEvent) => {
@@ -141,7 +146,8 @@ export const mediaBulkUploadService = async (formData, onProgressCallBack) => {
 };
 
 export const fetchStudentViewCourseListService = async (query) => {
-  const res = await axiosInstance.get(`/student/course/get?${query}`);
+  const querySuffix = query ? `?${query}` : "";
+  const res = await axiosInstance.get(`/student/course/get${querySuffix}`);
   return res.data;
 };
 
@@ -245,7 +251,7 @@ export const getUserPaymentHistoryService = async (userId) => {
 };
 
 export const deleteUserAccountService = async (userId) => {
-  const res = await axiosInstance.delete(`/user/delete-account/${userId}`);
+  const res = await axiosInstance.delete(`/user/delete/${userId}`);
   return res.data;
 };
 

@@ -1,9 +1,13 @@
-const { createBulkNotifications } = require("../../../utils/notification-service");
+const {
+  createBulkNotifications,
+} = require("../../../utils/notification-service");
 
 const broadcastMessage = async (req, res) => {
   try {
     const { studentIds, message } = req.body;
     const instructorId = req.user._id;
+    const trimmedMessage = String(message || "").trim();
+    const safeSenderName = req.user?.userName || "Instructor";
 
     if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
       return res.status(400).json({
@@ -12,7 +16,7 @@ const broadcastMessage = async (req, res) => {
       });
     }
 
-    if (!message || message.trim() === "") {
+    if (!trimmedMessage) {
       return res.status(400).json({
         success: false,
         message: "Message content is required",
@@ -22,10 +26,10 @@ const broadcastMessage = async (req, res) => {
     const notifications = studentIds.map((studentId) => ({
       recipientId: studentId,
       senderId: instructorId,
-      senderName: req.user?.userName,
+      senderName: safeSenderName,
       recipientRole: "student",
       title: "New educator announcement",
-      message,
+      message: trimmedMessage,
       type: "BROADCAST",
       link: "/home?tab=my-courses",
     }));

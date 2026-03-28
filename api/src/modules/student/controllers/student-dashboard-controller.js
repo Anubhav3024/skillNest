@@ -8,51 +8,73 @@ const getStudentDashboard = async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    if (String(req.user?._id) !== String(userId)) {
+    if (
+      String(req.user?._id) !== String(userId) &&
+      req.user?.role !== "admin"
+    ) {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
     // 1. Get enrolled courses
     const studentCoursesDoc = await StudentCourses.findOne({ userId });
-    const enrolledCourseIds = (studentCoursesDoc?.courses || []).map(c => c.courseId);
+    const enrolledCourseIds = (studentCoursesDoc?.courses || []).map(
+      (c) => c.courseId,
+    );
 
     // 2. Fetch full course details for enrolled courses
-    const enrolledCourses = enrolledCourseIds.length > 0
-      ? await Course.find({ _id: { $in: enrolledCourseIds } }).lean()
-      : [];
+    const enrolledCourses =
+      enrolledCourseIds.length > 0
+        ? await Course.find({ _id: { $in: enrolledCourseIds } }).lean()
+        : [];
 
     // 3. Fetch progress for each enrolled course
-    const progressDocs = enrolledCourseIds.length > 0
-      ? await CourseProgress.find({ userId, courseId: { $in: enrolledCourseIds } }).lean()
-      : [];
+    const progressDocs =
+      enrolledCourseIds.length > 0
+        ? await CourseProgress.find({
+            userId,
+            courseId: { $in: enrolledCourseIds },
+          }).lean()
+        : [];
 
     const progressMap = {};
-    progressDocs.forEach(p => {
-      progressMap[p.courseId] = p;
+    progressDocs.forEach((p) => {
+      progressMap[String(p.courseId)] = p;
     });
 
     // 4. Build enriched course list with progress %
     let lastActiveCourse = null;
     let lastActiveDate = null;
 
-    const coursesWithProgress = enrolledCourses.map(course => {
+    const coursesWithProgress = enrolledCourses.map((course) => {
       const progress = progressMap[String(course._id)] || {};
       const totalLectures = course.curriculum?.length || 0;
-      const completedLectures = progress.lecturesProgress?.filter(l => l.viewed)?.length || 0;
-      const progressPercent = totalLectures > 0 ? Math.round((completedLectures / totalLectures) * 100) : 0;
+      const completedLectures =
+        progress.lecturesProgress?.filter((l) => l.viewed)?.length || 0;
+      const progressPercent =
+        totalLectures > 0
+          ? Math.round((completedLectures / totalLectures) * 100)
+          : 0;
 
       // Find purchase info
-      const purchaseInfo = studentCoursesDoc?.courses?.find(c => c.courseId === String(course._id));
+      const purchaseInfo = studentCoursesDoc?.courses?.find(
+        (c) => c.courseId === String(course._id),
+      );
 
       // Track most recently active course
       const lastViewed = progress.lecturesProgress?.reduce((latest, lp) => {
-        if (lp.dateViewed && (!latest || new Date(lp.dateViewed) > new Date(latest))) {
+        if (
+          lp.dateViewed &&
+          (!latest || new Date(lp.dateViewed) > new Date(latest))
+        ) {
           return lp.dateViewed;
         }
         return latest;
       }, null);
 
-      if (lastViewed && (!lastActiveDate || new Date(lastViewed) > new Date(lastActiveDate))) {
+      if (
+        lastViewed &&
+        (!lastActiveDate || new Date(lastViewed) > new Date(lastActiveDate))
+      ) {
         lastActiveDate = lastViewed;
         lastActiveCourse = {
           ...course,
@@ -80,9 +102,16 @@ const getStudentDashboard = async (req, res) => {
     });
 
     // 5. Calculate stats
-    const totalCoursesCompleted = coursesWithProgress.filter(c => c.isCompleted).length;
-    const totalCoursesInProgress = coursesWithProgress.filter(c => !c.isCompleted && c.progressPercent > 0).length;
-    const totalLecturesCompleted = coursesWithProgress.reduce((sum, c) => sum + c.completedLectures, 0);
+    const totalCoursesCompleted = coursesWithProgress.filter(
+      (c) => c.isCompleted,
+    ).length;
+    const totalCoursesInProgress = coursesWithProgress.filter(
+      (c) => !c.isCompleted && c.progressPercent > 0,
+    ).length;
+    const totalLecturesCompleted = coursesWithProgress.reduce(
+      (sum, c) => sum + c.completedLectures,
+      0,
+    );
 
     // 6. Get recommendations (courses not purchased, published)
     const recommendations = await Course.find({
@@ -91,15 +120,21 @@ const getStudentDashboard = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .limit(6)
-      .select("title image category level pricing instructorName students curriculum")
+      .select(
+        "title image category level pricing instructorName students curriculum",
+      )
       .lean();
 
-    const recommendationsWithMeta = recommendations.map(course => ({
-      ...course,
-      totalLectures: course.curriculum?.length || 0,
-      totalStudents: course.students?.length || 0,
-      totalDuration: course.curriculum?.reduce((sum, l) => sum + (l.duration || 0), 0) || 0,
-    }));
+    const recommendationsWithMeta = recommendations.map((course) => {
+      const { curriculum, ...rest } = course;
+      return {
+        ...rest,
+        totalLectures: curriculum?.length || 0,
+        totalStudents: course.students?.length || 0,
+        totalDuration:
+          curriculum?.reduce((sum, l) => sum + (l.duration || 0), 0) || 0,
+      };
+    });
 
     // 8. Get chronological activity feed
     const activities = await Activity.find({ userId })
@@ -117,7 +152,9 @@ const getStudentDashboard = async (req, res) => {
       success: true,
       data: {
         enrolledCourses: coursesWithProgress,
-        activeCourse: lastActiveCourse || (coursesWithProgress.length > 0 ? coursesWithProgress[0] : null),
+        activeCourse:
+          lastActiveCourse ||
+          (coursesWithProgress.length > 0 ? coursesWithProgress[0] : null),
         stats: {
           totalEnrolled: coursesWithProgress.length,
           totalCompleted: totalCoursesCompleted,

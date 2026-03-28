@@ -1,8 +1,18 @@
 const Notification = require("../../../models/Notification");
-const { formatNotificationPayload } = require("../../../utils/notification-service");
+const mongoose = require("mongoose");
+const {
+  formatNotificationPayload,
+} = require("../../../utils/notification-service");
 
 const getMyNotifications = async (req, res) => {
   try {
+    if (!req.user?._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
     const recipientId = req.user?._id;
     const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);
     const unreadOnly = String(req.query.unreadOnly || "false") === "true";
@@ -33,8 +43,22 @@ const getMyNotifications = async (req, res) => {
 
 const markNotificationRead = async (req, res) => {
   try {
+    if (!req.user?._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification id",
+      });
+    }
+
     const notification = await Notification.findOneAndUpdate(
-      { _id: req.params.id, recipientId: req.user?._id },
+      { _id: req.params.id, recipientId: req.user._id },
       { $set: { read: true } },
       { new: true },
     );
@@ -61,8 +85,15 @@ const markNotificationRead = async (req, res) => {
 
 const markAllNotificationsRead = async (req, res) => {
   try {
+    if (!req.user?._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
     await Notification.updateMany(
-      { recipientId: req.user?._id, read: false },
+      { recipientId: req.user._id, read: false },
       { $set: { read: true } },
     );
 

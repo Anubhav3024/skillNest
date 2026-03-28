@@ -12,7 +12,12 @@ const router = require("express").Router();
 
 router.post("/add", authenticate, checkRole("instructor"), addNewCourse);
 router.get("/get/:instructorId", authenticate, checkRole("instructor"), getAllCourses);
-router.get("/get/details/:id", getCourseDetailsById);
+router.get(
+  "/get/details/:id",
+  authenticate,
+  checkRole("instructor", "admin"),
+  getCourseDetailsById,
+);
 router.put(
   "/update/:id",
   authenticate,

@@ -5,6 +5,7 @@ import {
   Search as SearchIcon,
   Activity,
   User,
+  Users,
   Settings,
   HelpCircle,
   LogOut,
@@ -17,7 +18,7 @@ import {
   CheckCircle2,
   Eye,
   ShoppingCart,
-  CreditCard
+  CreditCard,
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -449,11 +450,22 @@ MyCoursesTab.propTypes = {
 
 /* ───── TAB: Browse ───── */
 const CATEGORIES = [
-  "Web Development", "Backend Development", "Data Science", "Machine Learning",
-  "Artificial Intelligence", "Cloud Computing", "Cyber Security",
-  "Mobile Development", "Game Development", "Software Engineering",
+  { id: "web-development", label: "Web Development" },
+  { id: "backend-development", label: "Backend Development" },
+  { id: "data-science", label: "Data Science" },
+  { id: "machine-learning", label: "Machine Learning" },
+  { id: "artificial-intelligence", label: "Artificial Intelligence" },
+  { id: "cloud-computing", label: "Cloud Computing" },
+  { id: "cyber-security", label: "Cyber Security" },
+  { id: "mobile-development", label: "Mobile Development" },
+  { id: "game-development", label: "Game Development" },
+  { id: "software-engineering", label: "Software Engineering" },
 ];
-const LEVELS = ["Beginner", "Intermediate", "Advanced"];
+const LEVELS = [
+  { id: "beginner", label: "Beginner" },
+  { id: "intermediate", label: "Intermediate" },
+  { id: "advanced", label: "Advanced" },
+];
 
 const BrowseTab = ({ navigate, externalSearch = "" }) => {
   const [courses, setCourses] = useState([]);
@@ -469,8 +481,8 @@ const BrowseTab = ({ navigate, externalSearch = "" }) => {
         const queryParams = { ...filters, page, limit: 12 };
         if (externalSearch) queryParams.search = externalSearch;
         const query = Object.entries(queryParams)
-          .filter(([, v]) => v)
-          .map(([k, v]) => `${k}=${v}`)
+          .filter(([, v]) => v !== undefined && v !== null && v !== "")
+          .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
           .join("&");
         const res = await fetchStudentViewCourseListService(query);
         if (res?.success) {
@@ -529,18 +541,23 @@ const BrowseTab = ({ navigate, externalSearch = "" }) => {
               <div className="space-y-2.5">
                 {CATEGORIES.map((cat) => (
                   <label
-                    key={cat}
+                    key={cat.id}
                     className="flex items-center gap-3 cursor-pointer group"
-                    onClick={() => setFilters((f) => ({ ...f, category: f.category === cat ? "" : cat }))}
+                    onClick={() =>
+                      setFilters((f) => ({
+                        ...f,
+                        category: f.category === cat.id ? "" : cat.id,
+                      }))
+                    }
                   >
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                      filters.category === cat ? "border-primary bg-primary" : "border-primary/20 group-hover:border-primary/40"
+                      filters.category === cat.id ? "border-primary bg-primary" : "border-primary/20 group-hover:border-primary/40"
                     }`}>
-                      {filters.category === cat && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                      {filters.category === cat.id && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                     </div>
                     <span className={`text-xs font-medium transition-colors ${
-                      filters.category === cat ? "text-primary font-bold" : "text-muted-foreground group-hover:text-primary"
-                    }`}>{cat}</span>
+                      filters.category === cat.id ? "text-primary font-bold" : "text-muted-foreground group-hover:text-primary"
+                    }`}>{cat.label}</span>
                   </label>
                 ))}
               </div>
@@ -551,18 +568,23 @@ const BrowseTab = ({ navigate, externalSearch = "" }) => {
               <div className="space-y-2.5">
                 {LEVELS.map((lvl) => (
                   <label
-                    key={lvl}
+                    key={lvl.id}
                     className="flex items-center gap-3 cursor-pointer group"
-                    onClick={() => setFilters((f) => ({ ...f, level: f.level === lvl.toLowerCase() ? "" : lvl.toLowerCase() }))}
+                    onClick={() =>
+                      setFilters((f) => ({
+                        ...f,
+                        level: f.level === lvl.id ? "" : lvl.id,
+                      }))
+                    }
                   >
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                      filters.level === lvl.toLowerCase() ? "border-primary bg-primary" : "border-primary/20 group-hover:border-primary/40"
+                      filters.level === lvl.id ? "border-primary bg-primary" : "border-primary/20 group-hover:border-primary/40"
                     }`}>
-                      {filters.level === lvl.toLowerCase() && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                      {filters.level === lvl.id && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                     </div>
                     <span className={`text-xs font-medium transition-colors ${
-                      filters.level === lvl.toLowerCase() ? "text-primary font-bold" : "text-muted-foreground group-hover:text-primary"
-                    }`}>{lvl}</span>
+                      filters.level === lvl.id ? "text-primary font-bold" : "text-muted-foreground group-hover:text-primary"
+                    }`}>{lvl.label}</span>
                   </label>
                 ))}
               </div>

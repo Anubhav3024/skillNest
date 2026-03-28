@@ -1,6 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const mongoSanitize = require("express-mongo-sanitize");
 const session = require("express-session");
 const passport = require("passport");
 const connectDB = require("./src/config/db");
@@ -25,6 +28,31 @@ const notificationRoutes = require("./src/modules/notification/routes/notificati
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
+
+app.disable("x-powered-by");
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
+
+if (isProduction) {
+  // Required for secure cookies/sessions behind reverse proxies (Render/NGINX/etc).
+  app.set("trust proxy", 1);
+}
+
+let MongoStore = null;
+if (isProduction) {
+  try {
+    MongoStore = require("connect-mongo");
+  } catch (error) {
+    throw new Error(
+      "Missing dependency: connect-mongo. Install it in api/ (npm i connect-mongo) for production session storage.",
+    );
+  }
+}
 
 const allowedOrigins = new Set(
   [
@@ -53,25 +81,80 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const sessionSecret = process.env.SESSION_SECRET || process.env.JWT_SECRET || "dev_session_secret";
-app.use(
-  session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    },
-  }),
-);
+const finalSessionSecret =
+  process.env.SESSION_SECRET || (isProduction ? null : "dev_session_secret");
+
+if (isProduction && !finalSessionSecret) {
+  throw new Error("SESSION_SECRET must be defined in production");
+}
+
+const sessionConfig = {
+  secret: finalSessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProduction,
+  },
+};
+
+if (isProduction) {
+  const sessionStoreUrl =
+    process.env.SESSION_STORE_URL || process.env.MONGO_URL;
+  if (!sessionStoreUrl) {
+    throw new Error(
+      "SESSION_STORE_URL or MONGO_URL must be defined in production",
+    );
+  }
+
+  const ttlSeconds = Number.parseInt(process.env.SESSION_TTL_SECONDS || "", 10);
+  if (!MongoStore) {
+    throw new Error("connect-mongo must be installed for production sessions");
+  }
+  sessionConfig.store = MongoStore.create({
+    mongoUrl: sessionStoreUrl,
+    ttl:
+      Number.isFinite(ttlSeconds) && ttlSeconds > 0
+        ? ttlSeconds
+        : 60 * 60 * 24 * 7,
+    autoRemove: "native",
+  });
+}
+
+app.use(session(sessionConfig));
 
 app.use(passport.initialize());
+app.use(passport.session());
+
+const globalRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: Number.parseInt(process.env.RATE_LIMIT_GLOBAL || "", 10) || 1200,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests, please try again later.",
+  },
+});
+
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: Number.parseInt(process.env.RATE_LIMIT_AUTH || "", 10) || 60,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many auth attempts, please try again later.",
+  },
+});
+
+app.use(globalRateLimiter);
 
 // Capture raw body for webhook signature verification
 app.use(
   express.json({
+    limit: "1mb",
     verify: (req, res, buf) => {
       if (req.originalUrl.includes("/webhook")) {
         req.rawBody = buf.toString();
@@ -80,10 +163,13 @@ app.use(
   }),
 );
 
+app.use(mongoSanitize({ replaceWith: "_" }));
+
 app.get("/health", (req, res) => {
   res.send("API is healthy :) ");
 });
 
+app.use("/auth", authRateLimiter);
 app.use("/auth", authRoutes);
 app.use("/media", mediaRoutes);
 app.use("/instructor/course", instructorCourseRoutes);
@@ -103,7 +189,9 @@ app.use("/student/activity", studentActivityRoutes);
 app.use("/notifications", notificationRoutes);
 
 app.use((err, req, res, next) => {
-  res.status(500).json({ success: false, message: err.message || "Something went wrong" });
+  res
+    .status(500)
+    .json({ success: false, message: err.message || "Something went wrong" });
 });
 
 const http = require("http");
@@ -113,8 +201,9 @@ const server = http.createServer(app);
 initSocket(server);
 
 connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`
+  server
+    .listen(PORT, () => {
+      console.log(`
 -----------------------------------------
 🚀 SERVER INITIALIZED
 📍 PORT: ${PORT}
@@ -122,9 +211,10 @@ connectDB().then(() => {
 🔋 STATUS: Online
 -----------------------------------------
     `);
-  }).on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`
+    })
+    .on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.error(`
 ❌ CRITICAL ERROR: PORT ${PORT} IS ALREADY IN USE
 -----------------------------------------------
 The backend cannot start because port ${PORT} is being held by another process.
@@ -133,9 +223,9 @@ This often happens when a previous instance didn't shut down correctly.
 RECOMMENDED ACTION: Run 'npx kill-port ${PORT}' or restart the terminal.
 -----------------------------------------------
       `);
-      process.exit(1);
-    } else {
-      console.error("SERVER ERROR:", err);
-    }
-  });
+        process.exit(1);
+      } else {
+        console.error("SERVER ERROR:", err);
+      }
+    });
 });

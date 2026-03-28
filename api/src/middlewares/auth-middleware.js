@@ -1,18 +1,37 @@
 const jwt = require("jsonwebtoken");
 const { normalizeRole } = require("../utils/role");
 
+const parseCookies = (cookieHeader = "") =>
+  cookieHeader
+    .split(";")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .reduce((acc, pair) => {
+      const separator = pair.indexOf("=");
+      if (separator < 0) return acc;
+      const key = decodeURIComponent(pair.slice(0, separator).trim());
+      const value = decodeURIComponent(pair.slice(separator + 1).trim());
+      acc[key] = value;
+      return acc;
+    }, {});
+
 const authenticate = async (req, res, next) => {
   let token;
 
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer")) {
-      return res
-        .status(401)
-        .json({ success: "false", message: "No token hence no authroization" });
+    if (authHeader && authHeader.startsWith("Bearer")) {
+      token = authHeader.split(" ")[1];
+    } else {
+      const cookies = parseCookies(req.headers.cookie || "");
+      token = cookies.accessToken;
     }
 
-    token = authHeader.split(" ")[1];
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided for authorization" });
+    }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = {

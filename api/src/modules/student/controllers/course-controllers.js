@@ -1,6 +1,7 @@
 const Course = require("../../../models/course");
 const StudentCourses = require("../../../models/student-courses");
 const User = require("../../../models/user");
+const mongoose = require("mongoose");
 
 const escapeRegex = (input = "") =>
   input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -12,10 +13,19 @@ const getAllStudentViewCourses = async (req, res) => {
       level = [],
       primaryLanguage = [],
       sortBy = "price-lowtohigh",
-      page = 1,
-      limit = 12,
+      page: rawPage = 1,
+      limit: rawLimit = 12,
       search = "",
     } = req.query;
+
+    const parsedPage = Number.parseInt(rawPage, 10);
+    const parsedLimit = Number.parseInt(rawLimit, 10);
+    const page =
+      Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+    const limit =
+      Number.isFinite(parsedLimit) && parsedLimit >= 1
+        ? Math.min(parsedLimit, 50)
+        : 12;
 
     let filters = { isPublished: true };
 
@@ -95,23 +105,28 @@ const getStudentViewCourseDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!id) {
-      console.log("id undefined");
-      return;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course id",
+      });
     }
 
-    const courseDetails = await Course.findById(id).lean();
+    const courseDetails = await Course.findOne({
+      _id: id,
+      isPublished: true,
+    }).lean();
 
     if (!courseDetails) {
       return res.status(404).json({
         success: false,
-        message: "Error fetching details of the specific course",
+        message: "Course not found",
       });
     }
 
     // Fetch instructor details to include avatar and bio
     const instructorDetails = await User.findById(courseDetails.instructorId)
-      .select("avatar philosophy socialLinks experience userName userEmail")
+      .select("avatar philosophy socialLinks experience userName")
       .lean();
 
     return res.status(200).json({
@@ -119,7 +134,7 @@ const getStudentViewCourseDetails = async (req, res) => {
       message: "Course details fetched successfully",
       courseDetails: {
         ...courseDetails,
-        instructorDetails
+        instructorDetails,
       },
     });
   } catch (error) {
@@ -134,17 +149,24 @@ const checkCoursePurchaseInfo = async (req, res) => {
   try {
     const { id, studentId } = req.params;
 
+    if (
+      String(req.user?._id || "") !== String(studentId) &&
+      req.user?.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
+      });
+    }
+
     const coursesBoughtByCurrentStudent = await StudentCourses.findOne({
       userId: studentId,
     });
-    
-
 
     const boughtOrNot =
       coursesBoughtByCurrentStudent?.courses?.findIndex(
-        (item) => item.courseId === id
+        (item) => String(item.courseId) === String(id),
       ) > -1;
-
 
     return res.status(200).json({
       success: true,
@@ -158,4 +180,8 @@ const checkCoursePurchaseInfo = async (req, res) => {
   }
 };
 
-module.exports = { getAllStudentViewCourses, getStudentViewCourseDetails, checkCoursePurchaseInfo };
+module.exports = {
+  getAllStudentViewCourses,
+  getStudentViewCourseDetails,
+  checkCoursePurchaseInfo,
+};

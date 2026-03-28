@@ -18,7 +18,7 @@ import {
   resetCourseProgressService,
 } from "@/services";
 import { Check, ChevronLeft, ChevronRight, Play } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -50,7 +50,7 @@ const StudentCourseProgress = () => {
       setShowConfetti(false);
       setShowCourseCompleteDialog(false);
 
-      const fetchCurrentCourseProgress = async (req, res) => {
+      const fetchCurrentCourseProgress = async () => {
         const response = await getStudentCurrentCourseProgressService(
           auth?.user?._id,
           id
@@ -95,7 +95,7 @@ const StudentCourseProgress = () => {
   };
 
   useEffect(() => {
-    const fetchCurrentCourseProgress = async (req, res) => {
+    const fetchCurrentCourseProgress = async () => {
       const response = await getStudentCurrentCourseProgressService(
         auth?.user?._id,
         id
@@ -152,7 +152,7 @@ const StudentCourseProgress = () => {
 
           if (response?.success) {
 
-            const fetchCurrentCourseProgress = async (req, res) => {
+            const fetchCurrentCourseProgress = async () => {
               const response = await getStudentCurrentCourseProgressService(
                 auth?.user?._id,
                 id

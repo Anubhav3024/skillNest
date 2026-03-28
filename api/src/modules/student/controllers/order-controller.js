@@ -49,7 +49,8 @@ const createOrder = async (req, res) => {
     if (!Number.isFinite(coursePricing) || coursePricing <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Invalid course pricing. Please set a valid price before purchase.",
+        message:
+          "Invalid course pricing. Please set a valid price before purchase.",
       });
     }
 
@@ -67,7 +68,8 @@ const createOrder = async (req, res) => {
     }
 
     const rawReceipt = `rcpt_${Date.now().toString(36)}_${String(userId).slice(-6)}`;
-    const receipt = rawReceipt.length > 40 ? rawReceipt.slice(0, 40) : rawReceipt;
+    const receipt =
+      rawReceipt.length > 40 ? rawReceipt.slice(0, 40) : rawReceipt;
 
     const options = {
       amount: Math.round(coursePricing * 100),
@@ -137,7 +139,12 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
       orderId,
     } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !orderId) {
+    if (
+      !razorpay_order_id ||
+      !razorpay_payment_id ||
+      !razorpay_signature ||
+      !orderId
+    ) {
       return res.status(400).json({
         success: false,
         message: "Missing payment verification details",
@@ -252,15 +259,23 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
               },
             },
           },
-          { session }
+          { session },
         );
-        
-        // 💰 Create Transaction Record (90/10 Split)
-        const platformFee = Number((updatedOrder.coursePricing * 0.1).toFixed(2));
-        const instructorShare = Number((updatedOrder.coursePricing * 0.9).toFixed(2));
 
-        const instructor = await User.findById(updatedOrder.instructorId).session(session);
-        const existingTx = await Transaction.findOne({ orderId: updatedOrder._id }).session(session);
+        // 💰 Create Transaction Record (90/10 Split)
+        const platformFee = Number(
+          (updatedOrder.coursePricing * 0.1).toFixed(2),
+        );
+        const instructorShare = Number(
+          (updatedOrder.coursePricing * 0.9).toFixed(2),
+        );
+
+        const instructor = await User.findById(
+          updatedOrder.instructorId,
+        ).session(session);
+        const existingTx = await Transaction.findOne({
+          orderId: updatedOrder._id,
+        }).session(session);
 
         if (!existingTx) {
           const transaction = new Transaction({
@@ -286,10 +301,11 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
     }
 
     if (!processed) {
+      const latestOrder = await Order.findById(order._id);
       return res.status(200).json({
         success: true,
         message: "Order already confirmed",
-        order,
+        order: latestOrder || order,
       });
     }
 
@@ -301,34 +317,50 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
       courseTitle: finalOrder.courseTitle,
       amount: finalOrder.coursePricing,
       userName: finalOrder.userName,
-      message: `New enrollment for "${finalOrder.courseTitle}" by ${finalOrder.userName}! 🥂`
+      message: `New enrollment for "${finalOrder.courseTitle}" by ${finalOrder.userName}! 🥂`,
     });
 
-    await createNotification({
-      recipientId: finalOrder.instructorId,
-      recipientRole: "instructor",
-      senderId: finalOrder.userId,
-      senderName: finalOrder.userName,
-      title: "New paid enrollment",
-      message: `${finalOrder.userName} enrolled in "${finalOrder.courseTitle}" and completed payment.`,
-      type: "PAYMENT",
-      courseId: finalOrder.courseId,
-      entityType: "order",
-      entityId: String(finalOrder._id),
-      link: "/instructor?tab=earnings",
-      metadata: {
-        courseTitle: finalOrder.courseTitle,
-        amount: finalOrder.coursePricing,
-      },
-    });
+    try {
+      await createNotification({
+        recipientId: finalOrder.instructorId,
+        recipientRole: "instructor",
+        senderId: finalOrder.userId,
+        senderName: finalOrder.userName,
+        title: "New paid enrollment",
+        message: `${finalOrder.userName} enrolled in "${finalOrder.courseTitle}" and completed payment.`,
+        type: "PAYMENT",
+        courseId: finalOrder.courseId,
+        entityType: "order",
+        entityId: String(finalOrder._id),
+        link: "/instructor?tab=earnings",
+        metadata: {
+          courseTitle: finalOrder.courseTitle,
+          amount: finalOrder.coursePricing,
+        },
+      });
+    } catch (notificationError) {
+      console.error("Payment notification side-effect failed", {
+        orderId: String(finalOrder._id),
+        userId: String(finalOrder.userId),
+        error: notificationError.message,
+      });
+    }
     // 🎓 Log Course Enrollment Activity
-    await Activity.create({
-      userId: finalOrder.userId,
-      type: "COURSE_ENROLL",
-      courseId: finalOrder.courseId,
-      courseTitle: finalOrder.courseTitle,
-      metadata: { orderId: finalOrder._id, amount: finalOrder.coursePricing }
-    });
+    try {
+      await Activity.create({
+        userId: finalOrder.userId,
+        type: "COURSE_ENROLL",
+        courseId: finalOrder.courseId,
+        courseTitle: finalOrder.courseTitle,
+        metadata: { orderId: finalOrder._id, amount: finalOrder.coursePricing },
+      });
+    } catch (activityError) {
+      console.error("Activity side-effect failed", {
+        orderId: String(finalOrder._id),
+        userId: String(finalOrder.userId),
+        error: activityError.message,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -389,9 +421,16 @@ const handleWebhook = async (req, res) => {
       });
     }
 
-    const rawBody = req.rawBody
-      ? (Buffer.isBuffer(req.rawBody) ? req.rawBody.toString() : String(req.rawBody))
-      : JSON.stringify(req.body);
+    if (!req.rawBody) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing raw webhook payload",
+      });
+    }
+
+    const rawBody = Buffer.isBuffer(req.rawBody)
+      ? req.rawBody.toString()
+      : String(req.rawBody);
 
     const expectedSignature = crypto
       .createHmac("sha256", webhookSecret)
@@ -463,7 +502,7 @@ const handleWebhook = async (req, res) => {
                 },
               },
             },
-            { upsert: true, session }
+            { upsert: true, session },
           );
 
           await Course.findByIdAndUpdate(
@@ -478,15 +517,23 @@ const handleWebhook = async (req, res) => {
                 },
               },
             },
-            { session }
+            { session },
           );
 
           // 💰 Create Transaction Record (90/10 Split)
-          const platformFee = Number((updatedOrder.coursePricing * 0.1).toFixed(2));
-          const instructorShare = Number((updatedOrder.coursePricing * 0.9).toFixed(2));
+          const platformFee = Number(
+            (updatedOrder.coursePricing * 0.1).toFixed(2),
+          );
+          const instructorShare = Number(
+            (updatedOrder.coursePricing * 0.9).toFixed(2),
+          );
 
-          const instructor = await User.findById(updatedOrder.instructorId).session(session);
-          const existingTx = await Transaction.findOne({ orderId: updatedOrder._id }).session(session);
+          const instructor = await User.findById(
+            updatedOrder.instructorId,
+          ).session(session);
+          const existingTx = await Transaction.findOne({
+            orderId: updatedOrder._id,
+          }).session(session);
 
           if (!existingTx) {
             const transaction = new Transaction({
@@ -519,35 +566,53 @@ const handleWebhook = async (req, res) => {
           courseTitle: finalOrder.courseTitle,
           amount: finalOrder.coursePricing,
           userName: finalOrder.userName,
-          message: `New enrollment for "${finalOrder.courseTitle}" by ${finalOrder.userName}! 🥂 (Webhook)`
+          message: `New enrollment for "${finalOrder.courseTitle}" by ${finalOrder.userName}! 🥂 (Webhook)`,
         });
 
-        await createNotification({
-          recipientId: finalOrder.instructorId,
-          recipientRole: "instructor",
-          senderId: finalOrder.userId,
-          senderName: finalOrder.userName,
-          title: "New paid enrollment",
-          message: `${finalOrder.userName} enrolled in "${finalOrder.courseTitle}" and payment was captured.`,
-          type: "PAYMENT",
-          courseId: finalOrder.courseId,
-          entityType: "order",
-          entityId: String(finalOrder._id),
-          link: "/instructor?tab=earnings",
-          metadata: {
-            courseTitle: finalOrder.courseTitle,
-            amount: finalOrder.coursePricing,
-            source: "webhook",
-          },
-        });
+        try {
+          await createNotification({
+            recipientId: finalOrder.instructorId,
+            recipientRole: "instructor",
+            senderId: finalOrder.userId,
+            senderName: finalOrder.userName,
+            title: "New paid enrollment",
+            message: `${finalOrder.userName} enrolled in "${finalOrder.courseTitle}" and payment was captured.`,
+            type: "PAYMENT",
+            courseId: finalOrder.courseId,
+            entityType: "order",
+            entityId: String(finalOrder._id),
+            link: "/instructor?tab=earnings",
+            metadata: {
+              courseTitle: finalOrder.courseTitle,
+              amount: finalOrder.coursePricing,
+              source: "webhook",
+            },
+          });
+        } catch (notificationError) {
+          console.error("Webhook notification side-effect failed", {
+            orderId: String(finalOrder._id),
+            error: notificationError.message,
+          });
+        }
         // 🎓 Log Course Enrollment Activity
-        await Activity.create({
-          userId: finalOrder.userId,
-          type: "COURSE_ENROLL",
-          courseId: finalOrder.courseId,
-          courseTitle: finalOrder.courseTitle,
-          metadata: { orderId: finalOrder._id, amount: finalOrder.coursePricing, source: "webhook" }
-        });
+        try {
+          await Activity.create({
+            userId: finalOrder.userId,
+            type: "COURSE_ENROLL",
+            courseId: finalOrder.courseId,
+            courseTitle: finalOrder.courseTitle,
+            metadata: {
+              orderId: finalOrder._id,
+              amount: finalOrder.coursePricing,
+              source: "webhook",
+            },
+          });
+        } catch (activityError) {
+          console.error("Webhook activity side-effect failed", {
+            orderId: String(finalOrder._id),
+            error: activityError.message,
+          });
+        }
       }
     }
 

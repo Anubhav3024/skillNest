@@ -89,7 +89,10 @@ const NotificationDropdown = ({ userId, role }) => {
   useEffect(() => {
     if (!userId) return undefined;
 
-    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    const socketBaseUrl = import.meta.env.DEV
+      ? undefined
+      : import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL || undefined;
+    const socket = io(socketBaseUrl);
     socket.emit(roomEvent, userId);
     socket.on("new-notification", (payload) => {
       setNotifications((current) => {

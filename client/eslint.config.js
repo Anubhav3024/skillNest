@@ -28,11 +28,24 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
       'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
+    },
+  },
+  {
+    files: [
+      'vite.config.js',
+      'tailwind.config.js',
+      'postcss.config.js',
+      'eslint.config.js',
+    ],
+    languageOptions: {
+      globals: globals.node,
     },
   },
 ]

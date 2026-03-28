@@ -36,7 +36,9 @@ const addReview = async (req, res) => {
       });
     }
 
-    const course = await Course.findById(courseId).select("_id title");
+    const course = await Course.findById(courseId).select(
+      "_id title instructorId",
+    );
     if (!course) {
       return res.status(404).json({
         success: false,
@@ -58,7 +60,9 @@ const addReview = async (req, res) => {
       });
     }
 
-    const existingReview = await Review.findOne({ courseId, userId }).select("_id");
+    const existingReview = await Review.findOne({ courseId, userId }).select(
+      "_id",
+    );
 
     const review = await Review.findOneAndUpdate(
       { courseId, userId },
@@ -78,26 +82,30 @@ const addReview = async (req, res) => {
     );
 
     if (course.instructorId && String(course.instructorId) !== String(userId)) {
-      await createNotification({
-        recipientId: course.instructorId,
-        recipientRole: "instructor",
-        senderId: userId,
-        senderName: userName,
-        title: existingReview ? "Feedback updated" : "New feedback received",
-        message: existingReview
-          ? `${userName} updated feedback for "${course.title}".`
-          : `${userName} shared new feedback for "${course.title}".`,
-        type: "FEEDBACK",
-        courseId: course._id,
-        entityType: "review",
-        entityId: String(review._id),
-        link: "/instructor?tab=students",
-        metadata: {
-          courseTitle: course.title,
-          rating: numericRating,
-          reviewText: trimmedReviewText,
-        },
-      });
+      try {
+        await createNotification({
+          recipientId: course.instructorId,
+          recipientRole: "instructor",
+          senderId: userId,
+          senderName: userName,
+          title: existingReview ? "Feedback updated" : "New feedback received",
+          message: existingReview
+            ? `${userName} updated feedback for "${course.title}".`
+            : `${userName} shared new feedback for "${course.title}".`,
+          type: "FEEDBACK",
+          courseId: course._id,
+          entityType: "review",
+          entityId: String(review._id),
+          link: "/instructor?tab=students",
+          metadata: {
+            courseTitle: course.title,
+            rating: numericRating,
+            reviewText: trimmedReviewText,
+          },
+        });
+      } catch (notificationError) {
+        console.error("Review notification failed:", notificationError);
+      }
     }
 
     return res.status(201).json({
@@ -136,7 +144,9 @@ const getReviewsByCourseId = async (req, res) => {
     }));
 
     const currentUserReview = currentUserId
-      ? reviews.find((review) => String(review.userId) === String(currentUserId)) || null
+      ? reviews.find(
+          (review) => String(review.userId) === String(currentUserId),
+        ) || null
       : null;
 
     return res.status(200).json({

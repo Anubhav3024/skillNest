@@ -64,7 +64,10 @@ const InstructorDashboardPage = () => {
   useEffect(() => {
     if (!auth?.user?._id) return;
 
-    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    const socketBaseUrl = import.meta.env.DEV
+      ? undefined
+      : import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL || undefined;
+    const socket = io(socketBaseUrl);
     
     socket.emit("join-instructor", auth.user._id);
 

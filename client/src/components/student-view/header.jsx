@@ -11,6 +11,8 @@ const StudentViewCommonHeader = () => {
   const { resetCredentials, auth } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const showSearch = !!auth?.authenticated;
+
   const handleSearch = (e) => {
     if (e.key === "Enter" && searchQuery.trim() !== "") {
       navigate(`/home?tab=browse&search=${encodeURIComponent(searchQuery)}`);
@@ -38,17 +40,19 @@ const StudentViewCommonHeader = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative hidden md:flex items-center">
-            <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search courses..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
-              className="pl-10 pr-4 py-2 w-48 lg:w-64 rounded-full bg-muted border-none focus:ring-2 focus:ring-primary/40 outline-none transition-all text-sm font-body"
-            />
-          </div>
+          {showSearch && (
+            <div className="relative hidden md:flex items-center">
+              <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                className="pl-10 pr-4 py-2 w-48 lg:w-64 rounded-full bg-muted border-none focus:ring-2 focus:ring-primary/40 outline-none transition-all text-sm font-body"
+              />
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             {auth?.authenticated ? (

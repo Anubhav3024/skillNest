@@ -7,6 +7,20 @@ const getActivityOverview = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    if (!req.user?._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    if (String(req.user._id) !== String(userId) && req.user?.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
+      });
+    }
+
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -24,7 +38,10 @@ const getActivityOverview = async (req, res) => {
     const allCourseProgress = await CourseProgress.find({ userId });
     let lecturesWatched = 0;
     allCourseProgress.forEach((progress) => {
-      lecturesWatched += progress.lecturesProgress.filter((l) => l.viewed).length;
+      const lecturesProgress = Array.isArray(progress.lecturesProgress)
+        ? progress.lecturesProgress
+        : [];
+      lecturesWatched += lecturesProgress.filter((l) => l?.viewed).length;
     });
 
     // 3. Total Enrolled

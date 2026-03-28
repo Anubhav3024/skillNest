@@ -6,7 +6,7 @@ const configuredBaseUrl = (
   ""
 ).trim();
 
-const baseURL = configuredBaseUrl || "http://localhost:5000";
+const baseURL = (import.meta.env.DEV ? "" : configuredBaseUrl) || "";
 
 const axiosInstance = axios.create({
   baseURL,

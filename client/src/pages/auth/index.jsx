@@ -4,6 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { Github } from "lucide-react";
 import { toast } from "react-toastify";
+import { exchangeOAuthTicketService } from "@/services";
+import { normalizeRole } from "@/utils/role";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -29,12 +31,46 @@ const AuthPage = () => {
     const params = new URLSearchParams(location.search);
     const oauth = params.get("oauth");
     const token = params.get("token");
+    const ticket = params.get("ticket");
     const error = params.get("error");
+    const reason = params.get("reason");
 
     if (oauth && error) {
       const provider =
         oauth === "google" ? "Google" : oauth === "github" ? "GitHub" : "OAuth";
-      toast.error(`${provider} login failed. Please try again.`);
+      toast.error(
+        reason
+          ? decodeURIComponent(reason)
+          : `${provider} login failed. Please try again.`,
+      );
+      return;
+    }
+
+    if (oauth && ticket) {
+      (async () => {
+        try {
+          const data = await exchangeOAuthTicketService(ticket);
+          if (data?.success && data?.accessToken) {
+            localStorage.setItem("accessToken", data.accessToken);
+            if (data.user) {
+              localStorage.setItem("user", JSON.stringify(data.user));
+            } else {
+              localStorage.removeItem("user");
+            }
+            const role = normalizeRole(data.user?.role);
+            window.location.replace(role === "instructor" ? "/instructor" : "/");
+            return;
+          }
+
+          toast.error(data?.message || "OAuth exchange failed. Please retry.");
+        } catch (exchangeError) {
+          console.error("OAuth exchange error:", exchangeError);
+          toast.error(
+            exchangeError?.response?.data?.message ||
+              "OAuth exchange failed. Please retry.",
+          );
+        }
+      })();
       return;
     }
 

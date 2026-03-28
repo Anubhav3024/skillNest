@@ -15,15 +15,11 @@ const InstructorDashboardPage = lazy(() => import("./pages/instructor"));
 const AddNewCoursePage = lazy(() =>
   import("./pages/instructor/add-new-course")
 );
-const StudentViewCoursesPage = lazy(() => import("./pages/student/courses"));
 const StudentViewCourseDetailsPage = lazy(() =>
   import("./pages/student/course-details")
 );
 const PaypalPaymentReturnPage = lazy(() =>
   import("./pages/student/payment-return")
-);
-const StudentCoursesPage = lazy(() =>
-  import("./pages/student/student-courses")
 );
 const StudentCourseProgress = lazy(() =>
   import("./pages/student/course-progress")

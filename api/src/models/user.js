@@ -25,16 +25,14 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "instructor"],
+      enum: ["student", "instructor", "admin"],
       required: true,
     },
     githubId: {
       type: String,
-      default: "",
     },
     googleId: {
       type: String,
-      default: "",
     },
     avatar: {
       type: String,
@@ -87,7 +85,8 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// UserSchema.index({ userEmail: 1 }, { unique: true });
-// UserSchema.index({ userName: 1 }, { unique: true });
+UserSchema.index({ userName: 1 }, { unique: true });
+UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
+UserSchema.index({ googleId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
 const Course = require("../../../models/course");
 const { deleteMediaFromCloudinary } = require("../../../utils/cloudinary");
-const { createBulkNotifications } = require("../../../utils/notification-service");
+const {
+  createBulkNotifications,
+} = require("../../../utils/notification-service");
 
 const hasMeaningfulValue = (value) =>
-  value !== undefined && value !== null && !(typeof value === "string" && value.trim() === "");
+  value !== undefined &&
+  value !== null &&
+  !(typeof value === "string" && value.trim() === "");
+
+const isDeepEqual = (left, right) =>
+  JSON.stringify(left) === JSON.stringify(right);
 
 const formatReadableDate = (value) => {
   if (!value) return null;
@@ -17,7 +24,11 @@ const formatReadableDate = (value) => {
   });
 };
 
-const buildCourseChangeNotifications = ({ previousCourse, updatedCourse, sender }) => {
+const buildCourseChangeNotifications = ({
+  previousCourse,
+  updatedCourse,
+  sender,
+}) => {
   const recipients = (previousCourse.students || [])
     .map((student) => student.studentId)
     .filter(Boolean);
@@ -52,7 +63,9 @@ const buildCourseChangeNotifications = ({ previousCourse, updatedCourse, sender 
       link: `/course/details/${updatedCourse._id}`,
       metadata: {
         courseTitle: updatedCourse.title,
-        lectureTitles: newLectures.map((lecture) => lecture.title).filter(Boolean),
+        lectureTitles: newLectures
+          .map((lecture) => lecture.title)
+          .filter(Boolean),
       },
     });
   }
@@ -73,22 +86,37 @@ const buildCourseChangeNotifications = ({ previousCourse, updatedCourse, sender 
   }
 
   const updatedFields = [];
-  if (hasMeaningfulValue(updatedCourse.subtitle) && previousCourse.subtitle !== updatedCourse.subtitle) {
+  if (
+    hasMeaningfulValue(updatedCourse.subtitle) &&
+    previousCourse.subtitle !== updatedCourse.subtitle
+  ) {
     updatedFields.push("course summary");
   }
-  if (hasMeaningfulValue(updatedCourse.welcomeMessage) && previousCourse.welcomeMessage !== updatedCourse.welcomeMessage) {
+  if (
+    hasMeaningfulValue(updatedCourse.welcomeMessage) &&
+    previousCourse.welcomeMessage !== updatedCourse.welcomeMessage
+  ) {
     updatedFields.push("welcome note");
   }
-  if (hasMeaningfulValue(updatedCourse.description) && previousCourse.description !== updatedCourse.description) {
+  if (
+    hasMeaningfulValue(updatedCourse.description) &&
+    previousCourse.description !== updatedCourse.description
+  ) {
     updatedFields.push("course details");
   }
-  if (hasMeaningfulValue(updatedCourse.objectives) && previousCourse.objectives !== updatedCourse.objectives) {
+  if (
+    hasMeaningfulValue(updatedCourse.objectives) &&
+    !isDeepEqual(previousCourse.objectives, updatedCourse.objectives)
+  ) {
     updatedFields.push("learning goals");
   }
   if (curriculumChanged && newLectures.length === 0) {
     updatedFields.push("course materials");
   }
-  if (previousCourse.status !== updatedCourse.status && hasMeaningfulValue(updatedCourse.status)) {
+  if (
+    previousCourse.status !== updatedCourse.status &&
+    hasMeaningfulValue(updatedCourse.status)
+  ) {
     updatedFields.push("availability status");
   }
 
@@ -120,7 +148,7 @@ const buildCourseChangeNotifications = ({ previousCourse, updatedCourse, sender 
 };
 
 const addNewCourse = async (req, res) => {
-// ... existing code ...
+  // ... existing code ...
   try {
     const courseData = {
       ...req.body,
@@ -157,7 +185,9 @@ const getAllCourses = async (req, res) => {
 
     // Ownership Check: Strictly enforce data isolation
     if (String(instructorId) !== requesterId && req.user?.role !== "admin") {
-      console.warn(`Unauthorized course access attempt: ${requesterId} tried to access ${instructorId}`);
+      console.warn(
+        `Unauthorized course access attempt: ${requesterId} tried to access ${instructorId}`,
+      );
       return res.status(403).json({
         success: false,
         message: "Forbidden: You can only access your own manifests",
@@ -176,9 +206,9 @@ const getAllCourses = async (req, res) => {
       {
         $addFields: {
           revenue: { $sum: "$students.paidAmount" },
-          studentCount: { $size: "$students" }
-        }
-      }
+          studentCount: { $size: "$students" },
+        },
+      },
     ];
 
     // Sorting logic based on sort parameter
@@ -219,6 +249,8 @@ const getAllCourses = async (req, res) => {
 const getCourseDetailsById = async (req, res) => {
   try {
     const { id } = req.params;
+    const requesterId = String(req.user?._id || "");
+    const requesterRole = req.user?.role;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -236,12 +268,21 @@ const getCourseDetailsById = async (req, res) => {
       });
     }
 
+    // Instructor routes should be isolated to the owning instructor (or admin).
+    if (requesterRole !== "admin" && String(courseDetails.instructorId) !== requesterId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: you can only access your own courses",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Course details fetched successfully",
       courseDetails,
     });
   } catch (error) {
+    console.error("Error fetching course details:", error);
     return res.status(500).json({
       success: false,
       message: "Error fetching course details",
@@ -266,9 +307,15 @@ const updateCourseById = async (req, res) => {
       });
     }
 
-    console.log("Course owner check:", { ownerId: course.instructorId, requesterId });
+    console.log("Course owner check:", {
+      ownerId: course.instructorId,
+      requesterId,
+    });
     if (String(course.instructorId) !== requesterId) {
-      console.log("Update failed: Permission denied", { ownerId: course.instructorId, requesterId });
+      console.log("Update failed: Permission denied", {
+        ownerId: course.instructorId,
+        requesterId,
+      });
       return res.status(403).json({
         success: false,
         message: "Forbidden: you can only update your own courses",
@@ -291,7 +338,12 @@ const updateCourseById = async (req, res) => {
     });
 
     if (notifications.length > 0) {
-      await createBulkNotifications(notifications);
+      createBulkNotifications(notifications).catch((notificationError) => {
+        console.error(
+          "Failed to create course update notifications:",
+          notificationError,
+        );
+      });
     }
 
     return res.status(200).json({
@@ -353,7 +405,10 @@ const deleteCourse = async (req, res) => {
         }
       }
     } catch (mediaError) {
-      console.error("Error purging media assets during course deletion:", mediaError);
+      console.error(
+        "Error purging media assets during course deletion:",
+        mediaError,
+      );
       // We continue deletion of the DB record even if media purging fails partly
     }
 

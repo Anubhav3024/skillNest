@@ -11,14 +11,49 @@ const { normalizeRole } = require("../../../utils/role");
 const { isValidRole } = require("../../../utils/role");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const {
+  issueOAuthTicket,
+  consumeOAuthTicket,
+} = require("../../../utils/oauth-ticket-store");
 
 const router = require("express").Router();
 
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET must be defined before starting auth routes");
+}
+
+const clientUrl = String(
+  process.env.CLIENT_URL || "http://localhost:5173",
+).trim();
+
+const oauthCookieClearOptions = {
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+};
+
+const fetchAndNormalizeUser = async (userId) => {
+  const user = await User.findById(userId).select("-userPassword");
+  if (!user) return null;
+
+  const normalizedRole = normalizeRole(user.role);
+  if (normalizedRole && normalizedRole !== user.role) {
+    user.role = normalizedRole;
+    await user.save();
+  }
+
+  return user;
+};
+
+const hasEnv = (key) => String(process.env[key] || "").trim() !== "";
+
 const isGitHubConfigured = () =>
   Boolean(
-    process.env.GITHUB_CLIENT_ID &&
-      process.env.GITHUB_CLIENT_SECRET &&
-      process.env.GITHUB_CALLBACK_URL,
+    hasEnv("GITHUB_CLIENT_ID") &&
+    hasEnv("GITHUB_CLIENT_SECRET") &&
+    hasEnv("GITHUB_CALLBACK_URL"),
   );
 
 const ensureGitHubConfigured = (req, res, next) => {
@@ -33,9 +68,9 @@ const ensureGitHubConfigured = (req, res, next) => {
 
 const isGoogleConfigured = () =>
   Boolean(
-    process.env.GOOGLE_CLIENT_ID &&
-      process.env.GOOGLE_CLIENT_SECRET &&
-      process.env.GOOGLE_CALLBACK_URL,
+    hasEnv("GOOGLE_CLIENT_ID") &&
+    hasEnv("GOOGLE_CLIENT_SECRET") &&
+    hasEnv("GOOGLE_CALLBACK_URL"),
   );
 
 const ensureGoogleConfigured = (req, res, next) => {
@@ -50,124 +85,221 @@ const ensureGoogleConfigured = (req, res, next) => {
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.post("/logout", authenticate, logoutUser);
+router.post("/logout", authenticate, (req, res, next) => {
+  // Backwards compatible: older OAuth flow set an accessToken cookie.
+  // Always clear it so logout behaves consistently across auth methods.
+  res.clearCookie("accessToken", oauthCookieClearOptions);
+  return logoutUser(req, res, next);
+});
 router.post("/refresh-token", authenticate, refreshToken);
 router.get("/check-auth", authenticate, async (req, res) => {
-  const user = await User.findById(req.user?._id).select("-userPassword");
-  if (!user) {
-    return res.status(404).json({ success: false, message: "User not found" });
-  }
+  try {
+    const user = await fetchAndNormalizeUser(req.user?._id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
 
-  const normalizedRole = normalizeRole(user.role);
-  if (normalizedRole && normalizedRole !== user.role) {
-    user.role = normalizedRole;
-    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "User authenticated!!!",
+      user,
+    });
+  } catch (error) {
+    console.error("/check-auth error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to validate auth state",
+      details: error.message,
+    });
   }
-
-  return res.status(200).json({
-    success: true,
-    message: "User authenticated!!!",
-    user,
-  });
 });
 router.get("/me", authenticate, async (req, res) => {
-  const user = await User.findById(req.user?._id).select("-userPassword");
-  if (!user) {
-    return res.status(404).json({ success: false, message: "User not found" });
-  }
+  try {
+    const user = await fetchAndNormalizeUser(req.user?._id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
 
-  const normalizedRole = normalizeRole(user.role);
-  if (normalizedRole && normalizedRole !== user.role) {
-    user.role = normalizedRole;
-    await user.save();
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error("/me error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch current user",
+      details: error.message,
+    });
   }
-
-  return res.status(200).json({ success: true, user });
 });
 
 router.get("/github", ensureGitHubConfigured, (req, res, next) => {
   const role = normalizeRole(req.query.role);
   req.session.oauthRole = isValidRole(role) ? role : "student";
-  return req.session.save(() =>
-    passport.authenticate("github", {
-      scope: ["user:email"],
-    })(req, res, next),
-  );
-});
-
-router.get(
-  "/github/callback",
-  ensureGitHubConfigured,
-  passport.authenticate("github", {
-    session: false,
-    failureRedirect: `${process.env.CLIENT_URL || "http://localhost:5173"}/auth?oauth=github&error=1`,
-  }),
-  (req, res) => {
-    const user = req.user;
-    if (!user) {
-      return res.redirect(
-        `${process.env.CLIENT_URL || "http://localhost:5173"}/auth?oauth=github&error=1`,
-      );
+  return req.session.save((saveError) => {
+    if (saveError) {
+      return next(saveError);
     }
 
-    const accessToken = jwt.sign(
-      {
-        _id: user._id,
-        userName: user.userName,
-        userEmail: user.userEmail,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" },
-    );
+    return passport.authenticate("github", {
+      scope: ["user:email"],
+    })(req, res, next);
+  });
+});
 
-    return res.redirect(
-      `${process.env.CLIENT_URL || "http://localhost:5173"}/auth?oauth=github&token=${accessToken}`,
-    );
-  },
-);
+router.get("/github/callback", ensureGitHubConfigured, (req, res, next) => {
+  passport.authenticate("github", { session: false }, (err, user, info) => {
+    if (err) {
+      console.error("GitHub OAuth error:", err);
+      const reason = encodeURIComponent("GitHub login failed");
+      res.redirect(`${clientUrl}/auth?oauth=github&error=1&reason=${reason}`);
+      return;
+    }
+
+    (async () => {
+      if (!user) {
+        const reason = encodeURIComponent(info?.message || "GitHub login failed");
+        res.redirect(`${clientUrl}/auth?oauth=github&error=1&reason=${reason}`);
+        return;
+      }
+
+      // Issue a short-lived, one-time ticket that the SPA can exchange for a JWT.
+      // This avoids putting the JWT directly into the redirect URL.
+      const ticket = await issueOAuthTicket(
+        { userId: String(user._id) },
+        2 * 60 * 1000,
+      );
+
+      // Clear any previous cookie-based auth token to keep behavior consistent.
+      res.clearCookie("accessToken", oauthCookieClearOptions);
+
+      if (req.session?.oauthRole) {
+        req.session.oauthRole = undefined;
+      }
+
+      res.redirect(
+        `${clientUrl}/auth?oauth=github&ticket=${encodeURIComponent(ticket)}`,
+      );
+    })().catch((callbackError) => {
+      console.error("GitHub OAuth callback error:", callbackError);
+      const reason = encodeURIComponent("OAuth processing failed");
+      res.redirect(`${clientUrl}/auth?oauth=github&error=1&reason=${reason}`);
+    });
+  })(req, res, next);
+});
 
 router.get("/google", ensureGoogleConfigured, (req, res, next) => {
   const role = normalizeRole(req.query.role);
   req.session.oauthRole = isValidRole(role) ? role : "student";
-  return req.session.save(() =>
-    passport.authenticate("google", {
+  return req.session.save((saveError) => {
+    if (saveError) {
+      return next(saveError);
+    }
+
+    return passport.authenticate("google", {
       scope: ["profile", "email"],
       prompt: "select_account",
-    })(req, res, next),
-  );
+    })(req, res, next);
+  });
 });
 
-router.get(
-  "/google/callback",
-  ensureGoogleConfigured,
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: `${process.env.CLIENT_URL || "http://localhost:5173"}/auth?oauth=google&error=1`,
-  }),
-  (req, res) => {
-    const user = req.user;
-    if (!user) {
-      return res.redirect(
-        `${process.env.CLIENT_URL || "http://localhost:5173"}/auth?oauth=google&error=1`,
+router.get("/google/callback", ensureGoogleConfigured, (req, res, next) => {
+  passport.authenticate("google", { session: false }, (err, user, info) => {
+    if (err) {
+      console.error("Google OAuth error:", err);
+      const reason = encodeURIComponent("Google login failed");
+      res.redirect(`${clientUrl}/auth?oauth=google&error=1&reason=${reason}`);
+      return;
+    }
+
+    (async () => {
+      if (!user) {
+        const reason = encodeURIComponent(info?.message || "Google login failed");
+        res.redirect(`${clientUrl}/auth?oauth=google&error=1&reason=${reason}`);
+        return;
+      }
+
+      const ticket = await issueOAuthTicket(
+        { userId: String(user._id) },
+        2 * 60 * 1000,
       );
+
+      res.clearCookie("accessToken", oauthCookieClearOptions);
+
+      if (req.session?.oauthRole) {
+        req.session.oauthRole = undefined;
+      }
+
+      res.redirect(
+        `${clientUrl}/auth?oauth=google&ticket=${encodeURIComponent(ticket)}`,
+      );
+    })().catch((callbackError) => {
+      console.error("Google OAuth callback error:", callbackError);
+      const reason = encodeURIComponent("OAuth processing failed");
+      res.redirect(`${clientUrl}/auth?oauth=google&error=1&reason=${reason}`);
+    });
+  })(req, res, next);
+});
+
+router.post("/oauth/exchange", async (req, res) => {
+  try {
+    const ticket = String(req.body?.ticket || "").trim();
+
+    if (!ticket) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing OAuth ticket",
+      });
+    }
+
+    const payload = await consumeOAuthTicket(ticket);
+    if (!payload) {
+      return res.status(410).json({
+        success: false,
+        message: "OAuth ticket expired or already used",
+      });
+    }
+
+    if (!payload.userId) {
+      return res.status(410).json({
+        success: false,
+        message: "OAuth ticket is invalid",
+      });
+    }
+
+    const safeUser = await fetchAndNormalizeUser(payload.userId);
+    if (!safeUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     const accessToken = jwt.sign(
       {
-        _id: user._id,
-        userName: user.userName,
-        userEmail: user.userEmail,
-        role: user.role,
+        _id: safeUser._id,
+        userName: safeUser.userName,
+        userEmail: safeUser.userEmail,
+        role: safeUser.role,
       },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "24h" },
     );
 
-    return res.redirect(
-      `${process.env.CLIENT_URL || "http://localhost:5173"}/auth?oauth=google&token=${accessToken}`,
-    );
-  },
-);
+    return res.status(200).json({
+      success: true,
+      accessToken,
+      user: safeUser,
+    });
+  } catch (error) {
+    console.error("OAuth ticket exchange error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to exchange OAuth ticket",
+    });
+  }
+});
 
 module.exports = router;

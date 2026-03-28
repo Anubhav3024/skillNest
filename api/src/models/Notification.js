@@ -21,6 +21,7 @@ const NotificationSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      default: "Untitled Notification",
     },
     message: {
       type: String,
@@ -44,7 +45,7 @@ const NotificationSchema = new mongoose.Schema(
     recipientRole: {
       type: String,
       enum: ["student", "instructor", "admin"],
-      default: "student",
+      required: true,
     },
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -75,7 +76,7 @@ const NotificationSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 NotificationSchema.index({ recipientId: 1, read: 1, createdAt: -1 });

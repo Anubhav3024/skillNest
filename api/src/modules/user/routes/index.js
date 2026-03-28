@@ -19,5 +19,7 @@ router.put("/change-password", authenticate, changePassword);
 router.get("/enrolled-courses/:userId", authenticate, getEnrolledCourses);
 router.get("/payment-history/:userId", authenticate, getPaymentHistory);
 router.delete("/delete/:userId", authenticate, deleteAccount);
+// Backwards-compatible alias used by older client builds
+router.delete("/delete-account/:userId", authenticate, deleteAccount);
 
 module.exports = router;
