@@ -1,0 +1,17 @@
+# Root .gitignore for SkillNest
+
+api/node_modules/
+client/node_modules/
+api/.env
+client/.env
+api/src/uploads/
+client/dist/
+
+# Standard Ignores
+node_modules/
+.env
+*.log
+.DS_Store
+.vscode/
+dist/
+build/
