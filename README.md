@@ -1,38 +1,36 @@
-# SkillNest – A Premium, Scalable Learning Management Platform
+﻿# SkillNest - A Premium, Scalable Learning Management Platform
 
 SkillNest is an industrial-grade Learning Management System (LMS) designed to bridge the gap between fragmented learning resources and professional skill development. Built from scratch with a focus on modern UI/UX, real-time engagement, and high-performance data handling, SkillNest empowers both educators and learners through a unified, high-fidelity digital ecosystem.
 
 ---
 
-## 📖 Overview
+## Overview
 SkillNest is more than just a course repository; it's a dynamic learning engine. It solves the problem of disconnected educational tools by providing a centralized platform where educators can build, manage, and scale their teaching business, while students benefit from a high-performance, interactive learning journey with real-time feedback and progress visualization.
 
 ---
 
-## ✨ Features
-
-### 🎓 For Students
+## Features
+### For Students
 - **Smart Course Discovery**: Advanced filtering and search functionality to find relevant skills indexed by category and level.
 - **Seamless Enrollment**: Integrated **Razorpay** payment gateway for instant, secure course access.
 - **Interactive Learning Journey**: A premium lecture player with automated progress tracking and persistence across devices.
 - **Activity Feed**: Real-time updates on achievements, new course drops, and peer engagement.
 - **Student Dashboard**: Data-driven insights into learning speed, course completion rates, and historical purchase records.
 
-### 👨‍🏫 For Educators
+### For Educators
 - **Advanced Course Builder**: A modular, multi-step curriculum creator with support for high-definition video uploads (Cloudinary).
 - **Sales & Engagement Analytics**: Deep-dive reporting using Recharts to track revenue, enrollment spikes, and student drop-off points.
 - **Real-Time Instructor Console**: Instant notifications for student enrollments and reviews powered by **Socket.io**.
 - **Student Management**: Direct oversight of learners, progress monitoring, and engagement metrics.
 
-### 🛡 Core System
+### Core System
 - **Hybrid Authentication**: Secure JWT-based registration paired with **OAuth2 (Google & GitHub)** for frictionless onboarding.
 - **Global Support Hub**: Integrated help-center with categorized knowledge bases and direct support messaging.
 - **Responsive Mastery**: A mobile-first, fluid UI design ensuring a premium experience on any screen size.
 
 ---
 
-## 🛠 Tech Stack
-
+## Tech Stack
 | Layer | Technology |
 | :--- | :--- |
 | **Frontend** | React (Vite), Tailwind CSS, Framer Motion, Lucide Icons |
@@ -45,7 +43,7 @@ SkillNest is more than just a course repository; it's a dynamic learning engine.
 
 ---
 
-## 🏗 Architecture & System Design
+## Architecture & System Design
 SkillNest follows a **Modular Monolith architecture** with a clear separation of concerns using the MVC (Model-View-Controller) design pattern.
 
 - **Frontend Architecture**: Atomic component design utilizing Radix UI for accessibility and Tailwind CSS for utility-first styling. Global state management for authentication and notifications.
@@ -55,9 +53,8 @@ SkillNest follows a **Modular Monolith architecture** with a clear separation of
 
 ---
 
-## 📊 High-Level Architecture & Workflows
-
-### 🔐 1. Authentication Workflow (Hybrid JWT + OAuth)
+## High-Level Architecture & Workflows
+### 1. Authentication Workflow (Hybrid JWT + OAuth)
 SkillNest uses a secure, ticket-based OAuth system and stateless JWT for session management.
 ```mermaid
 graph TD
@@ -74,7 +71,7 @@ graph TD
     H -->|Issue JWT| B
 ```
 
-### 📈 2. Student Dashboard Ecosystem
+### 2. Student Dashboard Ecosystem
 Real-time interaction and progress tracking powered by Socket.io and MongoDB Aggregations.
 ```mermaid
 graph LR
@@ -89,7 +86,7 @@ graph LR
     C -->|State Update| B
 ```
 
-### 🛠 3. Educator Management Path
+### 3. Educator Management Path
 Automated course lifecycle management from curriculum design to media delivery.
 ```mermaid
 graph TD
@@ -103,7 +100,7 @@ graph TD
     F -->|Recharts Visualization| B
 ```
 
-### 💸 4. Transaction & Enrollment Lifecycle
+### 4. Transaction & Enrollment Lifecycle
 A secure, signature-verified payment loop ensures data integrity during financial exchange.
 ```mermaid
 sequenceDiagram
@@ -130,8 +127,28 @@ sequenceDiagram
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
+## Deployment (Vercel + Render)
+
+This repo is a monorepo:
+- `client/` (Vite + React) deploy on Vercel
+- `api/` (Node + Express) deploy on Render
+
+### Backend (Render)
+1. Create a new **Web Service** on Render and connect the GitHub repo.
+2. Root directory: `api`
+3. Build command: `npm ci`
+4. Start command: `npm start`
+5. Add the environment variables from `api/.env.template` in Render dashboard.
+
+### Frontend (Vercel)
+1. Import the GitHub repo into Vercel.
+2. Project root: `client`
+3. Framework preset: **Vite**
+4. Build command: `npm run build`
+5. Output directory: `dist`
+6. Add `VITE_API_URL` (your Render backend URL) and `VITE_RAZORPAY_KEY_ID` in Vercel project env vars.
 ### Prerequisites
 - Node.js (v18+)
 - MongoDB Atlas (or local instance)
@@ -182,31 +199,29 @@ sequenceDiagram
 
 ---
 
-## 📁 Folder Structure
-
+## Folder Structure
 ```text
 skillnest/
-├── api/                  # Node.js/Express Backend
-│   ├── src/
-│   │   ├── modules/      # Domain-specific logic (Auth, Course, etc.)
-│   │   ├── models/       # Mongoose Database Schemas
-│   │   ├── config/       # Passport, DB, and Cloudinary config
-│   │   └── utils/        # Shared services (Sockets, logic helpers)
-│   └── index.js          # Server entry point
-├── client/               # React/Vite Frontend
-│   ├── src/
-│   │   ├── components/   # Reusable UI components
-│   │   ├── pages/        # Route-specific views
-│   │   ├── context/      # Auth & Global state providers
-│   │   └── services/     # API interaction layer
-│   └── tailwind.config.js
-└── README.md
+â”œâ”€â”€ api/                  # Node.js/Express Backend
+â”‚   â”œâ”€â”€ src/
+â”‚   â”‚   â”œâ”€â”€ modules/      # Domain-specific logic (Auth, Course, etc.)
+â”‚   â”‚   â”œâ”€â”€ models/       # Mongoose Database Schemas
+â”‚   â”‚   â”œâ”€â”€ config/       # Passport, DB, and Cloudinary config
+â”‚   â”‚   â””â”€â”€ utils/        # Shared services (Sockets, logic helpers)
+â”‚   â””â”€â”€ index.js          # Server entry point
+â”œâ”€â”€ client/               # React/Vite Frontend
+â”‚   â”œâ”€â”€ src/
+â”‚   â”‚   â”œâ”€â”€ components/   # Reusable UI components
+â”‚   â”‚   â”œâ”€â”€ pages/        # Route-specific views
+â”‚   â”‚   â”œâ”€â”€ context/      # Auth & Global state providers
+â”‚   â”‚   â””â”€â”€ services/     # API interaction layer
+â”‚   â””â”€â”€ tailwind.config.js
+â””â”€â”€ README.md
 ```
 
 ---
 
-## 🔌 API Documentation
-
+## API Documentation
 ### Authentication
 - `POST /auth/register` - Create a new user account.
 - `POST /auth/login` - Authenticate user and receive JWT.
@@ -224,8 +239,7 @@ skillnest/
 
 ---
 
-## 🧠 Challenges & Solutions
-
+## Challenges & Solutions
 - **Challenge**: Coordinating real-time "Activity Feeds" without high server load.
   - **Solution**: Implemented an event-driven pub-sub model using Socket.io, allowing the server to push updates only when specific "Activity" events are triggered in the database.
 - **Challenge**: Ensuring secure and idempotent payments.
@@ -235,8 +249,7 @@ skillnest/
 
 ---
 
-## ✅ Demo User Credentials
-
+## Demo User Credentials
 Use these accounts to explore the platform:
 
 | Role | Email | Password |
@@ -246,7 +259,7 @@ Use these accounts to explore the platform:
 
 ---
 
-## 🗺 Roadmap
+## Roadmap
 - [ ] AI-Powered Personalized Course Recommendations
 - [ ] Interactive Live Quiz & Gamification Engine
 - [ ] Mobile Application (React Native extension)
@@ -254,7 +267,7 @@ Use these accounts to explore the platform:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 1. Fork the Project.
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
@@ -263,13 +276,14 @@ Use these accounts to explore the platform:
 
 ---
 
-## 📄 License
+## License
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 👤 Author
+## Author
 **Anubhav**
 - GitHub: [your-github-handle](https://github.com/your-username)
 - LinkedIn: [Your Profile](https://linkedin.com/in/your-profile)
 - Email: your-email@example.com
+
