@@ -142,18 +142,11 @@ export default function AuthProvider({ children }) {
         setLoading(false);
       }
     } catch (error) {
-      console.log("Authentication check error", error);
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.status &&
-        error.response.data.status === 401
-      ) {
-        setAuth({
-          authenticated: false,
-          user: null,
-        });
-      }
+      // If the backend returns a real error (500, etc.), handle it silently for the check-auth pulse
+      setAuth({
+        authenticated: false,
+        user: null,
+      });
       setLoading(false);
     }
   };

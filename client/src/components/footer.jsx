@@ -1,16 +1,27 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Globe, Mail, Twitter } from "lucide-react";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleHomeClick = (e) => {
+    e.preventDefault();
+    if (location.pathname === "/" || location.pathname === "/home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+    }
+  };
   return (
     <footer className="w-full bg-emerald-950 text-white border-t border-white/5 py-16 px-6 md:px-12">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
         <div className="space-y-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-lg font-headline font-bold">
-              S
-            </div>
-            <span className="text-3xl font-headline font-black tracking-tighter block text-white">SkillNest</span>
+            <img src="/skillnestlog.png" alt="SkillNest Logo" className="w-[60px] h-[60px] object-contain transition-transform group-hover:scale-110" />
+            <span className="text-3xl font-headline font-black tracking-tighter block transition-colors">
+              <span className="text-[#0d694f]">Skill</span><span className="text-[#ff7e5f]">Nest</span>
+            </span>
           </div>
           <p className="text-emerald-100/40 font-medium max-w-xs leading-relaxed text-sm">
             The global sanctuary for high-end digital learning and intellectual growth. Cultivate your potential with our curated atelier.
@@ -30,16 +41,22 @@ const Footer = () => {
         
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 text-sm font-headline font-bold uppercase tracking-widest text-emerald-100/60">
           <div className="flex flex-col gap-4">
-            <span className="text-white text-xs mb-2">Platform</span>
-            <Link to="/courses" className="hover:text-primary transition-colors">Browse</Link>
-            <Link to="/instructor" className="hover:text-primary transition-colors">Teaching</Link>
-            <Link to="/community" className="hover:text-primary transition-colors">Community</Link>
+            <span className="text-white text-xs mb-2 tracking-widest font-black uppercase">Platform</span>
+            <a 
+              href="/" 
+              onClick={handleHomeClick}
+              className="hover:text-primary transition-colors cursor-pointer"
+            >
+              Home
+            </a>
+            <Link to="/auth?role=instructor" className="hover:text-primary transition-colors">Teacher</Link>
+            <Link to="/auth?role=student" className="hover:text-primary transition-colors">Student</Link>
           </div>
           <div className="flex flex-col gap-4">
-            <span className="text-white text-xs mb-2">Support</span>
-            <Link to="/help" className="hover:text-primary transition-colors">Help Center</Link>
-            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
-            <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <span className="text-white text-xs mb-2 tracking-widest font-black uppercase">Support</span>
+            <Link to="/help-center" className="hover:text-primary transition-colors">Help Center</Link>
+            <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms</Link>
           </div>
         </div>
       </div>

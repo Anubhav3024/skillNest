@@ -25,6 +25,8 @@ const StudentCourseProgress = lazy(() =>
   import("./pages/student/course-progress")
 );
 const StudentProfilePage = lazy(() => import("./pages/student/profile"));
+const AboutPage = lazy(() => import("./pages/student/about"));
+const SupportHubPage = lazy(() => import("./pages/student/legal"));
 
 function App() {
   const authContext = useContext(AuthContext);
@@ -104,12 +106,15 @@ function App() {
             element={<StudentViewCourseDetailsPage />}
           />
           <Route path="/profile" element={<StudentProfilePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/help-center" element={<SupportHubPage />} />
+          <Route path="/privacy-policy" element={<SupportHubPage />} />
+          <Route path="/terms-of-service" element={<SupportHubPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   );
 }
 
 export default App;
-

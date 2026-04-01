@@ -57,6 +57,9 @@ export default {
                     DEFAULT: 'hsl(var(--background))',
                     variant: 'hsl(var(--muted))',
                     container: 'hsl(var(--muted) / 0.5)',
+                },
+                transitionDuration: {
+                    2000: '2000ms',
                 }
     		}
     	}

@@ -209,7 +209,7 @@ const StudentViewCoursesPage = () => {
                     <div className="relative aspect-[16/10] overflow-hidden rounded-[2.5rem] bg-[#fcf8f1] border border-[#0d694f]/5 mb-8 shadow-inner">
                       <LazyLoadImage 
                         src={course.image} 
-                        className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110 opacity-90 group-hover:opacity-100" 
+                        className="w-full h-full object-cover transition-transform duration-2000 group-hover:scale-110 opacity-90 group-hover:opacity-100" 
                         effect="blur"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#011c14]/40 to-transparent"></div>

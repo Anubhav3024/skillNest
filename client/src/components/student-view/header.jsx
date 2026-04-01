@@ -1,17 +1,29 @@
 import { Search, User, LogOut } from "lucide-react";
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { AuthContext } from "@/context/auth-context";
 import { toast } from "react-toastify";
 
 const StudentViewCommonHeader = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { resetCredentials, auth } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState("");
 
   const showSearch = !!auth?.authenticated;
+
+  const handleNavClick = (id) => {
+    if (location.pathname === "/home" || location.pathname === "/") {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate(`/home#${id}`);
+    }
+  };
 
   const handleSearch = (e) => {
     if (e.key === "Enter" && searchQuery.trim() !== "") {
@@ -30,13 +42,32 @@ const StudentViewCommonHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-10">
           <Link to="/home" className="flex items-center gap-2 group">
-             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-xl font-headline font-bold transition-transform group-hover:scale-110">
-               S
-             </div>
-             <span className="text-2xl font-headline font-black text-foreground tracking-tighter group-hover:text-primary transition-colors">
-               SkillNest
+             <img src="/skillnestlog.png" alt="SkillNest Logo" className="w-[68px] h-[68px] object-contain transition-transform group-hover:scale-110" />
+             <span className="text-2xl font-headline font-black tracking-tighter transition-colors">
+               <span className="text-[#0d694f]">Skill</span><span className="text-[#ff7e5f]">Nest</span>
              </span>
           </Link>
+          
+          <div className="hidden md:flex items-center gap-8">
+             <Link 
+               to="/home"
+               className="text-sm font-headline font-black text-[#0d694f] hover:text-[#ff7e5f] transition-all tracking-tight"
+             >
+               Home
+             </Link>
+             <button 
+               onClick={() => handleNavClick("categories")}
+               className="text-sm font-headline font-black text-[#0d694f] hover:text-[#ff7e5f] transition-all tracking-tight"
+             >
+               Categories
+             </button>
+             <button 
+               onClick={() => handleNavClick("about-us")}
+               className="text-sm font-headline font-black text-[#0d694f] hover:text-[#ff7e5f] transition-all tracking-tight"
+             >
+               About Us
+             </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">

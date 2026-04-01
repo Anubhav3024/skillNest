@@ -58,6 +58,37 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+const authenticateOptionally = async (req, res, next) => {
+  let token;
+
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer")) {
+      token = authHeader.split(" ")[1];
+    } else {
+      const cookies = parseCookies(req.headers.cookie || "");
+      token = cookies.accessToken;
+    }
+
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = {
+      ...payload,
+      role: normalizeRole(payload?.role),
+    };
+
+    next();
+  } catch (error) {
+    // For optional auth, we just treat them as guests if the token is invalid or expired
+    req.user = null;
+    next();
+  }
+};
+
 const checkRole = (...roles) => {
   return (req, res, next) => {
     const normalizedRole = normalizeRole(req.user?.role);
@@ -71,4 +102,4 @@ const checkRole = (...roles) => {
   };
 };
 
-module.exports = { authenticate, checkRole };
+module.exports = { authenticate, authenticateOptionally, checkRole };

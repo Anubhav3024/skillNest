@@ -184,7 +184,7 @@ const InstructorDashboard = ({
                 Onboarding Protocol
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-headline font-extrabold text-[#0d694f] leading-[0.95] tracking-tight">
-                Welcome to SkillNest, <br />
+                Welcome to <span className="text-[#0d694f]">Skill</span><span className="text-[#ff7e5f]">Nest</span>, <br />
                 <span className="text-[#ff7e5f]">Educator</span>
               </h1>
               <p className="text-slate-500 font-medium text-base lg:text-lg mt-7 max-w-2xl leading-relaxed italic opacity-80">

@@ -180,15 +180,17 @@ const InstructorDashboardPage = () => {
   return (
     <div className="flex h-screen bg-[#fcf8f1] font-body text-slate-900 overflow-hidden smooth-scroll">
       {/* Sidebar */}
-      <aside className="w-60 bg-white/70 backdrop-blur-2xl border-r border-[#0d694f]/5 fixed top-0 left-0 h-screen z-50 flex flex-col p-5 px-4 transition-all duration-500 shadow-3d">
+      <aside className="w-60 bg-white/70 backdrop-blur-2xl border-r border-[#0d694f]/5 fixed top-0 left-0 h-screen z-50 flex flex-col pt-0 px-4 pb-5 transition-all duration-500 shadow-3d">
         <motion.div 
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="flex items-center gap-3 mb-8 px-4 group cursor-pointer" 
+          className="flex flex-col items-center justify-center gap-0 mb-6 group cursor-pointer" 
           onClick={() => navigate("/")}
         >
-          <div className="w-9 h-9 bg-[#0d694f] rounded-xl flex items-center justify-center text-white font-headline font-bold text-lg shadow-lg shadow-[#0d694f]/20 group-hover:rotate-6 transition-transform">S</div>
-          <span className="text-xl font-headline font-bold text-[#0d694f] tracking-tighter">SkillNest</span>
+          <img src="/skillnestlog.png" alt="SkillNest Logo" className="w-[95px] h-[95px] object-contain transition-transform group-hover:rotate-6" />
+          <span className="text-2xl font-headline font-black tracking-tighter transition-colors">
+            <span className="text-[#0d694f]">Skill</span><span className="text-[#ff7e5f]">Nest</span>
+          </span>
         </motion.div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-2">

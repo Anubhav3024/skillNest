@@ -25,6 +25,7 @@ const instructorRoutes = require("./src/modules/instructor/routes/instructor-rou
 const studentDashboardRoutes = require("./src/modules/student/routes/student-dashboard-routes");
 const studentActivityRoutes = require("./src/modules/student/routes/student-activity-routes");
 const notificationRoutes = require("./src/modules/notification/routes/notification-routes");
+const supportRoutes = require("./src/modules/support/routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -187,6 +188,7 @@ app.use("/instructor", instructorRoutes);
 app.use("/student/dashboard", studentDashboardRoutes);
 app.use("/student/activity", studentActivityRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/support", supportRoutes);
 
 app.use((err, req, res, next) => {
   res

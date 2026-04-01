@@ -7,9 +7,12 @@ const RouteGuard = ({ authenticated, user, element }) => {
   const location = useLocation();
   const role = normalizeRole(user?.role);
 
+  const publicPaths = ["/auth", "/help-center", "/privacy-policy", "/terms-of-service", "/about"];
+  const isPublicPath = publicPaths.some(path => location.pathname.startsWith(path));
+
   if (
     !authenticated &&
-    !location.pathname.includes("/auth") &&
+    !isPublicPath &&
     location.pathname !== "/"
   ) {
     return <Navigate to="/auth" />;

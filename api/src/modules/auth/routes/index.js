@@ -5,7 +5,7 @@ const {
   refreshToken,
 } = require("../controllers/index");
 
-const { authenticate } = require("../../../middlewares/auth-middleware");
+const { authenticate, authenticateOptionally } = require("../../../middlewares/auth-middleware");
 const User = require("../../../models/user");
 const { normalizeRole } = require("../../../utils/role");
 const { isValidRole } = require("../../../utils/role");
@@ -92,13 +92,21 @@ router.post("/logout", authenticate, (req, res, next) => {
   return logoutUser(req, res, next);
 });
 router.post("/refresh-token", authenticate, refreshToken);
-router.get("/check-auth", authenticate, async (req, res) => {
+router.get("/check-auth", authenticateOptionally, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(200).json({
+        success: false,
+        message: "Unauthenticated guest user",
+      });
+    }
+
     const user = await fetchAndNormalizeUser(req.user?._id);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(200).json({
+        success: false,
+        message: "User context not found in database",
+      });
     }
 
     return res.status(200).json({
@@ -108,9 +116,9 @@ router.get("/check-auth", authenticate, async (req, res) => {
     });
   } catch (error) {
     console.error("/check-auth error:", error);
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
-      message: "Failed to validate auth state",
+      message: "Internal error during auth check",
       details: error.message,
     });
   }
