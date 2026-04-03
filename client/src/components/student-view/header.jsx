@@ -35,6 +35,7 @@ const StudentViewCommonHeader = () => {
     toast.success("Logged out successfully", { autoClose: 800 });
     resetCredentials();
     sessionStorage.clear();
+    navigate("/auth", { replace: true });
   };
 
   return (

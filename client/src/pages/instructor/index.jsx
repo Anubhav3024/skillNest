@@ -94,6 +94,7 @@ const InstructorDashboardPage = () => {
   function handleLogout() {
     resetCredentials();
     sessionStorage.clear();
+    navigate("/auth", { replace: true });
   }
 
   const handleGlobalSearchKeyDown = (event) => {
