@@ -403,12 +403,12 @@ const InstructorDashboard = ({
             </div>
 
             <div className="relative z-10 w-full">
-              <div className="flex gap-4 sm:gap-8 overflow-x-auto pb-6 sm:pb-8 pt-4 custom-scrollbar snap-x snap-mandatory">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4 pt-4 lg:flex lg:gap-8 lg:overflow-x-auto lg:pb-8 custom-scrollbar lg:snap-x lg:snap-mandatory">
                 {listOfCourses.map((course) => (
                   <motion.div
                     key={course._id}
                     whileHover={{ y: -10, scale: 1.02 }}
-                    className="w-[260px] min-[420px]:w-[300px] sm:w-[340px] flex-none snap-start group relative bg-white border border-[#0d694f]/20 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col"
+                    className="w-full lg:w-[340px] lg:flex-none lg:snap-start group relative bg-white border border-[#0d694f]/20 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col"
                   >
                     <div className="relative p-1.5 bg-white/40 backdrop-blur-xl">
                       <div className="relative aspect-video overflow-hidden rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 shadow-inner">

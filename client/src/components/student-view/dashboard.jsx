@@ -1181,13 +1181,13 @@ const PaymentsTab = ({ auth }) => {
       </div>
       
       <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-3d border border-[#0d694f]/5">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-hidden">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcf8f1] border-b border-[#0d694f]/5">
                 <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Course Asset</th>
-                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Internal ID</th>
-                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Timestamp</th>
+                <th className="hidden md:table-cell px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Internal ID</th>
+                <th className="hidden md:table-cell px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Timestamp</th>
                 <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Investment</th>
                 <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Status</th>
               </tr>
@@ -1197,7 +1197,7 @@ const PaymentsTab = ({ auth }) => {
                 transactions.map((tx) => (
                   <tr key={tx._id} className="hover:bg-[#fcf8f1]/30 transition-colors group">
                     <td className="px-4 sm:px-8 py-6">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 min-w-0">
                         <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden border border-[#0d694f]/5 shadow-sm group-hover:scale-105 transition-transform">
                            {tx.courseId?.image ? (
                              <img src={tx.courseId.image} className="w-full h-full object-cover" alt="" />
@@ -1205,11 +1205,13 @@ const PaymentsTab = ({ auth }) => {
                              <div className="w-full h-full flex items-center justify-center text-[#0d694f]/10"><BookOpen size={16}/></div>
                            )}
                         </div>
-                        <span className="text-sm font-bold text-[#0d694f] group-hover:text-[#ff7e5f] transition-colors">{capitalize(tx.courseId?.title || "Unknown Course")}</span>
+                        <span className="text-sm font-bold text-[#0d694f] group-hover:text-[#ff7e5f] transition-colors truncate">
+                          {capitalize(tx.courseId?.title || "Unknown Course")}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-4 sm:px-8 py-6 text-[10px] font-mono font-bold text-muted-foreground/40">{tx.orderId?.slice(-12).toUpperCase()}</td>
-                    <td className="px-4 sm:px-8 py-6 text-[10px] font-bold text-slate-500">
+                    <td className="hidden md:table-cell px-4 sm:px-8 py-6 text-[10px] font-mono font-bold text-muted-foreground/40">{tx.orderId?.slice(-12).toUpperCase()}</td>
+                    <td className="hidden md:table-cell px-4 sm:px-8 py-6 text-[10px] font-bold text-slate-500">
                       {new Date(tx.createdAt).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' })}
                     </td>
                     <td className="px-4 sm:px-8 py-6 text-sm font-black text-[#0d694f]">₹{tx.totalAmount}</td>
@@ -1343,24 +1345,24 @@ const StudentDashboard = () => {
   return (
     <div className="flex min-h-screen bg-[#fcf8f1] font-body text-slate-900 selection:bg-[#0d694f]/20 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-16 sm:w-64 bg-white/70 backdrop-blur-2xl border-r border-[#0d694f]/5 fixed top-0 left-0 h-screen z-50 flex flex-col pt-0 px-2 sm:px-4 pb-5 transition-all duration-500 shadow-3d">
+      <aside className="w-16 md:w-64 bg-white/70 backdrop-blur-2xl border-r border-[#0d694f]/5 fixed top-0 left-0 h-screen z-50 flex flex-col pt-0 px-2 md:px-4 pb-5 transition-all duration-500 shadow-3d">
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="flex flex-col items-center justify-center gap-0 mb-4 sm:mb-6 group cursor-pointer"
+          className="flex flex-col items-center justify-center gap-0 mb-4 md:mb-6 group cursor-pointer"
           onClick={() => navigate("/")}
         >
           <img
             src="/skillnestlog.png"
             alt="SkillNest Logo"
-            className="w-10 h-10 sm:w-[95px] sm:h-[95px] object-contain transition-transform group-hover:rotate-6"
+            className="w-10 h-10 md:w-[95px] md:h-[95px] object-contain transition-transform group-hover:rotate-6"
           />
-          <span className="hidden sm:block text-2xl font-headline font-black tracking-tighter transition-colors">
+          <span className="hidden md:block text-2xl font-headline font-black tracking-tighter transition-colors">
             <span className="text-[#0d694f]">Skill</span><span className="text-[#ff7e5f]">Nest</span>
           </span>
         </motion.div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-0 sm:pr-2">
+        <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-0 md:pr-2">
           {sidebarLinks.map((link) => (
             <motion.button
               key={link.id}
@@ -1369,7 +1371,7 @@ const StudentDashboard = () => {
               onClick={() => handleTabChange(link.id)}
               title={link.label}
               aria-label={link.label}
-              className={`relative w-full flex items-center justify-center sm:justify-start gap-0 sm:gap-4 px-2 sm:px-4 py-2.5 rounded-2xl font-headline font-semibold text-[13px] tracking-tight transition-all duration-300 group ${
+              className={`relative w-full flex items-center justify-center md:justify-start gap-0 md:gap-4 px-2 md:px-4 py-2.5 rounded-2xl font-headline font-semibold text-[13px] tracking-tight transition-all duration-300 group ${
                 activeTab === link.id
                   ? "bg-[#0d694f] text-white shadow-3d scale-[1.02]"
                   : "text-muted-foreground/60 hover:text-[#0d694f] hover:bg-[#0d694f]/5"
@@ -1380,14 +1382,14 @@ const StudentDashboard = () => {
                   activeTab === link.id ? "scale-110" : "group-hover:scale-110"
                 }`}
               />
-              <span className="hidden sm:inline">{link.label}</span>
+              <span className="hidden md:inline">{link.label}</span>
               {activeTab === link.id && (
                 <motion.div
                   layoutId="activeTabBadge"
-                  className="sm:ml-auto absolute sm:static right-2 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-[#ff7e5f] shadow-[0_0_8px_rgba(255,126,95,0.8)]"
+                  className="md:ml-auto absolute md:static right-2 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-[#ff7e5f] shadow-[0_0_8px_rgba(255,126,95,0.8)]"
                 ></motion.div>
               )}
-              <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 sm:hidden">
+              <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 md:hidden">
                 {link.label}
               </span>
             </motion.button>
@@ -1400,11 +1402,11 @@ const StudentDashboard = () => {
             onClick={handleLogout}
             title="Disconnect"
             aria-label="Disconnect"
-            className="relative w-full flex items-center justify-center sm:justify-start gap-0 sm:gap-4 px-2 sm:px-6 py-4 font-headline font-bold text-[10px] tracking-[0.15em] text-muted-foreground hover:text-[#ff7e5f] transition-colors group border-none bg-transparent"
+            className="relative w-full flex items-center justify-center md:justify-start gap-0 md:gap-4 px-2 md:px-6 py-4 font-headline font-bold text-[10px] tracking-[0.15em] text-muted-foreground hover:text-[#ff7e5f] transition-colors group border-none bg-transparent"
           >
             <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span className="hidden sm:inline">DISCONNECT</span>
-            <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 sm:hidden">
+            <span className="hidden md:inline">DISCONNECT</span>
+            <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 md:hidden">
               Disconnect
             </span>
           </motion.button>
@@ -1412,14 +1414,14 @@ const StudentDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 ml-16 sm:ml-64 overflow-y-auto overflow-x-hidden custom-scrollbar relative scroll-smooth">
+      <main className="flex-1 min-w-0 ml-16 md:ml-64 overflow-y-auto overflow-x-hidden custom-scrollbar relative scroll-smooth">
         {/* Header */}
         <motion.header
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex flex-col sm:flex-row sm:items-center items-stretch justify-between gap-3 sm:gap-10 sticky top-0 z-40 bg-[#0d694f] px-4 sm:px-8 lg:px-10 py-4 shadow-2xl shadow-[#0d694f]/20 border-b border-white/5"
+          className="flex flex-col md:flex-row md:items-center items-stretch justify-between gap-3 md:gap-10 sticky top-0 z-40 bg-[#0d694f] px-4 md:px-8 lg:px-10 py-4 shadow-2xl shadow-[#0d694f]/20 border-b border-white/5"
         >
-          <div className="w-full sm:flex-1 relative flex items-center group sm:max-w-xl">
+          <div className="w-full md:flex-1 relative flex items-center group md:max-w-xl">
             <Search className="absolute left-6 h-4 w-4 text-white/50 transition-colors group-focus-within:text-white" />
             <input
               type="text"
@@ -1431,12 +1433,12 @@ const StudentDashboard = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6">
+          <div className="flex items-center justify-between md:justify-start gap-3 md:gap-6">
             <NotificationDropdown userId={auth?.user?._id} role="student" />
 
             <div 
               onClick={() => setActiveTab("settings")}
-              className="flex items-center gap-3 p-1 bg-white/10 border border-white/10 rounded-full pr-2 sm:pr-5 cursor-pointer hover:bg-white/20 transition-all group"
+              className="flex items-center gap-3 p-1 bg-white/10 border border-white/10 rounded-full pr-2 md:pr-5 cursor-pointer hover:bg-white/20 transition-all group"
             >
               <div className="w-9 h-9 rounded-full bg-white/10 overflow-hidden border border-white/20 group-hover:scale-105 transition-transform flex items-center justify-center">
                 {auth?.user?.avatar ? (
@@ -1445,7 +1447,7 @@ const StudentDashboard = () => {
                   <User className="h-5 w-5 text-white/80" />
                 )}
               </div>
-              <span className="hidden sm:inline text-[12px] font-headline font-bold text-white tracking-tight">
+              <span className="hidden md:inline text-[12px] font-headline font-bold text-white tracking-tight">
                 {auth?.user?.userName?.split(" ")[0]}
               </span>
             </div>
