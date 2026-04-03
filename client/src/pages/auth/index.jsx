@@ -93,13 +93,13 @@ const AuthPage = () => {
   }, [location.search, setSignUpFormData]);
 
   const handleGithubLogin = () => {
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000").trim();
     const role = activeRole || "student";
     window.location.href = `${baseUrl}/auth/github?role=${encodeURIComponent(role)}`;
   };
 
   const handleGoogleLogin = () => {
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000").trim();
     const role = activeRole || "student";
     window.location.href = `${baseUrl}/auth/google?role=${encodeURIComponent(role)}`;
   };

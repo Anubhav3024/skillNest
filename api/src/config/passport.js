@@ -101,7 +101,7 @@ const pickAvatarFromProfile = (profile) =>
   profile?.photos?.[0]?.value || profile?._json?.avatar_url || "";
 
 const getRequestedRole = (req) => {
-  const requested = normalizeRole(req.session?.oauthRole);
+  const requested = normalizeRole(req?.oauthRole ?? req.session?.oauthRole);
   return isValidRole(requested) ? requested : null;
 };
 
@@ -121,7 +121,6 @@ passport.use(
       callbackURL:
         GITHUB_CALLBACK_URL || "http://localhost:5000/auth/github/callback",
       scope: ["user:email"],
-      state: true,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
@@ -230,7 +229,6 @@ passport.use(
       clientSecret: GOOGLE_CLIENT_SECRET || "missing-client-secret",
       callbackURL:
         GOOGLE_CALLBACK_URL || "http://localhost:5000/auth/google/callback",
-      state: true,
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {

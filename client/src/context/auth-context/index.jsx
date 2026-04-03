@@ -18,6 +18,11 @@ export const AuthContext = createContext(null);
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const isValidEmail = (email) => emailRegex.test(email);
+const isEmailOrUserName = (value) => {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return false;
+  return trimmed.includes("@") ? isValidEmail(trimmed) : true;
+};
 
 export default function AuthProvider({ children }) {
   const [signInFormData, setSignInFormData] = useState(initalSignInFormData);
@@ -29,13 +34,15 @@ export default function AuthProvider({ children }) {
     event.preventDefault();
 
     const { userName, userEmail, userPassword, role } = signUpFormData;
+    const trimmedEmail = (userEmail || "").trim();
+    const trimmedUserName = (userName || "").trim();
 
-    if (!userName || !userEmail || !userPassword || !role) {
+    if (!trimmedUserName || !trimmedEmail || !userPassword || !role) {
       toast.error("All fields are required");
       return;
     }
 
-    if (!isValidEmail(userEmail)) {
+    if (!isValidEmail(trimmedEmail)) {
       toast.error("Please enter a valid email address");
       return;
     }
@@ -46,7 +53,11 @@ export default function AuthProvider({ children }) {
     }
     try {
       setLoading(true);
-      const data = await registerService(signUpFormData);
+      const data = await registerService({
+        ...signUpFormData,
+        userName: trimmedUserName,
+        userEmail: trimmedEmail,
+      });
 
       if (data.success) {
         const user = normalizeUser(data.user || data.newUser);
@@ -79,21 +90,25 @@ export default function AuthProvider({ children }) {
     setLoading(true);
 
     const { userEmail, userPassword } = signInFormData;
+    const trimmedEmail = (userEmail || "").trim();
 
-    if (!userEmail || !userPassword) {
+    if (!trimmedEmail || !userPassword) {
       toast.error("Email and password are required");
       setLoading(false);
       return;
     }
 
-    if (!isValidEmail(userEmail)) {
-      toast.error("Please enter a valid email address");
+    if (!isEmailOrUserName(trimmedEmail)) {
+      toast.error("Please enter a valid email or username");
       setLoading(false);
       return;
     }
 
     try {
-      const data = await loginService(signInFormData);
+      const data = await loginService({
+        ...signInFormData,
+        userEmail: trimmedEmail,
+      });
       if (data.success) {
         const user = normalizeUser(data.user || data.newUser);
         localStorage.setItem("accessToken", data.accessToken);

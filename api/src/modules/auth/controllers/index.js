@@ -63,8 +63,8 @@ const registerUser = async (req, res) => {
       });
     }
 
-    userEmail = userEmail.toLowerCase();
-    userName = userName.toLowerCase();
+    userEmail = String(userEmail).trim().toLowerCase();
+    userName = String(userName).trim().toLowerCase();
 
     role = normalizeRole(role);
     if (!isValidRole(role)) {
@@ -88,7 +88,10 @@ const registerUser = async (req, res) => {
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "User already exists",
+        message:
+          existingUser.githubId || existingUser.googleId
+            ? "Account already exists (Google/GitHub). Please sign in with OAuth."
+            : "User already exists",
       });
     }
 
@@ -140,13 +143,14 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { userEmail, userPassword } = req.body;
+    const userIdentifier = String(userEmail || "").trim().toLowerCase();
 
     console.info("Auth login attempt", {
       action: "login",
       userEmail,
     });
 
-    if (!userEmail || !userPassword) {
+    if (!userIdentifier || !userPassword) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
@@ -155,8 +159,8 @@ const loginUser = async (req, res) => {
 
     const user = await User.findOne({
       $or: [
-        { userEmail: userEmail.toLowerCase() },
-        { userName: userEmail.toLowerCase() },
+        { userEmail: userIdentifier },
+        { userName: userIdentifier },
       ],
     }).select("+userPassword");
 
@@ -173,6 +177,13 @@ const loginUser = async (req, res) => {
     );
 
     if (!isCorrectPassword) {
+      if (user.githubId || user.googleId) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "This account was created using Google/GitHub sign-in. Please sign in using OAuth or reset your password.",
+        });
+      }
       return res.status(400).json({
         success: false,
         message: "Invalid user email or password",
