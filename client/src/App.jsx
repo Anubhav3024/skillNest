@@ -10,7 +10,7 @@ import Loader from "./components/common/loader";
 import StudentHomePage from "./pages/student/home";
 import { ToastContainer } from "react-toastify";
 
-const AuthPage = lazy(() => import("./pages/auth"));
+import AuthPage from "./pages/auth";
 const InstructorDashboardPage = lazy(() => import("./pages/instructor"));
 const AddNewCoursePage = lazy(() =>
   import("./pages/instructor/add-new-course")
