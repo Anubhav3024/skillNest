@@ -226,9 +226,9 @@ const InstructorDashboard = ({
       {/* Educator Profile Card - Always Visible */}
       <motion.div
         variants={itemVariants}
-        className="bg-white rounded-[3.5rem] p-8 md:p-12 border border-[#0d694f]/5 shadow-3d relative overflow-hidden group"
+        className="bg-white rounded-[2.5rem] sm:rounded-[3.5rem] p-6 sm:p-8 md:p-12 border border-[#0d694f]/5 shadow-3d relative overflow-hidden group"
       >
-        <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center gap-8 sm:gap-10 relative z-10">
           <div className="relative">
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#fcf8f1] shadow-xl overflow-hidden bg-[#fcf8f1] flex items-center justify-center">
               {auth?.user?.avatar ? (
@@ -299,13 +299,13 @@ const InstructorDashboard = ({
       {!isFirstTime && (
         <>
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
                 whileHover={{ y: -5 }}
-                className="bg-white p-8 rounded-[2rem] border border-[#0d694f]/5 shadow-3d group cursor-default"
+                className="bg-white p-6 sm:p-8 rounded-[2rem] border border-[#0d694f]/5 shadow-3d group cursor-default"
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div
@@ -383,7 +383,7 @@ const InstructorDashboard = ({
           {/* Vault Command Center */}
           <motion.div
             variants={itemVariants}
-            className="bg-white p-10 rounded-[3rem] border border-[#0d694f]/10 shadow-3d relative overflow-hidden group/vault"
+            className="bg-white p-6 sm:p-10 rounded-[2.5rem] sm:rounded-[3rem] border border-[#0d694f]/10 shadow-3d relative overflow-hidden group/vault"
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 relative z-10">
               <div>
@@ -403,12 +403,12 @@ const InstructorDashboard = ({
             </div>
 
             <div className="relative z-10 w-full">
-              <div className="flex gap-8 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory">
+              <div className="flex gap-4 sm:gap-8 overflow-x-auto pb-6 sm:pb-8 pt-4 custom-scrollbar snap-x snap-mandatory">
                 {listOfCourses.map((course) => (
                   <motion.div
                     key={course._id}
                     whileHover={{ y: -10, scale: 1.02 }}
-                    className="w-[340px] flex-none snap-start group relative bg-white border border-[#0d694f]/20 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col"
+                    className="w-[260px] min-[420px]:w-[300px] sm:w-[340px] flex-none snap-start group relative bg-white border border-[#0d694f]/20 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col"
                   >
                     <div className="relative p-1.5 bg-white/40 backdrop-blur-xl">
                       <div className="relative aspect-video overflow-hidden rounded-xl bg-[#fcf8f1] border border-[#0d694f]/5 shadow-inner">

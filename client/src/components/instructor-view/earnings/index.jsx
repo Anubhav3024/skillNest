@@ -155,7 +155,7 @@ const InstructorEarnings = ({ saasAnalytics, fetchSaaSAnalytics, user }) => {
           Active
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-6">
         <div className="space-y-1">
           <p className="text-[10px] font-bold text-muted-foreground/60 uppercase">
             UPI Identifier
@@ -358,13 +358,13 @@ const InstructorEarnings = ({ saasAnalytics, fetchSaaSAnalytics, user }) => {
       <motion.div variants={itemVariants}>{payoutInfo}</motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 min-[360px]:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {stats.map((stat, index) => (
           <motion.div
             key={index}
             variants={itemVariants}
             whileHover={{ y: -5 }}
-            className="bg-white p-8 rounded-[2rem] border border-[#0d694f]/5 shadow-3d group cursor-default"
+            className="bg-white p-6 sm:p-8 rounded-[2rem] border border-[#0d694f]/5 shadow-3d group cursor-default"
           >
             <div className="flex flex-col gap-6">
               <span className="text-[10px] font-bold  text-muted-foreground  opacity-60 group-hover:opacity-100 transition-opacity">
@@ -616,7 +616,7 @@ const InstructorEarnings = ({ saasAnalytics, fetchSaaSAnalytics, user }) => {
         open={isBreakdownModalOpen}
         onOpenChange={setIsBreakdownModalOpen}
       >
-        <DialogContent className="sm:max-w-2xl bg-white rounded-[3rem] border border-[#0d694f]/10 shadow-2xl p-10 overflow-hidden font-body">
+        <DialogContent className="sm:max-w-2xl bg-white rounded-[2.5rem] sm:rounded-[3rem] border border-[#0d694f]/10 shadow-2xl p-6 sm:p-10 overflow-hidden font-body">
           <div className="absolute top-0 right-0 w-48 h-48 bg-[#0d694f]/5 rounded-full blur-3xl -mr-24 -mt-24"></div>
 
           <DialogHeader className="relative z-10 mb-8">

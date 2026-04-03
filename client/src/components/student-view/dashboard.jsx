@@ -56,7 +56,7 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-16 pb-20 px-8 lg:px-10"
+      className="space-y-12 sm:space-y-16 pb-16 sm:pb-20 px-4 sm:px-8 lg:px-10"
     >
       {/* 1. Welcome Section */}
       <section className="pt-4">
@@ -87,22 +87,22 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
         transition={{ delay: 0.3 }}
         className="relative"
       >
-        <div className="bg-white rounded-[3.5rem] p-10 lg:p-14 shadow-3d border border-[#0d694f]/5 overflow-hidden flex flex-col lg:flex-row items-center gap-12 group transition-all hover:shadow-2xl">
+        <div className="bg-white rounded-[2.5rem] sm:rounded-[3.5rem] p-6 sm:p-10 lg:p-14 shadow-3d border border-[#0d694f]/5 overflow-hidden flex flex-col lg:flex-row items-center gap-8 sm:gap-12 group transition-all hover:shadow-2xl">
            <div className="absolute top-0 right-0 w-96 h-96 bg-[#0d694f]/5 rounded-full -mr-48 -mt-48 blur-3xl group-hover:bg-[#0d694f]/10 transition-colors"></div>
            
            {/* Avatar */}
            <div className="relative flex-shrink-0">
-             <div className="w-44 h-44 rounded-full bg-[#fcf8f1] p-1.5 shadow-2xl overflow-hidden border-2 border-white relative z-10">
-                {auth?.user?.avatar ? (
-                  <img src={auth.user.avatar} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <div className="w-full h-full bg-[#0d694f]/5 flex items-center justify-center text-[#0d694f]/20 rounded-full">
-                    <User size={64} strokeWidth={1} />
-                  </div>
-                )}
+             <div className="w-28 h-28 sm:w-44 sm:h-44 rounded-full bg-[#fcf8f1] p-1 shadow-2xl overflow-hidden border-2 border-white relative z-10">
+                 {auth?.user?.avatar ? (
+                   <img src={auth.user.avatar} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                 ) : (
+                   <div className="w-full h-full bg-[#0d694f]/5 flex items-center justify-center text-[#0d694f]/20 rounded-full">
+                    <User className="h-12 w-12 sm:h-16 sm:w-16" strokeWidth={1} />
+                   </div>
+                 )}
              </div>
-             <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-[#ff7e5f] rounded-full shadow-3d-orange flex items-center justify-center text-white z-20 border-4 border-white">
-                <TrendingUp size={20} />
+             <div className="absolute -bottom-2 -right-2 w-10 h-10 sm:w-12 sm:h-12 bg-[#ff7e5f] rounded-full shadow-3d-orange flex items-center justify-center text-white z-20 border-4 border-white">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
              </div>
            </div>
 
@@ -110,7 +110,7 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
            <div className="flex-1 text-center lg:text-left space-y-4 relative z-10">
               <div className="space-y-1">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ff7e5f] opacity-80">Official Scholar Profile</span>
-                <h3 className="text-3xl lg:text-4xl font-headline font-extrabold text-[#0d694f] tracking-tight">{capitalize(auth?.user?.userName)}</h3>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-headline font-extrabold text-[#0d694f] tracking-tight break-words">{capitalize(auth?.user?.userName)}</h3>
                 <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
                    <div className="flex items-center gap-2 px-4 py-2 bg-[#0d694f]/5 rounded-xl text-[#0d694f] text-[10px] font-black uppercase tracking-widest">
                       <BookOpen size={12} /> {auth?.user?.fieldOfStudy || "General Scholar"}
@@ -126,12 +126,12 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
            </div>
 
            {/* Stats Grid */}
-           <div className="grid grid-cols-2 gap-4 flex-shrink-0 w-full lg:w-auto relative z-10 pt-8 lg:pt-0 lg:border-l border-slate-100 lg:pl-12">
-              <div className="p-6 bg-[#fcf8f1] rounded-3xl border border-white text-center">
+           <div className="grid grid-cols-2 gap-4 flex-shrink-0 w-full lg:w-auto relative z-10 pt-6 sm:pt-8 lg:pt-0 lg:border-l border-slate-100 lg:pl-12">
+              <div className="p-4 sm:p-6 bg-[#fcf8f1] rounded-3xl border border-white text-center">
                  <div className="text-3xl font-headline font-black text-[#0d694f]">{stats?.totalEnrolled || 0}</div>
                  <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Vaults</p>
               </div>
-              <div className="p-6 bg-[#0d694f] rounded-3xl text-white text-center shadow-3d-orange">
+              <div className="p-4 sm:p-6 bg-[#0d694f] rounded-3xl text-white text-center shadow-3d-orange">
                  <div className="text-3xl font-headline font-black">{stats?.totalCompleted || 0}</div>
                  <p className="text-[9px] font-black uppercase opacity-60 tracking-widest">Mastered</p>
               </div>
@@ -168,7 +168,7 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
             <div className="h-1 w-20 bg-[#ff7e5f] mt-2 rounded-full"></div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 min-[360px]:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
           {[
             { label: "Manifest Progress", value: `${activeCourse?.progressPercent || 0}%`, icon: Activity, color: "text-[#4fb5ca]", sub: "Continuing Mastery" },
             { label: "Active Nodes", value: stats?.totalEnrolled || 0, icon: BookOpen, color: "text-[#0d694f]", sub: "Enrolled Disciplines" },
@@ -180,21 +180,21 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + (i * 0.1) }}
               whileHover={{ y: -8, shadow: "0 25px 50px -12px rgb(0 0 0 / 0.1)" }}
-              className="bg-white rounded-[3rem] p-10 shadow-3d border border-[#0d694f]/5 group transition-all relative overflow-hidden"
+              className="bg-white rounded-[2.2rem] sm:rounded-[3rem] p-5 sm:p-10 shadow-3d border border-[#0d694f]/5 group transition-all relative overflow-hidden"
             >
               <div className="relative z-10 flex items-center justify-between">
                 <div>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 group-hover:rotate-6 ${stat.color.replace('text', 'bg')}/10 ${stat.color} shadow-lg shadow-black/5`}>
-                    <stat.icon size={26} />
+                  <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-6 sm:mb-8 transition-transform group-hover:scale-110 group-hover:rotate-6 ${stat.color.replace('text', 'bg')}/10 ${stat.color} shadow-lg shadow-black/5`}>
+                    <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
-                  <div className="text-4xl font-headline font-black text-[#0d694f] tracking-tighter">{stat.value}</div>
-                  <div className="text-[11px] font-black text-slate-800 mt-2 tracking-wide">{stat.label}</div>
-                  <div className="text-[9px] font-bold text-slate-400 italic mt-0.5">
+                  <div className="text-3xl sm:text-4xl font-headline font-black text-[#0d694f] tracking-tighter">{stat.value}</div>
+                  <div className="text-[10px] sm:text-[11px] font-black text-slate-800 mt-2 tracking-wide">{stat.label}</div>
+                  <div className="text-[9px] font-bold text-slate-400 italic mt-0.5 hidden sm:block">
                     {stat.sub}
                   </div>
                 </div>
                 <div className="absolute top-4 right-4 text-[#0d694f]/5 rotate-12 transition-transform group-hover:scale-125">
-                   <stat.icon size={80} strokeWidth={1} />
+                   <stat.icon className="h-14 w-14 sm:h-20 sm:w-20" strokeWidth={1} />
                 </div>
               </div>
             </motion.div>
@@ -217,7 +217,7 @@ const DashboardTab = ({ data, navigate, setActiveTab }) => {
                 Browse Course Library
               </button>
            </div>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+           <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
             {recommendations.slice(0, 3).map((course, idx) => (
               <motion.div
                 key={course._id}
@@ -349,7 +349,7 @@ const MyCoursesTab = ({ data, navigate }) => {
 
   if (courses.length === 0) {
     return (
-      <div className="bg-white rounded-[2.5rem] p-16 shadow-3d text-center border border-primary/5">
+      <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 shadow-3d text-center border border-primary/5">
         <ShoppingCart className="w-12 h-12 text-primary/20 mx-auto mb-4" />
         <h3 className="text-xl font-headline font-black text-primary mb-2">No courses purchased</h3>
         <p className="text-muted-foreground text-sm mb-6">Browse our catalogue and start learning today.</p>
@@ -364,7 +364,7 @@ const MyCoursesTab = ({ data, navigate }) => {
           My Courses ({courses.length})
         </h3>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+       <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {courses.map((course) => (
           <motion.div
             key={course._id}
@@ -390,7 +390,7 @@ const MyCoursesTab = ({ data, navigate }) => {
                 </div>
               )}
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               <div>
                 <div className="text-[8px] font-black text-[#ff7e5f] uppercase tracking-widest mb-1">
                   {course.category}
@@ -598,14 +598,14 @@ const BrowseTab = ({ navigate, externalSearch = "" }) => {
               <Loader />
             </div>
           ) : courses.length === 0 ? (
-            <div className="bg-white rounded-[2rem] p-16 text-center shadow-3d border border-primary/5">
+            <div className="bg-white rounded-[2rem] p-10 sm:p-16 text-center shadow-3d border border-primary/5">
               <SearchIcon className="w-12 h-12 text-primary/20 mx-auto mb-4" />
               <h3 className="text-lg font-headline font-black text-primary mb-2">No courses available</h3>
               <p className="text-muted-foreground text-sm">Check back later for new courses.</p>
             </div>
           ) : (
             <div className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-6">
                 {courses.map((course) => (
                   <motion.div
                     key={course._id}
@@ -933,7 +933,7 @@ const SettingsTab = ({ auth, updateAuthUser }) => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20 px-8 lg:px-10">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-20 px-4 sm:px-8 lg:px-10">
       <div className="flex items-center justify-between">
          <h3 className="text-2xl font-headline font-bold text-[#0d694f]">Settings</h3>
          <Button 
@@ -983,7 +983,7 @@ const SettingsTab = ({ auth, updateAuthUser }) => {
               </div>
 
               <div className="flex-1 w-full space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60 ml-1">Display Name</label>
                     <input
@@ -1172,7 +1172,7 @@ const PaymentsTab = ({ auth }) => {
   );
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 px-8 lg:px-10 pb-20">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 px-4 sm:px-8 lg:px-10 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h3 className="text-3xl font-headline font-black text-[#0d694f] tracking-tighter">Financial Ledger</h3>
@@ -1185,18 +1185,18 @@ const PaymentsTab = ({ auth }) => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#fcf8f1] border-b border-[#0d694f]/5">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Course Asset</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Internal ID</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Timestamp</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Investment</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Status</th>
+                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Course Asset</th>
+                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Internal ID</th>
+                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Timestamp</th>
+                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Investment</th>
+                <th className="px-4 sm:px-8 py-5 text-[10px] font-black uppercase tracking-widest text-[#0d694f]/40">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#0d694f]/5">
               {transactions.length > 0 ? (
                 transactions.map((tx) => (
                   <tr key={tx._id} className="hover:bg-[#fcf8f1]/30 transition-colors group">
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden border border-[#0d694f]/5 shadow-sm group-hover:scale-105 transition-transform">
                            {tx.courseId?.image ? (
@@ -1208,12 +1208,12 @@ const PaymentsTab = ({ auth }) => {
                         <span className="text-sm font-bold text-[#0d694f] group-hover:text-[#ff7e5f] transition-colors">{capitalize(tx.courseId?.title || "Unknown Course")}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-[10px] font-mono font-bold text-muted-foreground/40">{tx.orderId?.slice(-12).toUpperCase()}</td>
-                    <td className="px-8 py-6 text-[10px] font-bold text-slate-500">
+                    <td className="px-4 sm:px-8 py-6 text-[10px] font-mono font-bold text-muted-foreground/40">{tx.orderId?.slice(-12).toUpperCase()}</td>
+                    <td className="px-4 sm:px-8 py-6 text-[10px] font-bold text-slate-500">
                       {new Date(tx.createdAt).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' })}
                     </td>
-                    <td className="px-8 py-6 text-sm font-black text-[#0d694f]">₹{tx.totalAmount}</td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-6 text-sm font-black text-[#0d694f]">₹{tx.totalAmount}</td>
+                    <td className="px-4 sm:px-8 py-6">
                       <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 w-max ${
                         tx.paymentStatus === 'captured' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'
                       }`}>
@@ -1225,7 +1225,7 @@ const PaymentsTab = ({ auth }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-8 py-32 text-center">
+                  <td colSpan="5" className="px-4 sm:px-8 py-32 text-center">
                     <div className="flex flex-col items-center gap-4 text-muted-foreground opacity-20">
                        <CreditCard size={64} strokeWidth={1} />
                        <p className="font-headline font-black text-sm tracking-widest uppercase">No transactions archived.</p>
@@ -1343,27 +1343,33 @@ const StudentDashboard = () => {
   return (
     <div className="flex min-h-screen bg-[#fcf8f1] font-body text-slate-900 selection:bg-[#0d694f]/20 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white/70 backdrop-blur-2xl border-r border-[#0d694f]/5 fixed top-0 left-0 h-screen z-50 flex flex-col pt-0 px-4 pb-5 transition-all duration-500 shadow-3d">
+      <aside className="w-16 sm:w-64 bg-white/70 backdrop-blur-2xl border-r border-[#0d694f]/5 fixed top-0 left-0 h-screen z-50 flex flex-col pt-0 px-2 sm:px-4 pb-5 transition-all duration-500 shadow-3d">
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="flex flex-col items-center justify-center gap-0 mb-6 group cursor-pointer"
+          className="flex flex-col items-center justify-center gap-0 mb-4 sm:mb-6 group cursor-pointer"
           onClick={() => navigate("/")}
         >
-          <img src="/skillnestlog.png" alt="SkillNest Logo" className="w-[95px] h-[95px] object-contain transition-transform group-hover:rotate-6" />
-          <span className="text-2xl font-headline font-black tracking-tighter transition-colors">
+          <img
+            src="/skillnestlog.png"
+            alt="SkillNest Logo"
+            className="w-10 h-10 sm:w-[95px] sm:h-[95px] object-contain transition-transform group-hover:rotate-6"
+          />
+          <span className="hidden sm:block text-2xl font-headline font-black tracking-tighter transition-colors">
             <span className="text-[#0d694f]">Skill</span><span className="text-[#ff7e5f]">Nest</span>
           </span>
         </motion.div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-2">
+        <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-0 sm:pr-2">
           {sidebarLinks.map((link) => (
             <motion.button
               key={link.id}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleTabChange(link.id)}
-              className={`w-full flex items-center gap-4 px-4 py-2.5 rounded-2xl font-headline font-semibold text-[13px] tracking-tight transition-all duration-300 group ${
+              title={link.label}
+              aria-label={link.label}
+              className={`relative w-full flex items-center justify-center sm:justify-start gap-0 sm:gap-4 px-2 sm:px-4 py-2.5 rounded-2xl font-headline font-semibold text-[13px] tracking-tight transition-all duration-300 group ${
                 activeTab === link.id
                   ? "bg-[#0d694f] text-white shadow-3d scale-[1.02]"
                   : "text-muted-foreground/60 hover:text-[#0d694f] hover:bg-[#0d694f]/5"
@@ -1374,10 +1380,16 @@ const StudentDashboard = () => {
                   activeTab === link.id ? "scale-110" : "group-hover:scale-110"
                 }`}
               />
-              <span>{link.label}</span>
+              <span className="hidden sm:inline">{link.label}</span>
               {activeTab === link.id && (
-                <motion.div layoutId="activeTabBadge" className="ml-auto w-1 h-1 rounded-full bg-[#ff7e5f] shadow-[0_0_8px_rgba(255,126,95,0.8)]"></motion.div>
+                <motion.div
+                  layoutId="activeTabBadge"
+                  className="sm:ml-auto absolute sm:static right-2 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-[#ff7e5f] shadow-[0_0_8px_rgba(255,126,95,0.8)]"
+                ></motion.div>
               )}
+              <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 sm:hidden">
+                {link.label}
+              </span>
             </motion.button>
           ))}
         </nav>
@@ -1386,23 +1398,28 @@ const StudentDashboard = () => {
           <motion.button
             whileHover={{ x: -4 }}
             onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-6 py-4 font-headline font-bold text-[10px] tracking-[0.15em] text-muted-foreground hover:text-[#ff7e5f] transition-colors group border-none bg-transparent"
+            title="Disconnect"
+            aria-label="Disconnect"
+            className="relative w-full flex items-center justify-center sm:justify-start gap-0 sm:gap-4 px-2 sm:px-6 py-4 font-headline font-bold text-[10px] tracking-[0.15em] text-muted-foreground hover:text-[#ff7e5f] transition-colors group border-none bg-transparent"
           >
             <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            DISCONNECT
+            <span className="hidden sm:inline">DISCONNECT</span>
+            <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg bg-slate-900/95 px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 sm:hidden">
+              Disconnect
+            </span>
           </motion.button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 overflow-y-auto w-full custom-scrollbar relative scroll-smooth">
+      <main className="flex-1 min-w-0 ml-16 sm:ml-64 overflow-y-auto overflow-x-hidden custom-scrollbar relative scroll-smooth">
         {/* Header */}
         <motion.header
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="flex items-center justify-between gap-10 sticky top-0 z-40 bg-[#0d694f] px-8 lg:px-10 py-4 shadow-2xl shadow-[#0d694f]/20 border-b border-white/5"
+          className="flex flex-col sm:flex-row sm:items-center items-stretch justify-between gap-3 sm:gap-10 sticky top-0 z-40 bg-[#0d694f] px-4 sm:px-8 lg:px-10 py-4 shadow-2xl shadow-[#0d694f]/20 border-b border-white/5"
         >
-          <div className="flex-1 relative flex items-center group max-w-xl">
+          <div className="w-full sm:flex-1 relative flex items-center group sm:max-w-xl">
             <Search className="absolute left-6 h-4 w-4 text-white/50 transition-colors group-focus-within:text-white" />
             <input
               type="text"
@@ -1414,12 +1431,12 @@ const StudentDashboard = () => {
             />
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6">
             <NotificationDropdown userId={auth?.user?._id} role="student" />
 
             <div 
               onClick={() => setActiveTab("settings")}
-              className="flex items-center gap-3 p-1 bg-white/10 border border-white/10 rounded-full pr-5 cursor-pointer hover:bg-white/20 transition-all group"
+              className="flex items-center gap-3 p-1 bg-white/10 border border-white/10 rounded-full pr-2 sm:pr-5 cursor-pointer hover:bg-white/20 transition-all group"
             >
               <div className="w-9 h-9 rounded-full bg-white/10 overflow-hidden border border-white/20 group-hover:scale-105 transition-transform flex items-center justify-center">
                 {auth?.user?.avatar ? (
@@ -1428,7 +1445,7 @@ const StudentDashboard = () => {
                   <User className="h-5 w-5 text-white/80" />
                 )}
               </div>
-              <span className="text-[12px] font-headline font-bold text-white tracking-tight">
+              <span className="hidden sm:inline text-[12px] font-headline font-bold text-white tracking-tight">
                 {auth?.user?.userName?.split(" ")[0]}
               </span>
             </div>
