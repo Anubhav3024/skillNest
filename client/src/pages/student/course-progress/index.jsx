@@ -248,7 +248,7 @@ const StudentCourseProgress = () => {
       <div className="flex flex-1 overflow-hidden">
         <div
           className={`flex-1 ${
-            isSidebarOpen ? "mr-[400px]" : ""
+            isSidebarOpen ? "md:mr-[400px]" : ""
           } transition-all duration-300`}
         >
           <VideoPlayer
@@ -264,7 +264,7 @@ const StudentCourseProgress = () => {
           </div>
         </div>
         <div
-          className={`fixed top-[68px] right-0 bottom-0 w-[400px] bg-[#1c1d1f] border-l border-r-gray-700 transition-all duration-300 ${
+          className={`fixed top-[68px] right-0 bottom-0 w-full md:w-[400px] bg-[#1c1d1f] border-l border-r-gray-700 transition-all duration-300 ${
             isSidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >

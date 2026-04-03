@@ -426,35 +426,35 @@ const VaultDetailedView = ({ courseId, onBack }) => {
 
           {activeTab === "students" && (
             <div className="bg-white rounded-[2.5rem] border border-[#0d694f]/5 overflow-hidden shadow-sm">
-              <div className="p-8 border-b border-[#0d694f]/5 flex items-center justify-between bg-gradient-to-r from-[#fcf8f1] to-transparent">
+              <div className="p-6 sm:p-8 border-b border-[#0d694f]/5 flex items-center justify-between bg-gradient-to-r from-[#fcf8f1] to-transparent">
                  <h3 className="text-lg font-headline font-bold text-[#0d694f] uppercase tracking-tight">Active Scholars ({students.length})</h3>
                  <button className="text-[10px] font-black text-[#ff7e5f] hover:underline uppercase tracking-widest">Filter Audience</button>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-hidden">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-[#fcf8f1]/50">
-                      <th className="px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Scholar</th>
-                      <th className="px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest text-center">Progress</th>
-                      <th className="px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest text-center">Enrolled</th>
-                      <th className="px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest text-right">Investment</th>
+                      <th className="px-4 sm:px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Scholar</th>
+                      <th className="hidden md:table-cell px-4 sm:px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest text-center">Progress</th>
+                      <th className="hidden md:table-cell px-4 sm:px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest text-center">Enrolled</th>
+                      <th className="px-4 sm:px-8 py-4 text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest text-right">Investment</th>
                     </tr>
                   </thead>
                   <tbody>
                     {students.map((student, i) => (
                       <tr key={i} className="hover:bg-[#fcf8f1]/30 transition-colors border-b border-[#0d694f]/5">
-                        <td className="px-8 py-5">
-                          <div className="flex items-center gap-3">
+                        <td className="px-4 sm:px-8 py-5">
+                          <div className="flex items-center gap-3 min-w-0">
                             <div className="w-9 h-9 rounded-xl bg-[#0d694f]/5 flex items-center justify-center text-[#0d694f] font-black text-xs">
                               {student.userName?.[0]}
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-[#0d694f] uppercase">{student.userName}</span>
-                              <span className="text-[9px] font-medium text-muted-foreground italic leading-none">{student.userEmail}</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-xs font-bold text-[#0d694f] uppercase truncate">{student.userName}</span>
+                              <span className="text-[9px] font-medium text-muted-foreground italic leading-none truncate">{student.userEmail}</span>
                             </div>
                           </div>
                         </td>
-                        <td className="px-8 py-5 text-center">
+                        <td className="hidden md:table-cell px-4 sm:px-8 py-5 text-center">
                           <div className="w-32 mx-auto space-y-1.5">
                              <div className="w-full h-1 bg-[#0d694f]/5 rounded-full overflow-hidden">
                                 <div className="h-full bg-[#ff7e5f] rounded-full" style={{ width: '65%' }}></div>
@@ -462,12 +462,12 @@ const VaultDetailedView = ({ courseId, onBack }) => {
                              <span className="text-[9px] font-black text-[#0d694f] opacity-40">65% ARCHIVED</span>
                           </div>
                         </td>
-                        <td className="px-8 py-5 text-center">
+                        <td className="hidden md:table-cell px-4 sm:px-8 py-5 text-center">
                           <span className="text-[10px] font-bold text-muted-foreground opacity-60">
                             {new Date(student.createdAt).toLocaleDateString()}
                           </span>
                         </td>
-                        <td className="px-8 py-5 text-right font-headline font-bold text-[#0d694f] text-xs">
+                        <td className="px-4 sm:px-8 py-5 text-right font-headline font-bold text-[#0d694f] text-xs">
                            ₹{student.coursePricing}
                         </td>
                       </tr>

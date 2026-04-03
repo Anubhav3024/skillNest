@@ -169,7 +169,7 @@ const AddNewCoursePage = () => {
         </div>
       </header>
 
-      <main className="max-w-[1400px] mx-auto p-12 lg:p-16">
+      <main className="max-w-[1400px] mx-auto p-4 sm:p-10 lg:p-16">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

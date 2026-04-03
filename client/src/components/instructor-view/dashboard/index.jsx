@@ -510,7 +510,7 @@ const InstructorDashboard = ({
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="overflow-x-hidden">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left border-b border-[#fcf8f1]">

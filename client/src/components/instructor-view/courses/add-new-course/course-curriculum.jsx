@@ -368,7 +368,7 @@ const CourseCurriculum = () => {
               className="bg-white rounded-[2rem] border border-[#0d694f]/5 shadow-3d overflow-hidden group"
             >
               <div className="p-8 border-b border-[#fcf8f1] flex flex-wrap items-center justify-between gap-6">
-                <div className="flex items-center gap-6 flex-1 min-w-[300px]">
+                <div className="flex items-center gap-6 flex-1 min-w-0">
                   <div className="w-12 h-12 rounded-2xl bg-[#fcf8f1] border border-[#0d694f]/10 flex items-center justify-center font-headline font-bold text-[#0d694f] text-sm shrink-0 shadow-inner">
                     {String(index + 1).padStart(2, '0')}
                   </div>

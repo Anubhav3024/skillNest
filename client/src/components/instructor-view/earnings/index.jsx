@@ -498,17 +498,17 @@ const InstructorEarnings = ({ saasAnalytics, fetchSaaSAnalytics, user }) => {
           </div>
         </div>
 
-        <div className="overflow-x-auto overflow-y-visible">
+        <div className="overflow-x-hidden overflow-y-visible">
           <table className="w-full text-left">
             <thead>
               <tr className="border-y border-[#fcf8f1]">
-                <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">
+                <th className="hidden md:table-cell py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">
                   Epoch
                 </th>
                 <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">
                   Scholar
                 </th>
-                <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">
+                <th className="hidden md:table-cell py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60">
                   Archive Identifier
                 </th>
                 <th className="py-3 px-4 text-[10px] font-bold text-muted-foreground/40  opacity-60 text-center">
@@ -531,21 +531,21 @@ const InstructorEarnings = ({ saasAnalytics, fetchSaaSAnalytics, user }) => {
                     transition={{ delay: 0.05 * index }}
                     className="group hover:bg-[#fcf8f1]/50 transition-colors cursor-pointer"
                   >
-                    <td className="py-3.5 px-4 text-[11px] text-muted-foreground/60 font-bold ">
+                    <td className="hidden md:table-cell py-3.5 px-4 text-[11px] text-muted-foreground/60 font-bold ">
                       {new Date(payment.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="w-9 h-9 rounded-full bg-[#fcf8f1] border border-[#0d694f]/10 flex items-center justify-center text-[10px] font-bold text-[#0d694f] shadow-inner group-hover:rotate-6 transition-transform">
                           {payment.userName?.substring(0, 2).toUpperCase() ||
                             "??"}
                         </div>
-                        <span className="text-[13px] font-headline font-bold text-[#0d694f]  tracking-tight group-hover:text-[#ff7e5f] transition-colors">
+                        <span className="text-[13px] font-headline font-bold text-[#0d694f] tracking-tight group-hover:text-[#ff7e5f] transition-colors truncate">
                           {payment.userName}
                         </span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-[11px] font-medium text-muted-foreground italic group-hover:text-[#0d694f] transition-colors">
+                    <td className="hidden md:table-cell py-3.5 px-4 text-[11px] font-medium text-muted-foreground italic group-hover:text-[#0d694f] transition-colors">
                       {payment.courseTitle}
                     </td>
                     <td className="py-3.5 px-4 text-center">

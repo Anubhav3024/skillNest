@@ -502,7 +502,7 @@ const StudentViewCourseDetailsPage = () => {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 min-w-[260px]">
+                  <div className="grid grid-cols-2 gap-4 w-full sm:min-w-[260px]">
                     <div className="bg-white rounded-[1.8rem] border border-[#0d694f]/5 px-6 py-5 shadow-sm">
                       <div className="text-[10px] font-black tracking-wide text-[#ff7e5f]">Average Rating</div>
                       <div className="mt-2 flex items-center gap-3">
@@ -533,13 +533,13 @@ const StudentViewCourseDetailsPage = () => {
                   </div>
                </div>
                
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                 {reviews.length > 0 ? (
-                   reviews.map((review, index) => (
-                     <div key={index} className="bg-white p-10 rounded-[2.5rem] border border-[#0d694f]/5 shadow-sm relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-6 opacity-5">
-                           <Star className="h-12 w-12 text-[#ff7e5f]" />
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
+                  {reviews.length > 0 ? (
+                    reviews.map((review, index) => (
+                      <div key={index} className="bg-white p-6 sm:p-10 rounded-[2.5rem] border border-[#0d694f]/5 shadow-sm relative overflow-hidden group">
+                         <div className="absolute top-0 right-0 p-6 opacity-5">
+                            <Star className="h-12 w-12 text-[#ff7e5f]" />
+                         </div>
                         <div className="flex gap-1 mb-6">
                            {[...Array(5)].map((_, i) => (
                               <Star key={i} className={`h-4 w-4 ${i < review.rating ? "text-[#ff7e5f] fill-current" : "text-muted-foreground/20"}`} />

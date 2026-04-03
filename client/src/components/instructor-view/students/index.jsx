@@ -236,16 +236,16 @@ const InstructorStudents = ({ listOfCourses }) => {
        </motion.div>
 
       {/* Students Table */}
-      <div className="space-y-6">
-        <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-[#0d694f]/5 shadow-3d overflow-hidden">
-          <div className="overflow-x-auto">
+       <div className="space-y-6">
+         <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-[#0d694f]/5 shadow-3d overflow-hidden">
+          <div className="overflow-x-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#fcf8f1]">
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Scholar Identity</th>
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Access Permissions</th>
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Engagement Matrix</th>
-                  <th className="py-3 px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider text-center">Protocol</th>
+                  <th className="py-3 px-3 sm:px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Scholar Identity</th>
+                  <th className="hidden md:table-cell py-3 px-3 sm:px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Access Permissions</th>
+                  <th className="hidden md:table-cell py-3 px-3 sm:px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider">Engagement Matrix</th>
+                  <th className="py-3 px-3 sm:px-5 text-[10px] font-bold text-muted-foreground/40 tracking-wider text-center">Protocol</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#fcf8f1]">
@@ -259,21 +259,24 @@ const InstructorStudents = ({ listOfCourses }) => {
                       transition={{ delay: 0.05 * index }}
                       className="group hover:bg-[#fcf8f1]/50 transition-colors cursor-pointer"
                     >
-                      <td className="py-3.5 px-5">
-                        <div className="flex items-center gap-4">
+                      <td className="py-3.5 px-3 sm:px-5">
+                        <div className="flex items-center gap-4 min-w-0">
                             <div className="w-10 h-10 rounded-full bg-[#0d694f]/5 border border-[#0d694f]/10 flex items-center justify-center text-[#0d694f] shadow-inner group-hover:rotate-6 transition-transform hover:bg-[#ff7e5f]/10">
                               <User className="h-5 w-5" />
                             </div>
-                            <div>
-                               <div className="font-headline font-bold text-[#0d694f] text-[14px] tracking-tight group-hover:text-[#ff7e5f] transition-colors">{enrollment.studentName}</div>
-                              <div className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1.5 mt-0.5 italic opacity-60">
+                            <div className="min-w-0">
+                               <div className="font-headline font-bold text-[#0d694f] text-[14px] tracking-tight group-hover:text-[#ff7e5f] transition-colors truncate">{enrollment.studentName}</div>
+                              <div className="hidden sm:flex text-[11px] text-muted-foreground font-semibold items-center gap-1.5 mt-0.5 italic opacity-60">
                                   <Mail className="h-3 w-3" />
                                   {enrollment.studentEmail}
+                              </div>
+                              <div className="sm:hidden text-[10px] text-muted-foreground font-semibold italic opacity-60 truncate">
+                                {enrollment.studentEmail}
                               </div>
                             </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-5 max-w-xs">
+                      <td className="hidden md:table-cell py-3.5 px-3 sm:px-5 max-w-xs">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-[#0d694f]/5 flex items-center justify-center text-[#0d694f]">
                               <BookOpen className="h-4 w-4" />
@@ -283,7 +286,7 @@ const InstructorStudents = ({ listOfCourses }) => {
                             </span>
                          </div>
                        </td>
-                      <td className="py-3.5 px-5">
+                      <td className="hidden md:table-cell py-3.5 px-3 sm:px-5">
                         <div className="space-y-1">
                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0d694f]/80 tracking-wider italic">
                               <Calendar className="h-3.5 w-3.5" />
@@ -295,7 +298,7 @@ const InstructorStudents = ({ listOfCourses }) => {
                             </div>
                          </div>
                        </td>
-                       <td className="py-3.5 px-5 text-center">
+                       <td className="py-3.5 px-3 sm:px-5 text-center">
                         <span className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider border border-emerald-100/50 group-hover:bg-[#0d694f] group-hover:text-white transition-all">
                             {enrollment.status ? enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1).toLowerCase() : "Active"}
                         </span>
