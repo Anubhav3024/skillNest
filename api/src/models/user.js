@@ -85,7 +85,6 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-UserSchema.index({ userName: 1 }, { unique: true });
 UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
 UserSchema.index({ googleId: 1 }, { unique: true, sparse: true });
 
