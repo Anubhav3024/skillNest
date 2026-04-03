@@ -2,6 +2,9 @@
 
 SkillNest is an industrial-grade Learning Management System (LMS) designed to bridge the gap between fragmented learning resources and professional skill development. Built from scratch with a focus on modern UI/UX, real-time engagement, and high-performance data handling, SkillNest empowers both educators and learners through a unified, high-fidelity digital ecosystem.
 
+## Live Demo
+- https://skill-nest-two.vercel.app/
+
 ---
 
 ## Overview
